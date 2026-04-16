@@ -35,8 +35,8 @@ export default function MePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white pb-32">
-      {/* Top Teal Header Section */}
-      <div className="bg-primary pt-6 pb-20 px-6 relative flex flex-col items-center">
+      {/* Top Teal Header Section - Increased padding to prevent button overlap */}
+      <div className="bg-primary pt-6 pb-36 px-6 relative flex flex-col items-center">
         {/* Visitors Button - Top Right */}
         <button className="absolute top-4 right-6 flex flex-col items-center active:scale-95 transition-all z-10">
           <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 mb-1">
@@ -59,17 +59,17 @@ export default function MePage() {
         <h2 className="text-3xl font-black text-white mb-2 tracking-tight">{displayName}</h2>
         <p className="text-[10px] font-black text-white/70 uppercase tracking-[0.2em] mb-6">Verified Official Profile</p>
 
-        {/* ID Pill */}
+        {/* ID Pill - Positioned with safe space from floating cards */}
         <div 
           onClick={copyId}
-          className="flex items-center space-x-2 bg-white/20 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/10 cursor-pointer active:scale-95 transition-all group"
+          className="flex items-center space-x-2 bg-white/20 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/10 cursor-pointer active:scale-95 transition-all group z-10"
         >
           <span className="text-xs font-black text-white tracking-widest uppercase">ID: {profile.numericId}</span>
           <Copy className="w-3.5 h-3.5 text-white/60 group-hover:text-white transition-colors" />
         </div>
 
         {/* Floating White Balance Cards */}
-        <div className="absolute bottom-[-100px] left-0 right-0 px-6 grid grid-cols-2 gap-4">
+        <div className="absolute bottom-[-100px] left-0 right-0 px-6 grid grid-cols-2 gap-4 z-20">
           <div className="bg-white rounded-[2.5rem] p-6 flex flex-col items-center shadow-xl border border-gray-50 group">
             <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
               <Coins className="w-6 h-6 text-primary" />

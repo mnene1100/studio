@@ -10,29 +10,29 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen pb-32 bg-white">
-      {/* Top Teal Action Section - Reduced top padding */}
-      <div className="bg-primary pt-8 pb-10 px-6 rounded-b-[3.5rem] shadow-xl">
+      {/* Top Teal Action Section - Tightened spacing */}
+      <div className="bg-primary pt-4 pb-8 px-6 rounded-b-[3.5rem] shadow-xl">
         <div className="grid grid-cols-2 gap-5">
-          <div className="bg-white/20 backdrop-blur-md rounded-[3rem] flex flex-col items-center justify-center p-6 border border-white/20 active:scale-95 transition-all cursor-pointer h-48 shadow-lg group">
-            <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-[1.5rem] flex items-center justify-center mb-4 shadow-xl transform group-hover:rotate-6 transition-transform">
-               <HelpCircle className="w-12 h-12 text-white" />
+          <div className="bg-white/20 backdrop-blur-md rounded-[3rem] flex flex-col items-center justify-center p-6 border border-white/20 active:scale-95 transition-all cursor-pointer h-44 shadow-lg group">
+            <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-[1.25rem] flex items-center justify-center mb-3 shadow-xl transform group-hover:rotate-6 transition-transform">
+               <HelpCircle className="w-10 h-10 text-white" />
             </div>
-            <span className="text-white font-black text-xs tracking-[0.15em] uppercase text-center">Mystery Note</span>
+            <span className="text-white font-black text-[10px] tracking-[0.15em] uppercase text-center">Mystery Note</span>
           </div>
-          <div className="bg-white/20 backdrop-blur-md rounded-[3rem] flex flex-col items-center justify-center p-6 border border-white/20 active:scale-95 transition-all cursor-pointer h-48 shadow-lg group">
-            <div className="w-20 h-20 bg-gradient-to-br from-orange-300 to-yellow-500 rounded-[1.5rem] flex items-center justify-center mb-4 shadow-xl transform group-hover:-rotate-6 transition-transform">
-              <ClipboardCheck className="w-12 h-12 text-white" />
+          <div className="bg-white/20 backdrop-blur-md rounded-[3rem] flex flex-col items-center justify-center p-6 border border-white/20 active:scale-95 transition-all cursor-pointer h-44 shadow-lg group">
+            <div className="w-16 h-16 bg-gradient-to-br from-orange-300 to-yellow-500 rounded-[1.25rem] flex items-center justify-center mb-3 shadow-xl transform group-hover:-rotate-6 transition-transform">
+              <ClipboardCheck className="w-10 h-10 text-white" />
             </div>
-            <span className="text-white font-black text-xs tracking-[0.15em] uppercase text-center">Task Center</span>
+            <span className="text-white font-black text-[10px] tracking-[0.15em] uppercase text-center">Task Center</span>
           </div>
         </div>
       </div>
 
       {/* Recommended Section Header */}
-      <div className="px-6 py-6 flex items-center justify-between">
-        <h3 className="text-base font-black text-primary tracking-tighter uppercase italic">Recommended</h3>
-        <button className="w-10 h-10 bg-primary/20 flex items-center justify-center rounded-full active:rotate-180 transition-transform duration-700">
-          <RefreshCw className="w-5 h-5 text-primary" />
+      <div className="px-6 py-4 flex items-center justify-between">
+        <h3 className="text-sm font-black text-primary tracking-tighter uppercase italic">Recommended</h3>
+        <button className="w-8 h-8 bg-primary/20 flex items-center justify-center rounded-full active:rotate-180 transition-transform duration-700">
+          <RefreshCw className="w-4 h-4 text-primary" />
         </button>
       </div>
 
@@ -41,7 +41,7 @@ export default function HomePage() {
         {isUsersLoading ? (
           <div className="grid grid-cols-2 gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="aspect-[3/4.5] bg-muted rounded-[2.5rem] animate-pulse" />
+              <div key={i} className="aspect-[3/4.5] bg-muted rounded-[2rem] animate-pulse" />
             ))}
           </div>
         ) : discoveryUsers.length > 0 ? (
@@ -62,22 +62,22 @@ export default function HomePage() {
                 
                 {/* Chat Icon Top Right */}
                 <div className="absolute top-4 right-4">
-                  <div className="w-9 h-9 bg-white/40 backdrop-blur-md border border-white/40 rounded-full flex items-center justify-center shadow-lg">
-                    <MessageSquare className="w-4 h-4 text-white fill-white" />
+                  <div className="w-8 h-8 bg-white/40 backdrop-blur-md border border-white/40 rounded-full flex items-center justify-center shadow-lg">
+                    <MessageSquare className="w-3.5 h-3.5 text-white fill-white" />
                   </div>
                 </div>
 
                 <div className="absolute bottom-6 left-4 right-4">
-                  <h4 className="text-sm font-black text-white truncate drop-shadow-lg tracking-tight mb-3">
+                  <h4 className="text-[13px] font-black text-white truncate drop-shadow-lg tracking-tight mb-2">
                     {u.displayName || 'Guest_User'}
                   </h4>
                   
                   <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-black/80 flex items-center justify-center rounded-full border border-white/10">
-                      <span className="text-[10px] font-black text-white">26</span>
+                    <div className="w-7 h-7 bg-black/80 flex items-center justify-center rounded-full border border-white/10">
+                      <span className="text-[9px] font-black text-white">26</span>
                     </div>
-                    <div className="px-4 py-1 bg-primary text-white rounded-full shadow-lg shadow-primary/20">
-                      <span className="text-[10px] font-black uppercase tracking-widest">{u.country?.substring(0, 5) || 'KENYA'}</span>
+                    <div className="px-3 py-0.5 bg-primary text-white rounded-full shadow-lg shadow-primary/20">
+                      <span className="text-[9px] font-black uppercase tracking-widest">{u.country?.substring(0, 5) || 'KENYA'}</span>
                     </div>
                   </div>
                 </div>
