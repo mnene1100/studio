@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   ShieldCheck, Headset, ChevronRight, Copy, 
-  Eye, Pencil, Coins, Diamond, Settings
+  Eye, Pencil, Coins, Diamond, Settings, UserCheck
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useHomeData } from '../layout';
@@ -97,7 +97,7 @@ export default function MePage() {
         
         <h2 className="text-2xl font-black text-white mb-0.5 tracking-tight drop-shadow-sm">{displayName}</h2>
         <p className="text-[9px] font-black text-white/70 uppercase tracking-[0.2em] mb-3">
-          {profile.gender} • Verified Official Profile
+          {profile.gender} • {profile.isVerified ? 'Verified Official Profile' : 'Unverified Account'}
         </p>
 
         <div 
@@ -163,13 +163,13 @@ export default function MePage() {
         </div>
 
         <button 
-           onClick={() => router.push('/home/me/edit')}
+           onClick={() => router.push('/home/me/verify')}
            className="w-full flex items-center p-5 bg-primary rounded-[1.75rem] shadow-xl shadow-primary/20 active:scale-[0.98] transition-all group"
         >
           <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mr-4">
-            <Pencil className="w-6 h-6 text-white" />
+            <UserCheck className="w-6 h-6 text-white" />
           </div>
-          <span className="flex-1 text-left font-black text-white text-base tracking-tight">Edit Profile</span>
+          <span className="flex-1 text-left font-black text-white text-base tracking-tight">Verify Profile</span>
           <ChevronRight className="w-5 h-5 text-white/50" />
         </button>
 
