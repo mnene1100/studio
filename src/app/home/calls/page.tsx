@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo } from 'react';
@@ -38,10 +39,10 @@ function CallItem({ call }: { call: any }) {
   }, [call.status, isCaller]);
 
   return (
-    <div className="flex items-center px-4 py-4 rounded-[2rem] hover:bg-muted/50 transition-all group">
-      <Avatar className="w-14 h-14 ring-2 ring-muted shadow-sm">
-        <AvatarImage src={profile?.profilePictureUrl} />
-        <AvatarFallback className="bg-primary/10 text-primary font-black">
+    <div className="flex items-center px-4 py-4 rounded-[2rem] hover:bg-muted/50 transition-all group bg-card/50 shadow-sm mb-2 mx-2 border border-transparent">
+      <Avatar className="w-14 h-14 ring-2 ring-muted shadow-sm overflow-hidden">
+        <AvatarImage src={profile?.profilePictureUrl} className="object-cover rounded-full" />
+        <AvatarFallback className="bg-primary/10 text-primary font-black rounded-full">
           {profile?.displayName?.substring(0, 2).toUpperCase() || '??'}
         </AvatarFallback>
       </Avatar>
@@ -72,6 +73,7 @@ export default function CallsPage() {
 
   const callsQuery = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
+    // Note: The participantIds query works well with fully permissive rules or targeted list rules.
     return query(
       collection(db, 'calls'),
       where('participantIds', 'array-contains', user.uid),

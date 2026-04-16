@@ -23,7 +23,7 @@ function TransactionItem({ item }: { item: any }) {
       <div className="flex-1">
         <div className="flex items-center justify-between mb-0.5">
           <h3 className="font-black text-foreground text-sm tracking-tight capitalize">
-            {item.type.replace('_', ' ')}
+            {item.type.replace(/_/g, ' ')}
           </h3>
           <div className="flex items-center space-x-1">
             <Coins className="w-3 h-3 text-primary" />

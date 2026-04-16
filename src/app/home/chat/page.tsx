@@ -29,7 +29,7 @@ function ChatListItem({ chat }: { chat: any }) {
   return (
     <Link 
       href={`/home/chat/${otherParticipantId}`}
-      className="flex items-center px-4 py-4 rounded-[2.5rem] active:bg-accent/50 transition-all group border border-transparent mb-2 mx-2"
+      className="flex items-center px-4 py-4 rounded-[2.5rem] active:bg-accent/50 transition-all group border border-transparent mb-2 mx-2 bg-card/50 shadow-sm"
     >
       <div className="relative">
         <Avatar className="w-14 h-14 rounded-full border-none shadow-sm overflow-hidden">
