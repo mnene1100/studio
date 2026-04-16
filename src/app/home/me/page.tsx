@@ -7,7 +7,7 @@ import {
   ShieldCheck, Headset, ChevronRight, Copy, 
   Eye, Pencil, Coins, Diamond
 } from "lucide-react";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { useHomeData } from '../layout';
 
 export default function MePage() {
@@ -36,7 +36,7 @@ export default function MePage() {
   return (
     <div className="flex flex-col min-h-screen bg-white pb-32">
       {/* Top Teal Header Section */}
-      <div className="bg-primary pt-8 pb-48 px-6 relative flex flex-col items-center">
+      <div className="bg-primary pt-8 pb-56 px-6 relative flex flex-col items-center">
         {/* Visitors Button - Top Right */}
         <button className="absolute top-6 right-6 flex flex-col items-center active:scale-95 transition-all z-10">
           <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 mb-1 shadow-lg">
@@ -57,21 +57,21 @@ export default function MePage() {
         </div>
         
         <h2 className="text-3xl font-black text-white mb-2 tracking-tight drop-shadow-sm">{displayName}</h2>
-        <p className="text-[10px] font-black text-white/70 uppercase tracking-[0.2em] mb-10">
+        <p className="text-[10px] font-black text-white/70 uppercase tracking-[0.2em] mb-12">
           {profile.gender} • Verified Official Profile
         </p>
 
         {/* ID Pill */}
         <div 
           onClick={copyId}
-          className="flex items-center space-x-2 bg-white/20 backdrop-blur-md px-6 py-3 rounded-full border border-white/10 cursor-pointer active:scale-95 transition-all group z-30 shadow-lg"
+          className="flex items-center space-x-2 bg-white/20 backdrop-blur-md px-6 py-3 rounded-full border border-white/10 cursor-pointer active:scale-95 transition-all group z-30 shadow-lg mb-8"
         >
           <span className="text-xs font-black text-white tracking-widest uppercase">ID: {profile.numericId}</span>
           <Copy className="w-3.5 h-3.5 text-white/60 group-hover:text-white transition-colors" />
         </div>
 
         {/* Floating White Balance Cards */}
-        <div className="absolute bottom-[-90px] left-0 right-0 px-6 grid grid-cols-2 gap-4 z-20">
+        <div className="absolute bottom-[-100px] left-0 right-0 px-6 grid grid-cols-2 gap-4 z-20">
           <div className="bg-white rounded-[2.5rem] p-6 flex flex-col items-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-gray-50 group">
             <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
               <Coins className="w-6 h-6 text-primary" />
@@ -106,7 +106,10 @@ export default function MePage() {
           <div className="h-[1px] w-full bg-gray-100" />
         </div>
 
-        <button className="w-full flex items-center p-5 bg-blue-600 rounded-[1.75rem] shadow-xl shadow-blue-500/20 active:scale-[0.98] transition-all group">
+        <button 
+          onClick={() => router.push('/home/me/settings')}
+          className="w-full flex items-center p-5 bg-blue-600 rounded-[1.75rem] shadow-xl shadow-blue-500/20 active:scale-[0.98] transition-all group"
+        >
           <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mr-4">
             <ShieldCheck className="w-6 h-6 text-white" />
           </div>

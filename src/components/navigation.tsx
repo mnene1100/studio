@@ -28,7 +28,7 @@ export function Navigation() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 h-16 w-full bg-white border-t border-gray-100 flex items-center justify-around px-6 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] pb-safe">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 h-14 w-full bg-white border-t border-gray-100 flex items-center justify-around px-6 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] pb-safe">
       {navItems.map((item) => {
         const isActive = item.href === '/home' 
           ? pathname === '/home' 
