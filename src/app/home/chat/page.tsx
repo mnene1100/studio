@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MessageSquare, MessageCircle, Loader2 } from "lucide-react";
 import { useUser, useFirestore, useDoc, useMemoFirebase, useCollection } from '@/firebase';
-import { doc, collection, query, where, orderBy } from 'firebase/firestore';
+import { doc, collection, query, where } from 'firebase/firestore';
 
 function ChatListItem({ chat }: { chat: any }) {
   const { user } = useUser();
@@ -37,7 +37,7 @@ function ChatListItem({ chat }: { chat: any }) {
           </AvatarFallback>
         </Avatar>
         {isOnline && (
-          <div className="absolute top-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full" />
+          <div className="absolute top-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white" />
         )}
       </div>
       
@@ -62,18 +62,20 @@ export default function ChatListPage() {
   const { user } = useUser();
   const db = useFirestore();
 
-  // Screen-specific listener
+  // Simplified query: No OrderBy to avoid index requirement during prototype
   const chatsQuery = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
     return query(
-      collection(db, 'chatConversations'),
-      where('participantIds', 'array-contains', user.uid),
-      orderBy('updatedAt', 'desc')
+      collection(db, 'chatRooms'),
+      where('participantIds', 'array-contains', user.uid)
     );
   }, [db, user?.uid]);
   const { data: chats, isLoading: isChatsLoading } = useCollection(chatsQuery);
 
-  const filteredAndSortedChats = (chats || []).filter(chat => !!chat.lastMessageSentAt);
+  // Client-side sorting for reliability
+  const filteredAndSortedChats = (chats || [])
+    .filter(chat => !!chat.lastMessageSentAt)
+    .sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime());
 
   return (
     <div className="flex flex-col min-h-screen bg-white pb-32">

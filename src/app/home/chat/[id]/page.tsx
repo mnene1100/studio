@@ -34,13 +34,13 @@ export default function ChatDetailPage() {
   }, [db, id]);
   const { data: profile } = useDoc(targetUserRef);
 
-  // 2. Find or Create Chat Conversation
+  // 2. Find or Create Chat Room
   useEffect(() => {
     if (!db || !currentUser || !id) return;
 
     const findConversation = async () => {
       const q = query(
-        collection(db, 'chatConversations'),
+        collection(db, 'chatRooms'),
         where('participantIds', 'array-contains', currentUser.uid)
       );
       const querySnapshot = await getDocs(q);
@@ -55,7 +55,7 @@ export default function ChatDetailPage() {
 
       if (!found) {
         const newChatId = [currentUser.uid, id].sort().join('_');
-        const chatRef = doc(db, 'chatConversations', newChatId);
+        const chatRef = doc(db, 'chatRooms', newChatId);
         setDocumentNonBlocking(chatRef, {
           id: newChatId,
           type: 'private',
@@ -74,7 +74,7 @@ export default function ChatDetailPage() {
   const messagesQuery = useMemoFirebase(() => {
     if (!db || !chatId) return null;
     return query(
-      collection(db, 'chatConversations', chatId, 'messages'),
+      collection(db, 'chatRooms', chatId, 'messages'),
       orderBy('sentAt', 'asc'),
       limit(50)
     );
@@ -102,10 +102,10 @@ export default function ChatDetailPage() {
       type: 'text'
     };
 
-    const messagesColRef = collection(db, 'chatConversations', chatId, 'messages');
+    const messagesColRef = collection(db, 'chatRooms', chatId, 'messages');
     addDocumentNonBlocking(messagesColRef, messageData);
 
-    const chatRef = doc(db, 'chatConversations', chatId);
+    const chatRef = doc(db, 'chatRooms', chatId);
     updateDocumentNonBlocking(chatRef, {
       updatedAt: now,
       lastMessageSentAt: now,
@@ -175,7 +175,7 @@ export default function ChatDetailPage() {
                   <AvatarFallback className="bg-white/10 text-white font-bold text-xs">{initials}</AvatarFallback>
                 </Avatar>
                 {isOnline && (
-                  <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full border border-primary" />
+                  <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-primary" />
                 )}
               </div>
               <div className="flex flex-col">
@@ -227,7 +227,7 @@ export default function ChatDetailPage() {
         })}
       </div>
 
-      {/* Fixed Bottom Input Area - Reduced bottom padding */}
+      {/* Fixed Bottom Input Area */}
       <div className="bg-white border-t border-gray-100 flex-shrink-0 z-10 pb-4">
         <div className="px-6 py-4 flex flex-col space-y-3">
           {suggestions.length > 0 && (
