@@ -90,8 +90,11 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
 
   if (isAuthLoading || isProfileLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
-        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background premium-gradient">
+        <div className="flex flex-col items-center space-y-4 animate-in fade-in zoom-in duration-1000">
+          <h1 className="text-6xl text-white font-['Pacifico'] font-light tracking-tight">NEXO</h1>
+          <p className="text-white/40 font-black tracking-[0.4em] uppercase text-[10px] animate-pulse">Premium Communication</p>
+        </div>
       </div>
     );
   }
