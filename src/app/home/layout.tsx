@@ -87,7 +87,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
       isUsersLoading
     }}>
       <div className="min-h-screen bg-white relative">
-        <main className="max-w-md mx-auto min-h-screen pb-20">
+        <main className="max-w-md mx-auto min-h-screen">
           {children}
         </main>
         <Navigation />

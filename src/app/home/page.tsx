@@ -49,7 +49,7 @@ export default function HomePage() {
             {discoveryUsers.map((u) => (
               <Link 
                 key={u.id} 
-                href={`/home/chat/${u.id}`}
+                href={`/home/profile/${u.id}`}
                 className="group relative aspect-[3/4] overflow-hidden rounded-[2.5rem] shadow-2xl active:scale-[0.98] transition-all"
               >
                 <img 
