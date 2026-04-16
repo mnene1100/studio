@@ -22,7 +22,7 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen pb-32 bg-background">
-      {/* Top Teal Section - Straight & Shorter */}
+      {/* Scrollable Header Area */}
       <div className="teal-gradient pt-12 pb-8 px-6 rounded-none shadow-xl">
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-white/10 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center p-4 border border-white/20 active:scale-95 transition-all cursor-pointer h-24 shadow-sm">
@@ -40,15 +40,15 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div className="px-6 mt-8 space-y-6">
-        {/* Recommended Header */}
-        <div className="flex items-center justify-between">
-          <h3 className="text-base font-black text-foreground/80 tracking-tight">Recommended</h3>
-          <button className="p-2.5 bg-primary/10 text-primary rounded-full active:rotate-180 transition-transform duration-500">
-            <RefreshCw className="w-5 h-5" />
-          </button>
-        </div>
+      {/* Sticky Recommended Header */}
+      <div className="sticky top-0 z-30 teal-gradient px-6 py-4 flex items-center justify-between shadow-md border-t border-white/10">
+        <h3 className="text-base font-black text-white tracking-tight uppercase">Recommended</h3>
+        <button className="p-2 bg-white/20 text-white rounded-full active:rotate-180 transition-transform duration-500 backdrop-blur-md border border-white/20">
+          <RefreshCw className="w-4 h-4" />
+        </button>
+      </div>
 
+      <div className="px-6 mt-6 space-y-6">
         {/* Discovery Grid */}
         {isUsersLoading ? (
           <div className="grid grid-cols-2 gap-4">
