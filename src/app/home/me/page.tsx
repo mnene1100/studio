@@ -25,11 +25,16 @@ export default function MePage() {
 
   const copyId = () => {
     if (profile?.numericId) {
-      navigator.clipboard.writeText(profile.numericId);
-      toast({
-        title: "Copied ID",
-        description: `ID ${profile.numericId} is ready to share.`,
-      });
+      // In a real environment, navigator.clipboard might require a secure context
+      try {
+        navigator.clipboard.writeText(profile.numericId);
+        toast({
+          title: "Copied ID",
+          description: `ID ${profile.numericId} is ready to share.`,
+        });
+      } catch (err) {
+        console.error('Failed to copy: ', err);
+      }
     }
   };
 
@@ -47,7 +52,7 @@ export default function MePage() {
   return (
     <div className="flex flex-col min-h-screen bg-black pb-32">
       {/* Top Teal Section */}
-      <div className="bg-primary pt-12 pb-8 px-6 relative rounded-none shadow-lg flex flex-col items-center">
+      <div className="bg-primary pt-12 pb-8 px-6 relative flex flex-col items-center shadow-lg">
         {/* Visitors Button (Top Right) */}
         <button className="absolute top-6 right-6 flex flex-col items-center space-y-1 group active:scale-95 transition-all">
           <div className="p-2 bg-white/20 backdrop-blur-md rounded-full border border-white/30">
@@ -56,13 +61,13 @@ export default function MePage() {
           <span className="text-[9px] font-black text-white/70 uppercase tracking-widest">Visitors</span>
         </button>
 
-        {/* Balance & Earnings Cards at the Top */}
+        {/* Recharge & Income Cards at the Top */}
         <div className="grid grid-cols-2 gap-4 w-full mb-8 mt-4">
           <div className="bg-white/10 backdrop-blur-md rounded-[2rem] p-4 flex flex-col items-center text-center border border-white/20 shadow-sm active:scale-95 transition-all cursor-pointer h-24 justify-center">
             <div className="p-2 bg-white/20 rounded-xl mb-1">
               <Coins className="w-4 h-4 text-white" />
             </div>
-            <p className="text-[8px] font-black text-white/70 uppercase tracking-widest mb-0.5">Balance</p>
+            <p className="text-[8px] font-black text-white/70 uppercase tracking-widest mb-0.5">Recharge</p>
             <h3 className="text-xl font-black text-white">500</h3>
           </div>
 
@@ -70,12 +75,12 @@ export default function MePage() {
             <div className="p-2 bg-white/20 rounded-xl mb-1">
               <Diamond className="w-4 h-4 text-white" />
             </div>
-            <p className="text-[8px] font-black text-white/70 uppercase tracking-widest mb-0.5">Earnings</p>
+            <p className="text-[8px] font-black text-white/70 uppercase tracking-widest mb-0.5">Income</p>
             <h3 className="text-xl font-black text-white">0</h3>
           </div>
         </div>
 
-        {/* Profile Avatar (Above Name) */}
+        {/* Profile Avatar */}
         <div className="relative mb-4">
           <Avatar className="w-24 h-24 border-4 border-white/20 ring-4 ring-black/5 shadow-2xl">
             <AvatarImage src={profile.profilePictureUrl} />
@@ -88,7 +93,7 @@ export default function MePage() {
         
         <h2 className="text-xl font-black text-white mb-2 tracking-tight">{displayName}</h2>
 
-        {/* ID Pill (Below Avatar/Name) */}
+        {/* ID Pill */}
         <div 
           onClick={copyId}
           className="flex items-center space-x-2 bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 cursor-pointer active:scale-95 transition-all mb-4"
