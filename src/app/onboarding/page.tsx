@@ -46,7 +46,6 @@ export default function OnboardingPage() {
   const router = useRouter();
   const db = useFirestore();
 
-  // Calculate the maximum allowed date (18 years ago from today)
   const maxDate = useMemo(() => {
     const today = new Date();
     const year = today.getFullYear() - 18;
@@ -64,7 +63,6 @@ export default function OnboardingPage() {
   const handleCompleteOnboarding = () => {
     if (!user || !country || !gender) return;
 
-    // For anonymous users, we generate random name and DOB > 18
     let finalName = name;
     let finalDob = dob;
 
@@ -72,14 +70,12 @@ export default function OnboardingPage() {
       const randomName = RANDOM_NAMES[Math.floor(Math.random() * RANDOM_NAMES.length)] + "_" + Math.floor(Math.random() * 1000);
       finalName = randomName;
       
-      // Generate DOB at least 18 years ago
       const currentYear = new Date().getFullYear();
       const birthYear = currentYear - 18 - Math.floor(Math.random() * 30);
       const birthMonth = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
       const birthDay = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
       finalDob = `${birthYear}-${birthMonth}-${birthDay}`;
     } else if (!name || !dob) {
-      // Email users must have these filled
       return;
     }
 
@@ -95,20 +91,14 @@ export default function OnboardingPage() {
       createdAt: new Date().toISOString(),
       lastOnlineAt: new Date().toISOString(),
       statusMessage: "Hey there! I'm using NEXO.",
-      balance: 500, // Giving new users 500 free coins
+      balance: 500,
       earnings: 0,
       isVerified: false,
     };
 
     const userRef = doc(db, 'userProfiles', user.uid);
-    
-    // Save to Firestore
     setDocumentNonBlocking(userRef, profileData, { merge: true });
-    
-    // Set persistence flag immediately to stop redirect loop
     localStorage.setItem('nexo_profile_completed', 'true');
-    
-    // Navigate home
     router.push('/home');
   };
 
@@ -159,7 +149,7 @@ export default function OnboardingPage() {
                   <Input 
                     id="display-name" 
                     placeholder="Name" 
-                    className="bg-white/5 border-white/5 h-12 rounded-2xl focus:ring-primary/20"
+                    className="bg-white/5 border-white/5 h-12 rounded-2xl focus:ring-primary/20 text-white"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
@@ -171,9 +161,10 @@ export default function OnboardingPage() {
                     id="dob" 
                     type="date"
                     max={maxDate}
-                    className="bg-white/5 border-white/5 h-12 rounded-2xl focus:ring-primary/20 text-white"
+                    className="bg-white/5 border-white/5 h-12 rounded-2xl focus:ring-primary/20 text-white appearance-none"
                     value={dob}
                     onChange={(e) => setDob(e.target.value)}
+                    style={{ colorScheme: 'dark' }}
                   />
                 </div>
               </>
@@ -215,9 +206,13 @@ export default function OnboardingPage() {
                 <SelectTrigger className="bg-white/5 border-white/5 h-12 rounded-2xl focus:ring-primary/20 text-white">
                   <SelectValue placeholder="Select Country" />
                 </SelectTrigger>
-                <SelectContent className="bg-card border-white/10 text-white rounded-2xl">
+                <SelectContent className="bg-[#1a1a1a] border-white/10 text-white rounded-2xl shadow-2xl">
                   {EAST_AFRICAN_COUNTRIES.map((c) => (
-                    <SelectItem key={c} value={c} className="focus:bg-primary/20 focus:text-primary cursor-pointer rounded-xl">
+                    <SelectItem 
+                      key={c} 
+                      value={c} 
+                      className="py-3 px-4 focus:bg-primary/20 focus:text-primary cursor-pointer rounded-xl font-medium"
+                    >
                       {c}
                     </SelectItem>
                   ))}

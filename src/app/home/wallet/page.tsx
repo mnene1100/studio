@@ -128,7 +128,7 @@ export default function WalletPage() {
                   <SelectValue />
                 </div>
               </SelectTrigger>
-              <SelectContent className="bg-white rounded-[2rem] border-none shadow-2xl p-2">
+              <SelectContent className="bg-white rounded-[2rem] border border-gray-100 shadow-2xl p-2 z-[60]">
                 <SelectItem value="kenya" className="py-4 font-black text-xs uppercase tracking-widest rounded-2xl focus:bg-primary/10 focus:text-primary">Kenya (KES)</SelectItem>
                 <SelectItem value="uganda" className="py-4 font-black text-xs uppercase tracking-widest rounded-2xl focus:bg-primary/10 focus:text-primary">Uganda (UGX)</SelectItem>
                 <SelectItem value="tanzania" className="py-4 font-black text-xs uppercase tracking-widest rounded-2xl focus:bg-primary/10 focus:text-primary">Tanzania (TZS)</SelectItem>
