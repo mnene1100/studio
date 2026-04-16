@@ -192,8 +192,8 @@ export default function UserProfilePage() {
         </div>
       </div>
 
-      {/* Profile Details Area */}
-      <div className="px-6 -mt-12 bg-white rounded-t-[3rem] relative z-10 pt-8 flex-1">
+      {/* Profile Details Area - Edges made straight by removing rounded class */}
+      <div className="px-6 -mt-12 bg-white relative z-10 pt-8 flex-1">
         {/* Status Indicator */}
         <div className="mb-3">
           <div className={`inline-flex items-center px-3 py-1 rounded-full border ${isOnline ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
