@@ -47,6 +47,14 @@
           "type": "string",
           "description": "A custom status message."
         },
+        "balance": {
+          "type": "number",
+          "description": "The user's current coin balance."
+        },
+        "earnings": {
+          "type": "number",
+          "description": "The user's total earnings."
+        },
         "lastOnlineAt": {
           "type": "string",
           "description": "Timestamp indicating the last time the user was online.",

@@ -7,7 +7,7 @@ import {
   ShieldCheck, Headset, ChevronRight, Copy, 
   Eye, Pencil, Coins, Diamond
 } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/use-toast";
 import { useHomeData } from '../layout';
 
 export default function MePage() {
@@ -77,7 +77,7 @@ export default function MePage() {
               <Coins className="w-6 h-6 text-primary" />
             </div>
             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Balance</p>
-            <h3 className="text-3xl font-black text-gray-900 mb-6 tracking-tight">500</h3>
+            <h3 className="text-3xl font-black text-gray-900 mb-6 tracking-tight">{profile.balance ?? 0}</h3>
             <button className="w-full py-3 bg-primary text-white rounded-full text-xs font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-primary/20">
               Recharge
             </button>
@@ -88,7 +88,7 @@ export default function MePage() {
               <Diamond className="w-6 h-6 text-blue-500" />
             </div>
             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Earnings</p>
-            <h3 className="text-3xl font-black text-gray-900 mb-6 tracking-tight">0</h3>
+            <h3 className="text-3xl font-black text-gray-900 mb-6 tracking-tight">{profile.earnings ?? 0}</h3>
             <button className="w-full py-3 bg-black text-white rounded-full text-xs font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg">
               Income
             </button>

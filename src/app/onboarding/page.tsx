@@ -86,6 +86,8 @@ export default function OnboardingPage() {
       createdAt: new Date().toISOString(),
       lastOnlineAt: new Date().toISOString(),
       statusMessage: "Hey there! I'm using NEXO.",
+      balance: 500, // Giving new users 500 free coins
+      earnings: 0,
     };
 
     const userRef = doc(db, 'userProfiles', user.uid);
