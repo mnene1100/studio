@@ -194,7 +194,6 @@ export default function CallPage() {
 
         if (tracks.length > 0) await agoraClientRef.current.publish(tracks);
         setJoined(true);
-        setStatusMessage('Calling...');
       } catch (error: any) {
         setErrorMessage(error.message || 'CONNECTION_FAILED');
       }
@@ -235,8 +234,13 @@ export default function CallPage() {
 
   const toggleCamera = async () => {
     if (localVideoTrackRef.current) {
-      await localVideoTrackRef.current.setEnabled(!cameraOn);
-      setCameraOn(!cameraOn);
+      const newState = !cameraOn;
+      await localVideoTrackRef.current.setEnabled(newState);
+      setCameraOn(newState);
+      // Re-trigger play if re-enabling camera to ensure video is visible
+      if (newState && localVideoRef.current) {
+        localVideoTrackRef.current.play(localVideoRef.current);
+      }
     }
   };
 
@@ -313,11 +317,13 @@ export default function CallPage() {
         )}
       </div>
 
-      {callType === 'video' && cameraOn && (
+      {/* Local Video View - Always present in DOM if callType is video to prevent track release */}
+      {callType === 'video' && (
         <div 
           className={cn(
             "absolute z-40 transition-all duration-500 rounded-[2.5rem] overflow-hidden border-4 border-white/20 shadow-2xl bg-black ring-8 ring-black/50 aspect-square",
-            isMinimized ? "bottom-44 right-6 w-32 h-32" : "top-24 right-6 w-56 h-56"
+            isMinimized ? "bottom-44 right-6 w-32 h-32" : "top-24 right-6 w-64 h-64",
+            !cameraOn && "opacity-0 pointer-events-none" // Hide instead of unmount to preserve ref
           )}
           ref={localVideoRef}
           onClick={() => setIsMinimized(!isMinimized)}
