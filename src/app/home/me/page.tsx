@@ -17,13 +17,11 @@ export default function MePage() {
   const { user, auth } = useUser();
   const db = useFirestore();
 
-  // Memoize document reference for Firestore hook
   const userRef = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
     return doc(db, 'userProfiles', user.uid);
   }, [db, user?.uid]);
 
-  // Fetch real-time profile data from Firestore
   const { data: profile, isLoading } = useDoc(userRef);
 
   const handleLogout = async () => {
@@ -41,8 +39,8 @@ export default function MePage() {
     if (profile?.numericId) {
       navigator.clipboard.writeText(profile.numericId);
       toast({
-        title: "Copied to clipboard",
-        description: `NEXO ID ${profile.numericId} copied successfully.`,
+        title: "Copied ID",
+        description: `NEXO ID ${profile.numericId} is ready to share.`,
       });
     }
   };
@@ -55,78 +53,80 @@ export default function MePage() {
 
   if (!profile) return null;
 
-  // Extremely safe initials extraction to prevent crash
-  // Uses displayName from schema as per backend.json
-  const displayName = profile.displayName || profile.name || "";
+  const displayName = profile.displayName || "";
   const initials = displayName.length > 0 ? displayName[0].toUpperCase() : '?';
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-background">
-      <header className="px-6 pt-12 pb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight text-white">Profile</h1>
-        <Button variant="ghost" size="icon" className="rounded-full bg-white/5">
+      <header className="glass-header px-6 pt-14 pb-6 flex items-center justify-between">
+        <h1 className="text-4xl font-black tracking-tighter text-white">Profile</h1>
+        <button className="p-3 bg-white/5 rounded-[1.25rem] active:scale-90 transition-all">
           <Settings className="w-5 h-5 text-muted-foreground" />
-        </Button>
+        </button>
       </header>
 
-      <div className="px-6 flex flex-col items-center mb-10">
-        <div className="relative mb-6">
-          <Avatar className="w-28 h-28 border-4 border-accent ring-8 ring-accent/5">
-            <AvatarImage src={profile.profilePictureUrl} />
-            <AvatarFallback className="bg-secondary text-2xl font-bold">{initials}</AvatarFallback>
-          </Avatar>
-          <div className="absolute bottom-1 right-1 p-2 bg-primary rounded-xl shadow-xl shadow-primary/40">
-            <QrCode className="w-5 h-5 text-white" />
+      <div className="flex-1 overflow-y-auto pb-32">
+        <div className="px-6 flex flex-col items-center py-10">
+          <div className="relative mb-6">
+            <div className="p-1 rounded-full bg-gradient-to-tr from-primary to-accent">
+              <Avatar className="w-32 h-32 border-4 border-background">
+                <AvatarImage src={profile.profilePictureUrl} />
+                <AvatarFallback className="bg-secondary text-3xl font-black">{initials}</AvatarFallback>
+              </Avatar>
+            </div>
+            <div className="absolute bottom-1 right-1 p-2.5 bg-primary rounded-[1.25rem] shadow-2xl shadow-primary/40 active:scale-90 transition-transform cursor-pointer">
+              <QrCode className="w-5 h-5 text-white" />
+            </div>
           </div>
-        </div>
-        <h2 className="text-2xl font-bold text-white mb-1">{displayName}</h2>
-        
-        {/* NEXO ID Display */}
-        <div 
-          onClick={copyId}
-          className="flex items-center space-x-2 bg-white/5 px-4 py-2 rounded-2xl cursor-pointer hover:bg-white/10 transition-all border border-white/5 active:scale-95"
-        >
-          <span className="text-[10px] uppercase font-bold tracking-widest text-accent">NEXO ID</span>
-          <span className="text-lg font-mono font-medium text-white tracking-wider">
-            {profile.numericId || '--------'}
-          </span>
-          <Copy className="w-3.5 h-3.5 text-muted-foreground" />
-        </div>
-      </div>
-
-      <div className="px-4 space-y-2 flex-1 overflow-y-auto pb-6">
-        <div className="bg-card/40 rounded-3xl p-2 border border-white/5">
-          {[
-            { label: 'Security & Privacy', icon: Shield, color: 'text-blue-400' },
-            { label: 'Notifications', icon: Bell, color: 'text-orange-400' },
-            { label: 'Help & Feedback', icon: HelpCircle, color: 'text-green-400' },
-          ].map((item, i) => (
-            <button 
-              key={i} 
-              className="w-full flex items-center p-4 rounded-2xl hover:bg-white/5 transition-all group"
-            >
-              <div className={`p-2 rounded-xl bg-white/5 mr-4`}>
-                <item.icon className={`w-5 h-5 ${item.color}`} />
-              </div>
-              <span className="flex-1 text-left text-sm font-medium text-white">{item.label}</span>
-              <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-white transition-all" />
-            </button>
-          ))}
+          <h2 className="text-3xl font-black text-white mb-2 tracking-tight">{displayName}</h2>
+          
+          <button 
+            onClick={copyId}
+            className="flex items-center space-x-3 bg-card/60 px-5 py-3 rounded-[1.5rem] border border-white/5 active:scale-95 transition-all shadow-xl"
+          >
+            <span className="text-[10px] uppercase font-black tracking-[0.2em] text-accent">NEXO ID</span>
+            <span className="text-xl font-mono font-bold text-white tracking-widest">
+              {profile.numericId}
+            </span>
+            <Copy className="w-4 h-4 text-muted-foreground" />
+          </button>
         </div>
 
-        <button 
-          onClick={handleLogout}
-          className="w-full flex items-center p-4 rounded-3xl hover:bg-destructive/10 text-destructive transition-all mt-4 border border-destructive/5"
-        >
-          <div className="p-2 rounded-xl bg-destructive/10 mr-4">
-            <LogOut className="w-5 h-5" />
+        <div className="px-4 space-y-6">
+          <div className="bg-card/40 rounded-[2.5rem] p-3 border border-white/5">
+            {[
+              { label: 'Security & Privacy', icon: Shield, color: 'text-blue-400', bg: 'bg-blue-400/10' },
+              { label: 'Notifications', icon: Bell, color: 'text-orange-400', bg: 'bg-orange-400/10' },
+              { label: 'Help & Feedback', icon: HelpCircle, color: 'text-green-400', bg: 'bg-green-400/10' },
+            ].map((item, i) => (
+              <button 
+                key={i} 
+                className="w-full flex items-center p-4 rounded-[1.75rem] active:bg-white/5 transition-all group mb-1 last:mb-0"
+              >
+                <div className={`p-3 rounded-2xl ${item.bg} mr-4`}>
+                  <item.icon className={`w-5 h-5 ${item.color}`} />
+                </div>
+                <span className="flex-1 text-left text-base font-bold text-white">{item.label}</span>
+                <ChevronRight className="w-5 h-5 text-muted-foreground/40 group-active:translate-x-1 transition-all" />
+              </button>
+            ))}
           </div>
-          <span className="flex-1 text-left text-sm font-semibold">Log Out</span>
-        </button>
-      </div>
 
-      <div className="p-8 text-center bg-background/80 backdrop-blur-xl">
-        <p className="text-[10px] text-muted-foreground uppercase tracking-[0.2em]">NEXO PREMIUM v1.0.4</p>
+          <button 
+            onClick={handleLogout}
+            className="w-full flex items-center p-5 rounded-[2.5rem] active:bg-destructive/10 text-destructive border border-destructive/10 transition-all"
+          >
+            <div className="p-3 rounded-2xl bg-destructive/10 mr-4">
+              <LogOut className="w-5 h-5" />
+            </div>
+            <span className="flex-1 text-left text-base font-black">Sign Out of Nexo</span>
+          </button>
+        </div>
+
+        <div className="mt-12 mb-10 text-center px-6">
+          <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.4em]">Nexo Premium v1.0.4</p>
+          <p className="text-[9px] text-muted-foreground/30 mt-2 font-bold">Securely Hosted in East Africa</p>
+        </div>
       </div>
     </div>
   );
