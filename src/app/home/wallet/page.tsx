@@ -21,7 +21,7 @@ import { createPesapalOrder } from '@/app/actions/pesapal';
 import { toast } from '@/hooks/use-toast';
 
 const PACKAGES = [
-  { id: 'pkg_0', coins: "25", price: 5, currency: "KES", label: "Ksh 5", badge: "Trial" },
+  { id: 'pkg_0', coins: "25", price: 3, currency: "KES", label: "Ksh 3", badge: "Trial" },
   { id: 'pkg_1', coins: "500", price: 70, currency: "KES", label: "Ksh 70", badge: "Best Seller" },
   { id: 'pkg_2', coins: "1,000", price: 120, currency: "KES", label: "Ksh 120" },
   { id: 'pkg_3', coins: "2,000", price: 240, currency: "KES", label: "Ksh 240" },
@@ -73,7 +73,7 @@ export default function WalletPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white pb-24">
-      {/* Seamless Header */}
+      {/* Seamless Header - No Shadow/Border */}
       <header className="bg-primary safe-top sticky top-0 z-50">
         <div className="px-4 h-16 flex items-center justify-between">
           <Button 
@@ -115,11 +115,10 @@ export default function WalletPage() {
               <span className="text-[8px] font-black text-primary uppercase tracking-widest italic">Coins</span>
             </div>
           </div>
-          {/* Decorative elements to make it feel premium */}
           <div className="absolute top-0 right-0 w-24 h-24 bg-primary/20 blur-3xl rounded-full -mr-12 -mt-12" />
         </div>
 
-        {/* Region Selector - Extra Compact */}
+        {/* Region Selector */}
         <div className="max-w-[40%]">
           <label className="text-[7px] font-black text-muted-foreground uppercase tracking-widest mb-1 block px-1">Region</label>
           <Select defaultValue="kenya">
@@ -137,7 +136,7 @@ export default function WalletPage() {
           </Select>
         </div>
 
-        {/* Packages Grid - Compact */}
+        {/* Packages Grid */}
         <div className="space-y-2">
           <div className="flex items-center justify-between px-1">
             <h3 className="text-[7px] font-black text-muted-foreground uppercase tracking-widest">Select Package</h3>
@@ -183,7 +182,7 @@ export default function WalletPage() {
           </div>
         </div>
 
-        {/* Vendors Link - Compact */}
+        {/* Vendors Link */}
         <div className="bg-gray-50 rounded-[1.25rem] p-2.5 flex items-center justify-between border border-gray-50">
           <div className="flex items-center space-x-2">
             <div className="w-7 h-7 bg-white rounded-lg shadow-sm flex items-center justify-center">
