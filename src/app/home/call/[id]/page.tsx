@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { 
   PhoneOff, Mic, MicOff, Video, VideoOff, 
-  Volume2, VolumeX, Maximize2, Minimize2, AlertCircle, Loader2
+  Volume2, VolumeX, Maximize2, Minimize2, AlertCircle
 } from "lucide-react";
 import { useFirestore, useDoc, useMemoFirebase, useUser, setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase';
 import { doc, updateDoc, increment, getDoc } from 'firebase/firestore';
@@ -34,7 +34,7 @@ export default function CallPage() {
   const [isMinimized, setIsMinimized] = useState(false);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [statusMessage, setStatusMessage] = useState('Initializing Secure Line...');
+  const [statusMessage, setStatusMessage] = useState('Calling...');
 
   const localVideoRef = useRef<HTMLDivElement>(null);
   const agoraClientRef = useRef<any>(null);
@@ -56,7 +56,6 @@ export default function CallPage() {
     router.back();
   };
 
-  // Billing logic: Only deduct when remote user connects (the call is "answered")
   useEffect(() => {
     const isCallConnected = remoteUsers.length > 0;
     if (!isCallConnected || !currentUser || !db || billingIntervalRef.current) return;
@@ -81,7 +80,6 @@ export default function CallPage() {
       try {
         await updateDoc(userRef, { balance: increment(-costPerMin) });
         
-        // Record billing transaction in history
         const billingId = `bill_${Date.now()}_${currentUser.uid}`;
         setDocumentNonBlocking(doc(db, 'transactions', billingId), {
           id: billingId,
@@ -100,11 +98,9 @@ export default function CallPage() {
       }
     };
 
-    // First minute deduction happens immediately upon remote user join (answer)
     if (!isBilledForFirstMinRef.current) {
       isBilledForFirstMinRef.current = true;
       deductCoins();
-      // Then start the interval for subsequent minutes
       billingIntervalRef.current = setInterval(deductCoins, 60000);
     }
 
@@ -157,7 +153,6 @@ export default function CallPage() {
         });
 
         const channelName = [currentUser.uid, targetUserId].sort().join('_');
-        setStatusMessage('Requesting Hardware...');
         
         try {
           const audioTrack = await AgoraRTC.createMicrophoneAudioTrack({ AEC: true, ANS: true, AGC: true });
@@ -171,14 +166,12 @@ export default function CallPage() {
           return;
         }
 
-        setStatusMessage('Authenticating...');
         const result = await getAgoraToken(channelName, currentUser.uid);
         if (result.error || !result.token) {
           setErrorMessage(result.error || 'TOKEN_NOT_RECEIVED');
           return;
         }
 
-        setStatusMessage('Joining...');
         await agoraClientRef.current.join(appId, channelName, result.token, currentUser.uid);
 
         const callId = `${currentUser.uid}_${targetUserId}_${Date.now()}`;
@@ -314,7 +307,6 @@ export default function CallPage() {
                 <p className="text-[11px] font-black text-primary uppercase tracking-[0.4em] animate-pulse">
                   {remoteUsers.length > 0 ? 'Connected' : statusMessage}
                 </p>
-                {remoteUsers.length === 0 && !errorMessage && <Loader2 className="w-6 h-6 text-white/20 animate-spin mt-4" />}
               </div>
             </div>
           </div>
@@ -325,7 +317,7 @@ export default function CallPage() {
         <div 
           className={cn(
             "absolute z-40 transition-all duration-500 rounded-[2.5rem] overflow-hidden border-4 border-white/20 shadow-2xl bg-black ring-8 ring-black/50 aspect-square",
-            isMinimized ? "bottom-44 right-6 w-32 h-32" : "top-24 right-6 w-48 h-48"
+            isMinimized ? "bottom-44 right-6 w-32 h-32" : "top-24 right-6 w-56 h-56"
           )}
           ref={localVideoRef}
           onClick={() => setIsMinimized(!isMinimized)}
@@ -345,7 +337,7 @@ export default function CallPage() {
             remoteUsers.length > 0 ? "bg-green-500 shadow-green-500/50 animate-pulse" : "bg-orange-500 shadow-orange-500/50"
           )} />
           <span className="text-[9px] font-black text-white uppercase tracking-[0.3em]">
-            {remoteUsers.length > 0 ? (callType === 'video' ? 'Live Encrypted' : 'Voice Secure') : 'Waiting...'}
+            {remoteUsers.length > 0 ? (callType === 'video' ? 'Live Encrypted' : 'Voice Secure') : 'Calling...'}
           </span>
         </div>
       </div>
