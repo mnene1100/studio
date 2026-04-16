@@ -1,8 +1,8 @@
+
 const CACHE_NAME = 'nexo-v1';
 const ASSETS_TO_CACHE = [
   '/',
-  '/manifest.json',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'
+  '/manifest.json'
 ];
 
 self.addEventListener('install', (event) => {

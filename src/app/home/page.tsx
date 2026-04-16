@@ -3,23 +3,24 @@
 
 import { useHomeData } from './layout';
 import { HelpCircle, ClipboardCheck, RefreshCw, MessageSquare } from "lucide-react";
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function HomePage() {
   const { discoveryUsers, isUsersLoading } = useHomeData();
+  const router = useRouter();
 
   return (
     <div className="flex flex-col min-h-screen pb-32 bg-white">
       {/* Top Teal Action Section - Tightened spacing */}
       <div className="bg-primary pt-2 pb-4 px-6 rounded-b-[3.5rem] shadow-xl">
         <div className="grid grid-cols-2 gap-5 mb-6">
-          <div className="bg-white/20 backdrop-blur-md rounded-[3rem] flex flex-col items-center justify-center p-6 border border-white/20 active:scale-95 transition-all cursor-pointer h-40 shadow-lg group">
+          <div className="bg-white/20 backdrop-blur-md rounded-[3rem] flex flex-col items-center justify-center p-6 border border-white/20 transition-all cursor-pointer h-40 shadow-lg group">
             <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-[1.25rem] flex items-center justify-center mb-3 shadow-xl transform group-hover:rotate-6 transition-transform">
                <HelpCircle className="w-8 h-8 text-white" />
             </div>
             <span className="text-white font-black text-[9px] tracking-[0.15em] uppercase text-center">Mystery Note</span>
           </div>
-          <div className="bg-white/20 backdrop-blur-md rounded-[3rem] flex flex-col items-center justify-center p-6 border border-white/20 active:scale-95 transition-all cursor-pointer h-40 shadow-lg group">
+          <div className="bg-white/20 backdrop-blur-md rounded-[3rem] flex flex-col items-center justify-center p-6 border border-white/20 transition-all cursor-pointer h-40 shadow-lg group">
             <div className="w-14 h-14 bg-gradient-to-br from-orange-300 to-yellow-500 rounded-[1.25rem] flex items-center justify-center mb-3 shadow-xl transform group-hover:-rotate-6 transition-transform">
               <ClipboardCheck className="w-8 h-8 text-white" />
             </div>
@@ -47,10 +48,10 @@ export default function HomePage() {
         ) : discoveryUsers.length > 0 ? (
           <div className="grid grid-cols-2 gap-3 pb-6">
             {discoveryUsers.map((u) => (
-              <Link 
+              <div 
                 key={u.id} 
-                href={`/home/profile/${u.id}`}
-                className="group relative aspect-[3/4] overflow-hidden rounded-[2.5rem] shadow-2xl active:scale-[0.98] transition-all"
+                onClick={() => router.push(`/home/profile/${u.id}`)}
+                className="group relative aspect-[3/4] overflow-hidden rounded-[2.5rem] shadow-2xl transition-all cursor-pointer"
               >
                 <img 
                   src={u.profilePictureUrl || `https://picsum.photos/seed/${u.id}/600/900`} 
@@ -60,12 +61,18 @@ export default function HomePage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
                 
-                {/* Chat Icon Top Right */}
-                <div className="absolute top-4 right-4">
-                  <div className="w-8 h-8 bg-white/40 backdrop-blur-md border border-white/40 rounded-full flex items-center justify-center shadow-lg">
-                    <MessageSquare className="w-3.5 h-3.5 text-white fill-white" />
+                {/* Independent Chat Button */}
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.push(`/home/chat/${u.id}`);
+                  }}
+                  className="absolute top-4 right-4 z-20"
+                >
+                  <div className="w-9 h-9 bg-white/40 backdrop-blur-md border border-white/40 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform">
+                    <MessageSquare className="w-4 h-4 text-white fill-white" />
                   </div>
-                </div>
+                </button>
 
                 <div className="absolute bottom-5 left-4 right-4">
                   <h4 className="text-[13px] font-black text-white truncate drop-shadow-lg tracking-tight mb-2">
@@ -81,7 +88,7 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         ) : (
