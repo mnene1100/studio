@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +46,15 @@ export default function OnboardingPage() {
   const router = useRouter();
   const db = useFirestore();
 
+  // Calculate the maximum allowed date (18 years ago from today)
+  const maxDate = useMemo(() => {
+    const today = new Date();
+    const year = today.getFullYear() - 18;
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }, []);
+
   useEffect(() => {
     if (!isUserLoading && !user) {
       router.push('/login');
@@ -88,6 +97,7 @@ export default function OnboardingPage() {
       statusMessage: "Hey there! I'm using NEXO.",
       balance: 500, // Giving new users 500 free coins
       earnings: 0,
+      isVerified: false,
     };
 
     const userRef = doc(db, 'userProfiles', user.uid);
@@ -156,10 +166,11 @@ export default function OnboardingPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="dob" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Birth Date</Label>
+                  <Label htmlFor="dob" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Birth Date (Min 18 Years)</Label>
                   <Input 
                     id="dob" 
                     type="date"
+                    max={maxDate}
                     className="bg-white/5 border-white/5 h-12 rounded-2xl focus:ring-primary/20 text-white"
                     value={dob}
                     onChange={(e) => setDob(e.target.value)}
