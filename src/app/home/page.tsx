@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useHomeData } from './layout';
@@ -13,7 +14,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen pb-32 bg-background">
       {/* Top Section - Structural teal header with extra top space */}
-      <div className="bg-primary safe-top px-5 pb-8 pt-12 shadow-lg">
+      <div className="bg-primary safe-top px-5 pb-8 pt-20 shadow-lg">
         <div className="grid grid-cols-2 gap-4 mt-6">
           <div className="bg-white/20 backdrop-blur-md rounded-[1.75rem] flex flex-col items-center justify-center p-5 border border-white/20 transition-all cursor-pointer h-36 shadow-lg group active:scale-95">
             <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-2xl flex items-center justify-center mb-2 shadow-xl transform group-hover:rotate-6 transition-transform">
@@ -78,9 +79,9 @@ export default function HomePage() {
                     }}
                     className="absolute top-4 right-4 z-20"
                   >
-                    <div className="bg-[#D9FF00] px-4 py-2 rounded-[1.2rem] flex items-center justify-center shadow-lg active:scale-90 transition-transform">
-                      <MessageSquare className="w-4 h-4 text-black fill-black mr-1" />
-                      <span className="text-[10px] font-black text-black uppercase italic">Chat</span>
+                    <div className="bg-primary px-4 py-2 rounded-[1.2rem] flex items-center justify-center shadow-lg active:scale-90 transition-transform">
+                      <MessageSquare className="w-4 h-4 text-white fill-white mr-1" />
+                      <span className="text-[10px] font-black text-white uppercase italic">Chat</span>
                     </div>
                   </button>
 
@@ -89,20 +90,20 @@ export default function HomePage() {
                       <h4 className="text-[14px] font-black text-white truncate drop-shadow-md tracking-tight">
                         {u.displayName?.toLowerCase() || 'guest_user'}
                       </h4>
-                      <UserCheck className="w-4 h-4 text-[#D9FF00] fill-[#D9FF00]" />
+                      <UserCheck className="w-4 h-4 text-primary fill-primary" />
                     </div>
                     
                     <div className="flex flex-wrap gap-1.5">
                       {/* Gender/Age Badge */}
-                      <div className="px-2.5 py-0.5 bg-[#00FFFF] rounded-full flex items-center space-x-1">
-                        <span className="text-[8px] font-black text-black uppercase tracking-tighter">
+                      <div className="px-2 py-0 bg-primary/20 backdrop-blur-sm rounded-full flex items-center space-x-1 border border-primary/30">
+                        <span className="text-[8px] font-black text-white uppercase tracking-tighter px-1.5">
                           {u.gender === 'Female' ? '♀' : '♂'} {age}
                         </span>
                       </div>
                       
                       {/* Country Badge */}
-                      <div className="px-2.5 py-0.5 bg-[#D9FF00] rounded-full">
-                        <span className="text-[8px] font-black text-black uppercase tracking-widest">
+                      <div className="px-2 py-0 bg-primary/20 backdrop-blur-sm rounded-full border border-primary/30">
+                        <span className="text-[8px] font-black text-white uppercase tracking-widest px-1.5">
                           {u.country?.substring(0, 5) || 'Kenya'}
                         </span>
                       </div>
