@@ -31,12 +31,16 @@ export default function SettingsPage() {
     if (!auth) return;
     try {
       await signOut(auth);
-      // Clean up all persistence flags
-      localStorage.removeItem('nexo_profile_completed');
-      localStorage.removeItem('nexo_profile');
-      router.push('/login');
-    } catch (error) {
-      console.error("Logout failed", error);
+      // Clear ALL persistence flags to ensure fresh start
+      localStorage.clear(); 
+      // Force navigation to the welcome (login) screen
+      router.replace('/login');
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Logout failed",
+        description: error.message || "An unexpected error occurred.",
+      });
     }
   };
 
@@ -47,73 +51,71 @@ export default function SettingsPage() {
       await deleteDoc(userProfileRef);
       await deleteUser(user);
       
-      localStorage.removeItem('nexo_profile_completed');
-      localStorage.removeItem('nexo_profile');
+      localStorage.clear();
       toast({
         title: "Account Deleted",
         description: "Your data has been removed from the NEXO network.",
       });
-      router.push('/login');
+      router.replace('/login');
     } catch (error: any) {
-      console.error("Delete failed", error);
       toast({
         variant: "destructive",
         title: "Re-authentication required",
-        description: "For security, please sign out and sign in again before deleting your account.",
+        description: "Please sign out and back in before deleting your account.",
       });
     }
   };
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-background">
-      <header className="glass-header px-4 h-20 flex items-center space-x-2">
-        <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-full">
+    <div className="flex flex-col h-screen overflow-hidden bg-black">
+      <header className="px-4 h-16 flex items-center space-x-2 border-b border-white/5">
+        <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-full text-white">
           <ChevronLeft className="w-6 h-6" />
         </Button>
-        <h1 className="text-xl font-bold text-white tracking-tight">Settings</h1>
+        <h1 className="text-lg font-black text-white tracking-tighter uppercase italic">Settings</h1>
       </header>
 
       <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
-        <div className="bg-card/40 rounded-[2.5rem] p-3 border border-white/5">
-          <h3 className="px-4 py-2 text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/40">Account Actions</h3>
+        <div className="bg-white/5 rounded-[2rem] p-3 border border-white/5">
+          <h3 className="px-4 py-2 text-[8px] uppercase font-black tracking-[0.3em] text-white/30">Account Management</h3>
           
           <button 
             onClick={handleLogout}
-            className="w-full flex items-center p-4 rounded-[1.75rem] active:bg-white/5 transition-all group mb-1"
+            className="w-full flex items-center p-4 rounded-[1.5rem] active:bg-white/5 transition-all group mb-1"
           >
-            <div className="p-3 rounded-2xl bg-white/5 mr-4">
-              <LogOut className="w-5 h-5 text-muted-foreground" />
+            <div className="p-2.5 rounded-xl bg-white/5 mr-4">
+              <LogOut className="w-4 h-4 text-white/60" />
             </div>
-            <span className="flex-1 text-left text-base font-bold text-white">Sign Out</span>
-            <ChevronRight className="w-5 h-5 text-muted-foreground/40" />
+            <span className="flex-1 text-left text-sm font-black text-white uppercase tracking-tight">Sign Out</span>
+            <ChevronRight className="w-4 h-4 text-white/10" />
           </button>
 
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <button 
-                className="w-full flex items-center p-4 rounded-[1.75rem] active:bg-destructive/10 transition-all group"
+                className="w-full flex items-center p-4 rounded-[1.5rem] active:bg-destructive/10 transition-all group"
               >
-                <div className="p-3 rounded-2xl bg-destructive/10 mr-4">
-                  <Trash2 className="w-5 h-5 text-destructive" />
+                <div className="p-2.5 rounded-xl bg-destructive/10 mr-4">
+                  <Trash2 className="w-4 h-4 text-destructive" />
                 </div>
-                <span className="flex-1 text-left text-base font-bold text-destructive">Delete Account</span>
-                <ChevronRight className="w-5 h-5 text-destructive/40" />
+                <span className="flex-1 text-left text-sm font-black text-destructive uppercase tracking-tight">Delete Account</span>
+                <ChevronRight className="w-4 h-4 text-destructive/20" />
               </button>
             </AlertDialogTrigger>
-            <AlertDialogContent className="bg-card border-white/10 text-white rounded-[2rem] max-w-sm">
+            <AlertDialogContent className="bg-card border-white/10 text-white rounded-[2rem] max-w-[300px]">
               <AlertDialogHeader>
-                <AlertDialogTitle className="text-xl font-bold">Are you sure?</AlertDialogTitle>
-                <AlertDialogDescription className="text-muted-foreground">
-                  This action is permanent. Your profile and chat history will be deleted and cannot be recovered.
+                <AlertDialogTitle className="text-lg font-black uppercase tracking-tight">Confirm Deletion</AlertDialogTitle>
+                <AlertDialogDescription className="text-xs font-medium text-white/40 leading-relaxed">
+                  This action is permanent. All chat history and profile data will be erased from our secure servers.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter className="mt-4 gap-2">
-                <AlertDialogCancel className="bg-white/5 border-none text-white hover:bg-white/10 rounded-2xl">Cancel</AlertDialogCancel>
+                <AlertDialogCancel className="bg-white/5 border-none text-white/60 hover:bg-white/10 rounded-xl text-xs font-black uppercase">Cancel</AlertDialogCancel>
                 <AlertDialogAction 
                   onClick={handleDeleteAccount}
-                  className="bg-destructive text-white hover:bg-destructive/90 rounded-2xl font-bold"
+                  className="bg-destructive text-white hover:bg-destructive/90 rounded-xl text-xs font-black uppercase"
                 >
-                  Delete Account
+                  Delete
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

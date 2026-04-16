@@ -28,7 +28,7 @@ export function Navigation() {
   ];
 
   return (
-    <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[85%] max-w-[320px] h-12 bg-black/90 backdrop-blur-3xl border border-white/10 rounded-full shadow-2xl flex items-center justify-around px-4">
+    <nav className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 w-[70%] max-w-[240px] h-11 bg-black/80 backdrop-blur-2xl border border-white/5 rounded-full shadow-2xl flex items-center justify-around px-2">
       {navItems.map((item) => {
         const isActive = item.href === '/home' 
           ? pathname === '/home' 
@@ -39,8 +39,8 @@ export function Navigation() {
             key={item.href} 
             href={item.href}
             className={cn(
-              "flex flex-col items-center justify-center transition-all duration-300 relative",
-              isActive ? "text-primary" : "text-muted-foreground/40"
+              "flex flex-col items-center justify-center transition-all duration-300",
+              isActive ? "text-primary" : "text-white/20"
             )}
           >
             <item.icon 
@@ -49,12 +49,6 @@ export function Navigation() {
                 isActive ? "stroke-[2.5px] scale-110" : "stroke-[2px]"
               )} 
             />
-            <span className={cn(
-              "text-[7px] font-black tracking-widest uppercase mt-0.5",
-              isActive ? "opacity-100" : "opacity-0 h-0"
-            )}>
-              {item.label}
-            </span>
           </Link>
         );
       })}
