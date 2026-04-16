@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -19,7 +18,6 @@ export default function LoginPage() {
   const auth = useAuth();
   const { user } = useUser();
 
-  // If user is already authenticated, send them to the entry check
   useEffect(() => {
     if (user) {
       router.push('/');
@@ -113,18 +111,29 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-background premium-gradient relative overflow-hidden">
-      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/20 blur-[120px] rounded-full" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-accent/20 blur-[120px] rounded-full" />
+    <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-black relative overflow-hidden">
+      {/* Background Video */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover z-0"
+      >
+        <source src="/background.mp4" type="video/mp4" />
+      </video>
+
+      {/* Dark Overlay for Readability */}
+      <div className="absolute inset-0 bg-black/50 z-1" />
 
       <div className="w-full max-w-sm space-y-16 text-center z-10">
         <div className="space-y-6 animate-in fade-in zoom-in duration-700">
-          <div className="mx-auto w-24 h-24 bg-accent rounded-[2rem] flex items-center justify-center shadow-2xl shadow-accent/30 rotate-12 transition-transform hover:rotate-0 duration-500">
-            <Zap className="text-accent-foreground w-12 h-12" />
+          <div className="mx-auto w-24 h-24 bg-primary rounded-[2rem] flex items-center justify-center shadow-2xl shadow-primary/30 rotate-12 transition-transform hover:rotate-0 duration-500">
+            <Zap className="text-white w-12 h-12" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-6xl font-black tracking-tighter text-white">NEXO</h1>
-            <p className="text-muted-foreground font-semibold tracking-[0.2em] uppercase text-[10px] opacity-70">
+            <h1 className="text-6xl font-black tracking-tighter text-white italic">NEXO</h1>
+            <p className="text-white/70 font-black tracking-[0.3em] uppercase text-[10px]">
               Premium Communication
             </p>
           </div>
@@ -136,24 +145,24 @@ export default function LoginPage() {
               <Button 
                 onClick={() => setIsEmailVisible(true)}
                 disabled={isLoading}
-                className="w-full h-16 bg-white text-black hover:bg-white/90 font-bold rounded-2xl text-lg flex items-center justify-center group shadow-xl"
+                className="w-full h-16 bg-white text-black hover:bg-white/90 font-black rounded-2xl text-lg flex items-center justify-center group shadow-xl uppercase tracking-widest"
               >
                 <Mail className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
-                Continue with Email
+                Email Login
               </Button>
 
               <Button 
                 variant="ghost"
                 onClick={handleFastLogin}
                 disabled={isLoading}
-                className="w-full h-16 text-accent hover:text-accent hover:bg-accent/10 font-bold rounded-2xl text-lg flex items-center justify-center group"
+                className="w-full h-16 text-white hover:text-white hover:bg-white/10 font-black rounded-2xl text-lg flex items-center justify-center group uppercase tracking-widest"
               >
                 {isLoading ? (
                   <Loader2 className="mr-3 h-5 w-5 animate-spin" />
                 ) : (
-                  <Zap className="mr-3 h-5 w-5 fill-accent/20 group-hover:scale-110 transition-transform" />
+                  <Zap className="mr-3 h-5 w-5 fill-white/20 group-hover:scale-110 transition-transform" />
                 )}
-                Fast Guest Login
+                Fast Guest
               </Button>
             </div>
           ) : (
@@ -161,11 +170,11 @@ export default function LoginPage() {
               <form onSubmit={handleSignIn} className="space-y-4 text-left">
                 <div className="space-y-3">
                   <div className="relative group">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-accent transition-colors" />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50 group-focus-within:text-primary transition-colors" />
                     <Input 
                       type="email" 
                       placeholder="Email address" 
-                      className="pl-12 h-14 bg-white/5 border-white/10 rounded-2xl text-white placeholder:text-muted-foreground/50 focus-visible:ring-accent/50 focus-visible:border-accent/50"
+                      className="pl-12 h-14 bg-white/10 border-white/10 rounded-2xl text-white placeholder:text-white/30 focus-visible:ring-primary/50 focus-visible:border-primary/50"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -173,11 +182,11 @@ export default function LoginPage() {
                     />
                   </div>
                   <div className="relative group">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-accent transition-colors" />
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50 group-focus-within:text-primary transition-colors" />
                     <Input 
                       type="password" 
                       placeholder="Password" 
-                      className="pl-12 h-14 bg-white/5 border-white/10 rounded-2xl text-white placeholder:text-muted-foreground/50 focus-visible:ring-accent/50 focus-visible:border-accent/50"
+                      className="pl-12 h-14 bg-white/10 border-white/10 rounded-2xl text-white placeholder:text-white/30 focus-visible:ring-primary/50 focus-visible:border-primary/50"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
@@ -190,7 +199,7 @@ export default function LoginPage() {
                   <Button 
                     type="submit" 
                     disabled={isLoading}
-                    className="w-full h-14 bg-accent text-accent-foreground hover:bg-accent/90 font-bold rounded-2xl shadow-lg shadow-accent/20"
+                    className="w-full h-14 bg-primary text-white hover:bg-primary/90 font-black rounded-2xl shadow-lg shadow-primary/20 uppercase tracking-widest"
                   >
                     {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Sign In"}
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -201,17 +210,17 @@ export default function LoginPage() {
                     variant="outline"
                     onClick={handleSignUp}
                     disabled={isLoading}
-                    className="w-full h-14 border-white/10 bg-white/5 text-white hover:bg-white/10 font-bold rounded-2xl"
+                    className="w-full h-14 border-white/10 bg-white/5 text-white hover:bg-white/10 font-black rounded-2xl uppercase tracking-widest"
                   >
                     <UserPlus className="mr-2 h-5 w-5" />
-                    Create New Account
+                    New Account
                   </Button>
 
                   <Button 
                     type="button"
                     variant="ghost"
                     onClick={() => setIsEmailVisible(false)}
-                    className="text-muted-foreground text-xs h-auto p-0 mx-auto"
+                    className="text-white/40 text-[10px] h-auto p-0 mx-auto font-black uppercase tracking-[0.3em]"
                     disabled={isLoading}
                   >
                     Back to options
@@ -223,8 +232,8 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="absolute bottom-12 text-[9px] text-muted-foreground/40 font-bold tracking-[0.4em] uppercase">
-        Encrypted & Secure Ecosystem
+      <div className="absolute bottom-12 text-[9px] text-white/20 font-black tracking-[0.5em] uppercase z-10">
+        Secure Communication Ecosystem
       </div>
     </div>
   );
