@@ -14,24 +14,21 @@ export function Navigation() {
       label: 'Home', 
       icon: Home, 
       href: '/home',
-      activeColor: "text-red-500"
     },
     { 
       label: 'Chats', 
       icon: MessageCircle, 
       href: '/home/chat',
-      activeColor: "text-blue-400"
     },
     { 
       label: 'You', 
       icon: User, 
       href: '/home/me',
-      activeColor: "text-pink-300"
     },
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 h-24 bg-white border-t border-gray-100 flex items-center justify-around px-6">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 h-20 bg-white border-t border-gray-100 flex items-center justify-around px-8">
       {navItems.map((item) => {
         const isActive = item.href === '/home' 
           ? pathname === '/home' 
@@ -44,18 +41,18 @@ export function Navigation() {
             className="flex flex-col items-center justify-center space-y-1 group"
           >
             <div className={cn(
-              "p-2 rounded-2xl transition-all duration-300",
+              "transition-all duration-300 mb-0.5",
               isActive ? "scale-110" : "opacity-40"
             )}>
               <item.icon 
                 className={cn(
-                  "w-7 h-7", 
-                  isActive ? "text-primary fill-primary/20" : "text-gray-400"
+                  "w-6 h-6", 
+                  isActive ? "text-red-400 fill-red-400/10" : "text-gray-400"
                 )} 
               />
             </div>
             <span className={cn(
-              "text-[10px] font-black uppercase tracking-widest transition-colors",
+              "text-[9px] font-black uppercase tracking-widest transition-colors",
               isActive ? "text-primary" : "text-gray-300"
             )}>
               {item.label}

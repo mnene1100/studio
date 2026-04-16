@@ -10,8 +10,8 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen pb-32 bg-white">
-      {/* Top Teal Action Section */}
-      <div className="bg-primary pt-12 pb-10 px-6 rounded-b-[3.5rem] shadow-xl">
+      {/* Top Teal Action Section - Reduced top padding */}
+      <div className="bg-primary pt-8 pb-10 px-6 rounded-b-[3.5rem] shadow-xl">
         <div className="grid grid-cols-2 gap-5">
           <div className="bg-white/20 backdrop-blur-md rounded-[3rem] flex flex-col items-center justify-center p-6 border border-white/20 active:scale-95 transition-all cursor-pointer h-48 shadow-lg group">
             <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-[1.5rem] flex items-center justify-center mb-4 shadow-xl transform group-hover:rotate-6 transition-transform">
