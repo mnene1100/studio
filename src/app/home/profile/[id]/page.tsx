@@ -31,11 +31,11 @@ export default function UserProfilePage() {
   const { data: profile, isLoading } = useDoc(userRef);
 
   const calculateAge = (dob: string) => {
-    if (!dob) return 26; // Default fallback
+    if (!dob) return null;
     try {
       return differenceInYears(new Date(), new Date(dob));
     } catch (e) {
-      return 26;
+      return null;
     }
   };
 
@@ -74,6 +74,7 @@ export default function UserProfilePage() {
   if (!profile) return null;
 
   const age = calculateAge(profile.dob);
+  const hasInformation = profile.createdAt || profile.country || profile.gender;
 
   return (
     <div className="flex flex-col min-h-screen bg-white relative pb-40">
@@ -148,7 +149,7 @@ export default function UserProfilePage() {
               {profile.displayName || "Guest_User"}
             </h1>
             <p className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">
-              {profile.gender} • {age} Years Old
+              {profile.gender} {age ? `• ${age} Years Old` : ''}
             </p>
           </div>
           <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
@@ -177,24 +178,28 @@ export default function UserProfilePage() {
            </p>
         </div>
 
-        {/* User Information Section */}
-        <div className="space-y-6">
-          <h3 className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em]">Information</h3>
-          
-          <div className="grid grid-cols-1 gap-4">
-            <div className="bg-white border border-gray-100 rounded-[2.5rem] p-6 flex items-center shadow-sm hover:shadow-md transition-shadow">
-              <div className="w-14 h-14 bg-primary/5 rounded-2xl flex items-center justify-center mr-5">
-                <Calendar className="w-7 h-7 text-primary" />
-              </div>
-              <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Member Since</p>
-                <h4 className="text-lg font-black text-gray-900 tracking-tight">
-                  {new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()}
-                </h4>
-              </div>
+        {/* User Information Section - Conditional */}
+        {hasInformation && (
+          <div className="space-y-6">
+            <h3 className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em]">Information</h3>
+            
+            <div className="grid grid-cols-1 gap-4">
+              {profile.createdAt && (
+                <div className="bg-white border border-gray-100 rounded-[2.5rem] p-6 flex items-center shadow-sm hover:shadow-md transition-shadow">
+                  <div className="w-14 h-14 bg-primary/5 rounded-2xl flex items-center justify-center mr-5">
+                    <Calendar className="w-7 h-7 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Member Since</p>
+                    <h4 className="text-lg font-black text-gray-900 tracking-tight">
+                      {new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()}
+                    </h4>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* FIXED BOTTOM ACTION BAR */}
