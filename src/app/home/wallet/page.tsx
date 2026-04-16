@@ -68,25 +68,27 @@ export default function WalletPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white pb-32">
-      <header className="bg-primary px-4 h-16 flex items-center justify-between shadow-sm sticky top-0 z-40">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={() => router.back()} 
-          className="w-9 h-9 bg-white/10 hover:bg-white/20 text-white rounded-full"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </Button>
-        
-        <h1 className="text-sm font-black text-white tracking-widest uppercase italic">Wallet</h1>
+      <header className="bg-primary safe-top shadow-sm sticky top-0 z-40">
+        <div className="px-4 h-16 flex items-center justify-between">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => router.back()} 
+            className="w-9 h-9 bg-white/10 hover:bg-white/20 text-white rounded-full"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </Button>
+          
+          <h1 className="text-sm font-black text-white tracking-widest uppercase italic">Wallet</h1>
 
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="w-9 h-9 bg-white/10 hover:bg-white/20 text-white rounded-full"
-        >
-          <History className="w-4 h-4" />
-        </Button>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="w-9 h-9 bg-white/10 hover:bg-white/20 text-white rounded-full"
+          >
+            <History className="w-4 h-4" />
+          </Button>
+        </div>
       </header>
 
       <div className="p-6">

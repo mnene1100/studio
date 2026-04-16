@@ -22,7 +22,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import Image from 'next/image';
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -69,17 +68,19 @@ export default function SettingsPage() {
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-[#F9FAFB]">
-      {/* Teal Header exactly as in screenshot */}
-      <header className="bg-primary px-4 h-20 flex items-center justify-center relative shadow-md">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={() => router.back()} 
-          className="absolute left-4 w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10"
-        >
-          <ChevronLeft className="w-6 h-6" />
-        </Button>
-        <h1 className="text-xl font-black text-white tracking-[0.2em] uppercase">Settings</h1>
+      {/* Teal Header with Safe Top */}
+      <header className="bg-primary safe-top relative shadow-md">
+        <div className="px-4 h-20 flex items-center justify-center">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => router.back()} 
+            className="absolute left-4 w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </Button>
+          <h1 className="text-xl font-black text-white tracking-[0.2em] uppercase">Settings</h1>
+        </div>
       </header>
 
       <div className="flex-1 overflow-y-auto px-6 py-10 space-y-4 pb-20">

@@ -12,8 +12,8 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen pb-32 bg-white">
-      <div className="bg-primary pt-2 pb-6 px-5 rounded-b-[2.5rem] shadow-lg">
-        <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="bg-primary safe-top pb-6 px-5 rounded-b-[2.5rem] shadow-lg">
+        <div className="grid grid-cols-2 gap-4 mb-6 pt-2">
           <div className="bg-white/20 backdrop-blur-md rounded-3xl flex flex-col items-center justify-center p-5 border border-white/20 transition-all cursor-pointer h-36 shadow-lg group">
             <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-2xl flex items-center justify-center mb-2 shadow-xl transform group-hover:rotate-6 transition-transform">
                <HelpCircle className="w-6 h-6 text-white" />
@@ -40,7 +40,7 @@ export default function HomePage() {
         {isUsersLoading ? (
           <div className="grid grid-cols-2 gap-3">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="aspect-[3/4.2] bg-muted rounded-2xl animate-pulse" />
+              <div key={i} className="aspect-[3/4.6] bg-muted rounded-2xl animate-pulse" />
             ))}
           </div>
         ) : discoveryUsers.length > 0 ? (
@@ -52,7 +52,7 @@ export default function HomePage() {
                 <div 
                   key={u.id} 
                   onClick={() => router.push(`/home/profile/${u.id}`)}
-                  className="group relative aspect-[3/4.2] overflow-hidden rounded-2xl shadow-xl transition-all cursor-pointer bg-gray-50 border border-gray-100"
+                  className="group relative aspect-[3/4.6] overflow-hidden rounded-[1.25rem] shadow-xl transition-all cursor-pointer bg-gray-50 border border-gray-100"
                 >
                   <Image 
                     src={u.profilePictureUrl || `https://picsum.photos/seed/${u.id}/600/900`} 
@@ -78,13 +78,13 @@ export default function HomePage() {
                     }}
                     className="absolute top-3 right-3 z-20"
                   >
-                    <div className="w-8 h-8 bg-white/30 backdrop-blur-md border border-white/30 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform">
-                      <MessageSquare className="w-3.5 h-3.5 text-white fill-white" />
+                    <div className="w-9 h-9 bg-white/30 backdrop-blur-md border border-white/30 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform">
+                      <MessageSquare className="w-4 h-4 text-white fill-white" />
                     </div>
                   </button>
 
                   <div className="absolute bottom-4 left-3 right-3">
-                    <h4 className="text-[12px] font-black text-white truncate drop-shadow-lg tracking-tight mb-1.5">
+                    <h4 className="text-[13px] font-black text-white truncate drop-shadow-lg tracking-tight mb-1.5">
                       {u.displayName || 'Guest_User'}
                     </h4>
                     

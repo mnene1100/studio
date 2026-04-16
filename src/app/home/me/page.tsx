@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRouter } from 'next/navigation';
@@ -35,10 +36,10 @@ export default function MePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white pb-32">
-      {/* Top Teal Header Section */}
-      <div className="bg-primary pt-8 pb-32 px-6 relative flex flex-col items-center">
+      {/* Top Teal Header Section with Safe Top */}
+      <div className="bg-primary safe-top pb-32 px-6 relative flex flex-col items-center">
         {/* Visitors Button - Top Right */}
-        <button className="absolute top-6 right-6 flex flex-col items-center active:scale-95 transition-all z-10">
+        <button className="absolute top-6 right-6 flex flex-col items-center active:scale-95 transition-all z-10 safe-top">
           <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 mb-1 shadow-lg">
             <Eye className="w-5 h-5 text-white" />
           </div>
@@ -46,7 +47,7 @@ export default function MePage() {
         </button>
 
         {/* Profile Avatar */}
-        <div className="relative mb-4 mt-2">
+        <div className="relative mb-4 mt-6">
           <div className="w-28 h-28 relative rounded-full overflow-hidden border-4 border-white/20 shadow-2xl bg-white/10">
             {profile.profilePictureUrl ? (
               <Image 

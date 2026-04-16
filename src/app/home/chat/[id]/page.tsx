@@ -168,59 +168,61 @@ export default function ChatDetailPage() {
 
   return (
     <div className="flex flex-col h-screen bg-white">
-      <header className="bg-primary px-4 h-20 flex items-center justify-between shadow-md relative z-20">
-        <div className="flex items-center space-x-2">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => router.back()} 
-            className="w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </Button>
-          
-          <div className="flex items-center space-x-3">
-            <div className="relative">
-              <Avatar className="w-10 h-10 border border-white/20">
-                <AvatarImage src={profile?.profilePictureUrl} />
-                <AvatarFallback className="bg-white/10 text-white font-bold">{initials}</AvatarFallback>
-              </Avatar>
-              {isOnline && (
-                <div className="absolute top-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-primary" />
-              )}
-            </div>
-            <div className="flex flex-col">
-              <h3 className="text-sm font-black text-white leading-tight tracking-tight">{displayName}</h3>
-              <span className="text-[9px] font-black text-white/70 uppercase tracking-widest">{lastSeenText}</span>
+      <header className="bg-primary safe-top px-4 shadow-md relative z-20">
+        <div className="h-20 flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => router.back()} 
+              className="w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </Button>
+            
+            <div className="flex items-center space-x-3">
+              <div className="relative">
+                <Avatar className="w-10 h-10 border border-white/20">
+                  <AvatarImage src={profile?.profilePictureUrl} />
+                  <AvatarFallback className="bg-white/10 text-white font-bold">{initials}</AvatarFallback>
+                </Avatar>
+                {isOnline && (
+                  <div className="absolute top-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-primary" />
+                )}
+              </div>
+              <div className="flex flex-col">
+                <h3 className="text-sm font-black text-white leading-tight tracking-tight">{displayName}</h3>
+                <span className="text-[9px] font-black text-white/70 uppercase tracking-widest">{lastSeenText}</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="flex items-center space-x-2">
-          <Button variant="ghost" size="icon" className="w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10">
-            <Phone className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10">
-            <Video className="w-4 h-4" />
-          </Button>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="ghost" size="icon" className="w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10" onClick={handleGetSummary}>
-                <Sparkles className="w-4 h-4" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-white border-none rounded-[2rem] max-w-xs shadow-2xl">
-              <DialogHeader>
-                <DialogTitle className="flex items-center text-primary font-black uppercase tracking-widest text-xs">
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Chat Analysis
-                </DialogTitle>
-              </DialogHeader>
-              <div className="py-2 text-[13px] text-gray-500 font-medium leading-relaxed">
-                {isSummaryLoading ? "AI is analyzing..." : summary || "Get a summary of your conversation."}
-              </div>
-            </DialogContent>
-          </Dialog>
+          <div className="flex items-center space-x-2">
+            <Button variant="ghost" size="icon" className="w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10">
+              <Phone className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="icon" className="w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10">
+              <Video className="w-4 h-4" />
+            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="icon" className="w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10" onClick={handleGetSummary}>
+                  <Sparkles className="w-4 h-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-white border-none rounded-[2rem] max-w-xs shadow-2xl">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center text-primary font-black uppercase tracking-widest text-xs">
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Chat Analysis
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="py-2 text-[13px] text-gray-500 font-medium leading-relaxed">
+                  {isSummaryLoading ? "AI is analyzing..." : summary || "Get a summary of your conversation."}
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </header>
 

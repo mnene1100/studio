@@ -66,11 +66,11 @@ export default function ChatListPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white pb-32">
-      <header className="bg-primary px-6 pt-10 pb-4 flex items-center justify-between shadow-sm sticky top-0 z-40">
-        <h1 className="text-3xl text-white font-black italic tracking-tight uppercase" style={{ fontFamily: 'Inter, sans-serif' }}>
+      <header className="bg-primary safe-top px-6 pb-4 flex items-center justify-between shadow-sm sticky top-0 z-40">
+        <h1 className="text-3xl text-white font-black italic tracking-tight uppercase pt-2" style={{ fontFamily: 'Inter, sans-serif' }}>
           Chats
         </h1>
-        <button className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 active:scale-90 transition-all">
+        <button className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 active:scale-90 transition-all mt-2">
           <MessageSquare className="w-4 h-4 text-white fill-white" />
         </button>
       </header>
