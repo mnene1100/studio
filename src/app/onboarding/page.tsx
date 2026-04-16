@@ -36,6 +36,7 @@ export default function OnboardingPage() {
   const db = useFirestore();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isCheckingProfile, setIsCheckingProfile] = useState(true);
   const [formData, setFormData] = useState({
     displayName: '',
     gender: 'Female',
@@ -55,12 +56,27 @@ export default function OnboardingPage() {
 
   // Protect the onboarding screen from existing users
   useEffect(() => {
-    if (isUserLoading || !user || !db) return;
+    if (isUserLoading || !db) return;
+
+    if (!user) {
+      router.replace('/login');
+      return;
+    }
 
     const checkExisting = async () => {
-      const userRef = doc(db, 'users', user.uid);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) {
+      try {
+        const userRef = doc(db, 'users', user.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          // If profile exists, go home immediately without showing this screen
+          router.replace('/home');
+        } else {
+          // Profile doesn't exist, allow onboarding UI to render
+          setIsCheckingProfile(false);
+        }
+      } catch (e) {
+        console.error("Profile check error:", e);
+        // Fallback to home on error to be safe
         router.replace('/home');
       }
     };
@@ -114,7 +130,7 @@ export default function OnboardingPage() {
     }
   };
 
-  if (isUserLoading) {
+  if (isUserLoading || isCheckingProfile) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="w-8 h-8 text-primary animate-spin" />

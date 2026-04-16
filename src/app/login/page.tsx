@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Zap, Mail, UserPlus, Loader2 } from "lucide-react";
 import { useAuth, useUser, useFirestore } from '@/firebase';
-import { signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword, User } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import { toast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
@@ -21,41 +21,10 @@ export default function LoginPage() {
   const db = useFirestore();
   const { user, isUserLoading } = useUser();
 
-  const createInitialProfile = async (firebaseUser: User) => {
-    if (!db) return;
-    const userRef = doc(db, 'users', firebaseUser.uid);
-    const userDoc = await getDoc(userRef);
-    
-    if (!userDoc.exists()) {
-      const numericId = (Math.floor(Math.random() * 900000000) + 100000000).toString();
-      const isGuest = firebaseUser.isAnonymous;
-      const displayName = isGuest ? `Guest_${numericId.substring(0, 4)}` : (firebaseUser.email?.split('@')[0] || `User_${numericId.substring(0, 4)}`);
-      
-      await setDoc(userRef, {
-        id: firebaseUser.uid,
-        numericId,
-        displayName: displayName,
-        email: firebaseUser.email || `${displayName.toLowerCase()}@nexo.com`,
-        gender: 'Male',
-        dob: '2000-01-01',
-        country: 'Kenya',
-        profilePictureUrl: `https://picsum.photos/seed/${firebaseUser.uid}/200/200`,
-        createdAt: new Date().toISOString(),
-        lastOnlineAt: new Date().toISOString(),
-        statusMessage: "Hey there! I'm using NEXO.",
-        balance: 500,
-        earnings: 0,
-        isVerified: false,
-        education: 'Undergraduate Degree',
-        horoscope: 'Aries',
-        lookingFor: 'Making Friends'
-      }, { merge: true });
-    }
-  };
-
+  // On mount, if user already logged in, send them to the root router
   useEffect(() => {
     if (!isUserLoading && user && db) {
-      router.replace('/home');
+      router.replace('/');
     }
   }, [user, isUserLoading, router, db]);
 
@@ -63,16 +32,15 @@ export default function LoginPage() {
     if (!auth || !db) return;
     setIsLoading(true);
     try {
-      const userCredential = await signInAnonymously(auth);
-      await createInitialProfile(userCredential.user);
-      router.replace('/home');
+      await signInAnonymously(auth);
+      // Let the root router decide where to go (Onboarding for new, Home for existing)
+      router.replace('/');
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Login Error",
         description: error.message || "Network issue detected.",
       });
-    } finally {
       setIsLoading(false);
     }
   };
@@ -82,16 +50,14 @@ export default function LoginPage() {
     if (!email.trim() || !password.trim() || !auth || !db) return;
     setIsLoading(true);
     try {
-      const credential = await signInWithEmailAndPassword(auth, email, password);
-      await createInitialProfile(credential.user);
-      router.replace('/home');
+      await signInWithEmailAndPassword(auth, email, password);
+      router.replace('/');
     } catch (error: any) {
       toast({ 
         variant: "destructive", 
         title: "Sign in failed", 
         description: "Please check your email and password." 
       });
-    } finally {
       setIsLoading(false);
     }
   };
@@ -101,16 +67,14 @@ export default function LoginPage() {
     if (!email.trim() || !password.trim() || !auth) return;
     setIsLoading(true);
     try {
-      const credential = await createUserWithEmailAndPassword(auth, email, password);
-      await createInitialProfile(credential.user);
-      router.replace('/home');
+      await createUserWithEmailAndPassword(auth, email, password);
+      router.replace('/');
     } catch (error: any) {
       toast({ 
         variant: "destructive", 
         title: "Sign up failed", 
         description: error.message 
       });
-    } finally {
       setIsLoading(false);
     }
   };
