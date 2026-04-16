@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -67,52 +66,52 @@ export default function WalletPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#F9FAFB] pb-24">
-      <header className="bg-primary px-4 h-24 flex items-center justify-between shadow-lg relative z-10">
+    <div className="flex flex-col min-h-screen bg-[#F9FAFB] pb-32">
+      <header className="bg-primary px-4 h-20 flex items-center justify-between shadow-lg relative z-10">
         <Button 
           variant="ghost" 
           size="icon" 
           onClick={() => router.back()} 
-          className="w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10"
+          className="w-9 h-9 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10"
         >
           <ChevronLeft className="w-5 h-5" />
         </Button>
         
         <div className="flex flex-col items-center">
-          <h1 className="text-lg font-black text-white tracking-[0.2em] uppercase italic">Wallet</h1>
-          <span className="text-[9px] font-black text-white/70 uppercase tracking-widest mt-0.5">KES Region</span>
+          <h1 className="text-base font-black text-white tracking-[0.1em] uppercase italic">Wallet</h1>
+          <span className="text-[8px] font-black text-white/70 uppercase tracking-widest mt-0.5">KES Region</span>
         </div>
 
         <Button 
           variant="ghost" 
           size="icon" 
-          className="w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10"
+          className="w-9 h-9 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10"
         >
           <History className="w-4 h-4" />
         </Button>
       </header>
 
-      <div className="px-5 -mt-6 relative z-20">
-        <div className="bg-white rounded-[2rem] p-5 flex items-center space-x-4 shadow-xl shadow-gray-200 border border-gray-50 mb-6">
-          <div className="w-14 h-14 bg-[#E8F8F5] rounded-[1.25rem] flex items-center justify-center">
-            <div className="text-primary text-xl font-black italic">S</div>
+      <div className="px-5 -mt-5 relative z-20">
+        <div className="bg-white rounded-[1.75rem] p-4 flex items-center space-x-4 shadow-xl shadow-gray-200 border border-gray-50 mb-4">
+          <div className="w-12 h-12 bg-[#E8F8F5] rounded-xl flex items-center justify-center">
+            <div className="text-primary text-lg font-black italic">S</div>
           </div>
           <div className="flex flex-col">
-            <h2 className="text-4xl font-black text-gray-900 tracking-tight leading-none">
+            <h2 className="text-3xl font-black text-gray-900 tracking-tight leading-none">
               {profile?.balance?.toLocaleString() || "0"}
             </h2>
-            <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mt-1.5">Available Coins</p>
+            <p className="text-[8px] font-black text-gray-400 uppercase tracking-[0.1em] mt-1">Available Coins</p>
           </div>
         </div>
 
-        <div className="space-y-3 mb-6">
-          <div className="flex items-center space-x-2 px-2">
-            <Globe className="w-3.5 h-3.5 text-primary opacity-50" />
-            <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Select Payment Region</h3>
+        <div className="space-y-2 mb-4">
+          <div className="flex items-center space-x-2 px-1">
+            <Globe className="w-3 h-3 text-primary opacity-50" />
+            <h3 className="text-[8px] font-black text-gray-400 uppercase tracking-[0.1em]">Payment Region</h3>
           </div>
           
           <Select defaultValue="kenya">
-            <SelectTrigger className="bg-white border-none h-12 rounded-xl px-5 text-sm font-bold text-gray-900 shadow-sm">
+            <SelectTrigger className="bg-white border-none h-11 rounded-xl px-4 text-xs font-bold text-gray-900 shadow-sm">
               <SelectValue placeholder="Select Region" />
             </SelectTrigger>
             <SelectContent className="bg-white rounded-xl border-none shadow-2xl">
@@ -123,42 +122,42 @@ export default function WalletPage() {
           </Select>
         </div>
 
-        <div className="space-y-4 mb-8">
-          <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] px-2">Select Package</h3>
-          <div className="grid grid-cols-3 gap-3">
+        <div className="space-y-3 mb-6">
+          <h3 className="text-[8px] font-black text-gray-400 uppercase tracking-[0.1em] px-1">Select Package</h3>
+          <div className="grid grid-cols-3 gap-2">
             {PACKAGES.map((pkg) => (
               <div 
                 key={pkg.id} 
                 onClick={() => setSelectedPackage(pkg)}
                 className={cn(
-                  "bg-white rounded-[1.5rem] p-3 flex flex-col items-center justify-center shadow-sm border transition-all cursor-pointer group active:scale-95",
+                  "bg-white rounded-2xl p-2.5 flex flex-col items-center justify-center shadow-sm border transition-all cursor-pointer group active:scale-95",
                   selectedPackage?.id === pkg.id 
                     ? "border-primary ring-2 ring-primary/20 bg-primary/5" 
                     : "border-gray-50 hover:border-primary/20"
                 )}
               >
-                <div className="w-8 h-8 bg-[#E8F8F5] rounded-lg flex items-center justify-center mb-2">
-                  <span className="text-primary text-xs font-black italic">S</span>
+                <div className="w-6 h-6 bg-[#E8F8F5] rounded-md flex items-center justify-center mb-1.5">
+                  <span className="text-primary text-[10px] font-black italic">S</span>
                 </div>
-                <span className="text-base font-black text-gray-900 leading-none">{pkg.coins}</span>
-                <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest mt-1">{pkg.label}</span>
+                <span className="text-sm font-black text-gray-900 leading-none">{pkg.coins}</span>
+                <span className="text-[7px] font-black text-gray-400 uppercase tracking-widest mt-1">{pkg.label}</span>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="space-y-3 mb-10">
-          <div className="flex items-center space-x-2 px-2">
-            <Users className="w-3.5 h-3.5 text-primary opacity-50" />
-            <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">P2P Coinsellers</h3>
+        <div className="space-y-2 mb-10">
+          <div className="flex items-center space-x-2 px-1">
+            <Users className="w-3 h-3 text-primary opacity-50" />
+            <h3 className="text-[8px] font-black text-gray-400 uppercase tracking-[0.1em]">P2P Coinsellers</h3>
           </div>
           
           <Button 
             variant="outline"
-            className="w-full h-12 bg-white border border-gray-100 rounded-full flex items-center justify-center space-x-2 active:scale-[0.98] transition-all shadow-sm group"
+            className="w-full h-11 bg-white border border-gray-100 rounded-full flex items-center justify-center space-x-2 active:scale-[0.98] transition-all shadow-sm group"
           >
-            <UserPlus className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
-            <span className="text-[10px] font-black text-gray-900 uppercase tracking-[0.2em]">Contact Official Sellers</span>
+            <UserPlus className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
+            <span className="text-[9px] font-black text-gray-900 uppercase tracking-[0.1em]">Contact Official Sellers</span>
           </Button>
         </div>
 
@@ -167,7 +166,7 @@ export default function WalletPage() {
             onClick={handlePayment}
             disabled={!selectedPackage || isLoading}
             className={cn(
-              "w-full h-14 rounded-full text-base font-black shadow-2xl transition-all active:scale-95 uppercase tracking-widest",
+              "w-full h-12 rounded-full text-sm font-black shadow-2xl transition-all active:scale-95 uppercase tracking-widest",
               selectedPackage 
                 ? "bg-primary text-white" 
                 : "bg-primary/40 text-white pointer-events-none opacity-50"
