@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useMemo } from 'react';
@@ -98,7 +97,7 @@ export default function UserProfilePage() {
     <div className="flex flex-col min-h-screen bg-white relative pb-40 overflow-x-hidden">
       <div className="relative w-full aspect-[4/5] overflow-hidden bg-muted">
         <Image 
-          src={profile.profilePictureUrl || `https://picsum.photos/seed/${profile.id}/800/1200`}
+          src={profile.profilePictureUrl || `https://picsum.photos/seed/${profile.id}/800/1000`}
           alt={profile.displayName || "User"}
           fill
           priority
@@ -150,7 +149,7 @@ export default function UserProfilePage() {
 
         <div className="absolute bottom-6 left-8 z-10">
           <div className="bg-primary/90 backdrop-blur-md px-4 py-2 rounded-full flex items-center space-x-2 border border-white/20 shadow-lg">
-            <div className={`w-2 h-2 ${isOnline ? 'bg-green-400 animate-pulse' : 'bg-white/50'} rounded-full`} />
+            <div className={`w-2 h-2 ${isOnline ? 'bg-green-400' : 'bg-white/50'} rounded-full`} />
             <span className="text-[9px] font-black text-white uppercase tracking-widest">
               {statusText}
             </span>

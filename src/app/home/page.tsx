@@ -45,7 +45,7 @@ export default function HomePage() {
         {isUsersLoading ? (
           <div className="grid grid-cols-2 gap-2.5">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="aspect-[3/4] bg-muted rounded-2xl animate-pulse" />
+              <div key={i} className="aspect-[4/5] bg-muted rounded-2xl animate-pulse" />
             ))}
           </div>
         ) : discoveryUsers.length > 0 ? (
@@ -57,10 +57,10 @@ export default function HomePage() {
                 <div 
                   key={u.id} 
                   onClick={() => router.push(`/home/profile/${u.id}`)}
-                  className="group relative aspect-[3/4] overflow-hidden rounded-[1.5rem] shadow-lg transition-all cursor-pointer bg-card border border-border/50 active:scale-[0.98]"
+                  className="group relative aspect-[4/5] overflow-hidden rounded-[1.25rem] shadow-lg transition-all cursor-pointer bg-card border border-border/50 active:scale-[0.98]"
                 >
                   <Image 
-                    src={u.profilePictureUrl || `https://picsum.photos/seed/${u.id}/600/900`} 
+                    src={u.profilePictureUrl || `https://picsum.photos/seed/${u.id}/600/750`} 
                     alt={u.displayName || 'User'}
                     fill
                     className="object-cover"
@@ -72,7 +72,7 @@ export default function HomePage() {
                   
                   {isOnline && (
                     <div className="absolute top-2.5 left-2.5 z-20">
-                      <div className="w-2 h-2 bg-green-500 rounded-full border border-white/50 shadow-lg animate-pulse" />
+                      <div className="w-2.5 h-2.5 bg-green-500 rounded-full shadow-lg" />
                     </div>
                   )}
 

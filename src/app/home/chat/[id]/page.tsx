@@ -187,7 +187,7 @@ export default function ChatDetailPage() {
                   <AvatarFallback className="bg-white/10 text-white font-bold">{initials}</AvatarFallback>
                 </Avatar>
                 {isOnline && (
-                  <div className="absolute top-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-primary" />
+                  <div className="absolute top-0 right-0 w-3 h-3 bg-green-400 rounded-full" />
                 )}
               </div>
               <div className="flex flex-col">
