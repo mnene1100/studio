@@ -78,7 +78,10 @@ export default function MePage() {
             </div>
             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Balance</p>
             <h3 className="text-3xl font-black text-gray-900 mb-6 tracking-tight">{profile.balance ?? 0}</h3>
-            <button className="w-full py-3 bg-primary text-white rounded-full text-xs font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-primary/20">
+            <button 
+              onClick={() => router.push('/home/wallet')}
+              className="w-full py-3 bg-primary text-white rounded-full text-xs font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-primary/20"
+            >
               Recharge
             </button>
           </div>

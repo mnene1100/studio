@@ -1,8 +1,8 @@
 
 {
-  "name": "NEXO",
+  "name": "NEXO | Premium Communication",
   "short_name": "NEXO",
-  "description": "Premium Communication Ecosystem",
+  "description": "Seamless real-time video, voice, and text messaging platform.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
