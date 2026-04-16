@@ -148,7 +148,7 @@ export default function UserProfilePage() {
         </div>
       </div>
 
-      {/* Profile Details - STRAIGHT EDGES */}
+      {/* Profile Details - STRAIGHT EDGES AS REQUESTED */}
       <div className="px-6 bg-white pt-8 flex-1 rounded-none border-t border-gray-100">
         <div className="mb-4">
           <div className={`inline-flex items-center px-3 py-1 border rounded-none ${isOnline ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
@@ -169,7 +169,7 @@ export default function UserProfilePage() {
            </p>
         </div>
 
-        {/* Life Info */}
+        {/* Life Info - STRAIGHT EDGES */}
         <div className="grid grid-cols-2 gap-4 pb-10">
           <div className="bg-gray-50 p-4 border border-gray-100 rounded-none">
             <h4 className="text-[7px] font-black text-gray-300 uppercase tracking-widest mb-1">Education</h4>

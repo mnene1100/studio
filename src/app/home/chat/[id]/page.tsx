@@ -172,8 +172,8 @@ export default function ChatDetailPage() {
             <div className="flex items-center space-x-3">
               <div className="relative">
                 <Avatar className="w-9 h-9 border border-white/20 rounded-full overflow-hidden">
-                  <AvatarImage src={profile?.profilePictureUrl} className="object-cover" />
-                  <AvatarFallback className="bg-white/10 text-white font-bold text-xs">{initials}</AvatarFallback>
+                  <AvatarImage src={profile?.profilePictureUrl} className="object-cover rounded-full" />
+                  <AvatarFallback className="bg-white/10 text-white font-bold text-xs rounded-full">{initials}</AvatarFallback>
                 </Avatar>
                 {isOnline && (
                   <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-primary" />

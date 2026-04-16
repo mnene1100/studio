@@ -127,13 +127,17 @@ export default function CallPage() {
           status: 'ongoing'
         }, { merge: true });
 
+        const tracksToPublish = [];
+        if (localAudioTrackRef.current) tracksToPublish.push(localAudioTrackRef.current);
         if (callType === 'video' && localVideoTrackRef.current) {
-          await agoraClientRef.current.publish([localAudioTrackRef.current, localVideoTrackRef.current]);
+          tracksToPublish.push(localVideoTrackRef.current);
           if (localVideoRef.current) {
             localVideoTrackRef.current.play(localVideoRef.current);
           }
-        } else {
-          await agoraClientRef.current.publish([localAudioTrackRef.current]);
+        }
+
+        if (tracksToPublish.length > 0) {
+          await agoraClientRef.current.publish(tracksToPublish);
         }
 
         setJoined(true);
@@ -248,9 +252,9 @@ export default function CallPage() {
             <div className="relative">
               <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping opacity-30" />
               <div className="absolute inset-0 bg-primary/10 rounded-full animate-pulse blur-3xl" />
-              <Avatar className="w-40 h-40 border-8 border-white/5 shadow-[0_0_80px_rgba(40,180,164,0.3)] scale-110 relative z-10">
-                <AvatarImage src={profile?.profilePictureUrl} className="object-cover" />
-                <AvatarFallback className="bg-primary/10 text-primary text-4xl font-black">{initials}</AvatarFallback>
+              <Avatar className="w-40 h-40 border-8 border-white/5 shadow-[0_0_80px_rgba(40,180,164,0.3)] relative z-10 rounded-full">
+                <AvatarImage src={profile?.profilePictureUrl} className="object-cover rounded-full" />
+                <AvatarFallback className="bg-primary/10 text-primary text-4xl font-black rounded-full">{initials}</AvatarFallback>
               </Avatar>
             </div>
             <div className="mt-16 text-center z-10">
@@ -277,10 +281,10 @@ export default function CallPage() {
       {callType === 'video' && cameraOn && (
         <div 
           className={cn(
-            "absolute z-40 transition-all duration-500 rounded-[2rem] overflow-hidden border-2 border-white/20 shadow-2xl bg-black ring-4 ring-black/50",
+            "absolute z-40 transition-all duration-500 rounded-full overflow-hidden border-2 border-white/20 shadow-2xl bg-black ring-4 ring-black/50",
             isMinimized 
-              ? "bottom-40 right-6 w-28 h-44" 
-              : "top-20 right-6 w-32 h-48"
+              ? "bottom-40 right-6 w-24 h-24" 
+              : "top-20 right-6 w-32 h-32"
           )}
           ref={localVideoRef}
           onClick={() => setIsMinimized(!isMinimized)}
