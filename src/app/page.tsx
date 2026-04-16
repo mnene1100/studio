@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect } from 'react';
@@ -22,7 +21,7 @@ export default function EntryPage() {
         if (userDoc.exists()) {
           const profile = userDoc.data();
           localStorage.setItem('nexo_profile', JSON.stringify(profile));
-          router.push('/home/chat');
+          router.push('/home'); // Redirect to Home dashboard
         } else {
           router.push('/onboarding');
         }

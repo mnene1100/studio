@@ -1,17 +1,16 @@
-
 "use client";
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MessageSquare, User, Phone, Video } from 'lucide-react';
+import { MessageSquare, User, Home } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function Navigation() {
   const pathname = usePathname();
 
   const navItems = [
+    { label: 'Home', icon: Home, href: '/home' },
     { label: 'Chat', icon: MessageSquare, href: '/home/chat' },
-    { label: 'Calls', icon: Phone, href: '/home/calls' },
     { label: 'Me', icon: User, href: '/home/me' },
   ];
 
@@ -19,7 +18,11 @@ export function Navigation() {
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-white/5 px-6 pb-6 pt-3 safe-area-bottom">
       <div className="max-w-md mx-auto flex justify-around items-center">
         {navItems.map((item) => {
-          const isActive = pathname.startsWith(item.href);
+          // Home is active only on the exact /home path, Chat is active on /home/chat and its sub-routes
+          const isActive = item.href === '/home' 
+            ? pathname === '/home' 
+            : pathname.startsWith(item.href);
+            
           return (
             <Link 
               key={item.href} 

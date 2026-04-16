@@ -1,7 +1,5 @@
-
 "use client";
 
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -10,38 +8,58 @@ import {
   LogOut, ChevronRight, Copy, QrCode
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import { signOut } from 'firebase/auth';
 
 export default function MePage() {
   const router = useRouter();
-  const [profile, setProfile] = useState<any>(null);
+  const { user, auth } = useUser();
+  const db = useFirestore();
 
-  useEffect(() => {
-    const savedProfile = localStorage.getItem('nexo_profile');
-    if (savedProfile) {
-      setProfile(JSON.parse(savedProfile));
+  // Memoize document reference for Firestore hook
+  const userRef = useMemoFirebase(() => {
+    if (!db || !user?.uid) return null;
+    return doc(db, 'userProfiles', user.uid);
+  }, [db, user?.uid]);
+
+  // Fetch real-time profile data from Firestore
+  const { data: profile, isLoading } = useDoc(userRef);
+
+  const handleLogout = async () => {
+    if (!auth) return;
+    try {
+      await signOut(auth);
+      localStorage.removeItem('nexo_profile');
+      router.push('/login');
+    } catch (error) {
+      console.error("Logout failed", error);
     }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem('nexo_session');
-    localStorage.removeItem('nexo_profile');
-    router.push('/login');
   };
 
   const copyId = () => {
-    if (profile?.nexoId) {
-      navigator.clipboard.writeText(profile.nexoId);
+    if (profile?.numericId) {
+      navigator.clipboard.writeText(profile.numericId);
       toast({
         title: "Copied to clipboard",
-        description: `NEXO ID ${profile.nexoId} copied successfully.`,
+        description: `NEXO ID ${profile.numericId} copied successfully.`,
       });
     }
   };
 
+  if (isLoading) return (
+    <div className="flex items-center justify-center h-screen bg-background">
+      <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+
   if (!profile) return null;
 
+  // Safe initials extraction to prevent crash
+  const initials = profile.displayName ? profile.displayName[0] : '?';
+
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div className="flex flex-col h-screen overflow-hidden bg-background">
       <header className="px-6 pt-12 pb-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight text-white">Profile</h1>
         <Button variant="ghost" size="icon" className="rounded-full bg-white/5">
@@ -52,14 +70,14 @@ export default function MePage() {
       <div className="px-6 flex flex-col items-center mb-10">
         <div className="relative mb-6">
           <Avatar className="w-28 h-28 border-4 border-accent ring-8 ring-accent/5">
-            <AvatarImage src={profile.avatar} />
-            <AvatarFallback>{profile.name[0]}</AvatarFallback>
+            <AvatarImage src={profile.profilePictureUrl} />
+            <AvatarFallback className="bg-secondary text-2xl font-bold">{initials}</AvatarFallback>
           </Avatar>
           <div className="absolute bottom-1 right-1 p-2 bg-primary rounded-xl shadow-xl shadow-primary/40">
             <QrCode className="w-5 h-5 text-white" />
           </div>
         </div>
-        <h2 className="text-2xl font-bold text-white mb-1">{profile.name}</h2>
+        <h2 className="text-2xl font-bold text-white mb-1">{profile.displayName}</h2>
         
         {/* NEXO ID Display */}
         <div 
@@ -68,13 +86,13 @@ export default function MePage() {
         >
           <span className="text-[10px] uppercase font-bold tracking-widest text-accent">NEXO ID</span>
           <span className="text-lg font-mono font-medium text-white tracking-wider">
-            {profile.nexoId}
+            {profile.numericId}
           </span>
           <Copy className="w-3.5 h-3.5 text-muted-foreground" />
         </div>
       </div>
 
-      <div className="px-4 space-y-2">
+      <div className="px-4 space-y-2 flex-1 overflow-y-auto pb-6">
         <div className="bg-card/40 rounded-3xl p-2 border border-white/5">
           {[
             { label: 'Security & Privacy', icon: Shield, color: 'text-blue-400' },
@@ -105,7 +123,7 @@ export default function MePage() {
         </button>
       </div>
 
-      <div className="mt-auto p-8 text-center">
+      <div className="p-8 text-center bg-background/80 backdrop-blur-xl">
         <p className="text-[10px] text-muted-foreground uppercase tracking-[0.2em]">NEXO PREMIUM v1.0.4</p>
       </div>
     </div>
