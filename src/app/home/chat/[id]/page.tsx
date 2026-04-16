@@ -11,10 +11,12 @@ import {
   Gift 
 } from "lucide-react";
 import { useFirestore, useDoc, useCollection, useMemoFirebase, useUser, addDocumentNonBlocking, updateDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase';
-import { doc, collection, query, orderBy, limit, where, getDocs } from 'firebase/firestore';
+import { doc, collection, query, orderBy, limit, where, getDocs, updateDoc, increment } from 'firebase/firestore';
 import { aiSuggestedConversationStarters } from "@/ai/flows/ai-suggested-conversation-starters";
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { useHomeData } from '../../layout';
+import { toast } from '@/hooks/use-toast';
 
 export default function ChatDetailPage() {
   const { id: targetUserId } = useParams();
@@ -22,6 +24,7 @@ export default function ChatDetailPage() {
   const router = useRouter();
   const db = useFirestore();
   const { user: currentUser } = useUser();
+  const { profile: currentUserProfile } = useHomeData();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const [input, setInput] = useState('');
@@ -90,9 +93,29 @@ export default function ChatDetailPage() {
     }
   }, [messages]);
 
-  const handleSendMessage = () => {
-    if (!input.trim() || !chatId || !currentUser) return;
+  const handleSendMessage = async () => {
+    if (!input.trim() || !chatId || !currentUser || !db) return;
     
+    // Coin Deduction Logic: Male users pay 15 coins per text
+    if (currentUserProfile?.gender === 'Male') {
+      const currentBalance = currentUserProfile.balance ?? 0;
+      if (currentBalance < 15) {
+        toast({
+          variant: 'destructive',
+          title: 'Insufficient Balance',
+          description: 'You need 15 coins to send a message. Please recharge your wallet.',
+        });
+        router.push('/home/wallet');
+        return;
+      }
+
+      // Atomic deduction
+      const userRef = doc(db, 'users', currentUser.uid);
+      await updateDoc(userRef, {
+        balance: increment(-15)
+      });
+    }
+
     const now = new Date().toISOString();
     const messageContent = input.trim();
     const messageData = {

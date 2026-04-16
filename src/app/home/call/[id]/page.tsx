@@ -10,11 +10,12 @@ import {
   Volume2, VolumeX, Maximize2, Minimize2, AlertCircle, Loader2
 } from "lucide-react";
 import { useFirestore, useDoc, useMemoFirebase, useUser, setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase';
-import { doc } from 'firebase/firestore';
+import { doc, updateDoc, increment } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getAgoraToken } from '@/app/actions/agora';
+import { useHomeData } from '../../layout';
 
 export default function CallPage() {
   const { id: targetUserId } = useParams();
@@ -23,6 +24,7 @@ export default function CallPage() {
   const router = useRouter();
   const db = useFirestore();
   const { user: currentUser } = useUser();
+  const { profile: currentUserProfile } = useHomeData();
 
   const [joined, setJoined] = useState(false);
   const [remoteUsers, setRemoteUsers] = useState<any[]>([]);
@@ -46,7 +48,56 @@ export default function CallPage() {
     if (!db || !targetUserId) return null;
     return doc(db, 'users', targetUserId as string);
   }, [db, targetUserId]);
-  const { data: profile } = useDoc(targetUserRef);
+  const { data: targetProfile } = useDoc(targetUserRef);
+
+  const handleEndCall = () => {
+    router.back();
+  };
+
+  // Billing logic
+  useEffect(() => {
+    if (!joined || !currentUser || !db || !currentUserProfile) return;
+
+    const costPerMin = callType === 'video' ? 160 : 80;
+    
+    const deductCoins = async () => {
+      // Check if user has enough coins for the current/next minute
+      const latestBalance = currentUserProfile.balance ?? 0;
+      
+      if (latestBalance < costPerMin) {
+        toast({
+          variant: "destructive",
+          title: "Insufficient Balance",
+          description: "Your call has ended due to low coin balance. Please recharge.",
+        });
+        handleEndCall();
+        return false;
+      }
+
+      // Perform deduction
+      const userRef = doc(db, 'users', currentUser.uid);
+      try {
+        await updateDoc(userRef, {
+          balance: increment(-costPerMin)
+        });
+        return true;
+      } catch (e) {
+        console.error("Billing error:", e);
+        handleEndCall();
+        return false;
+      }
+    };
+
+    // Initial deduction for minute 1
+    deductCoins();
+
+    // Deduct every minute
+    const billingInterval = setInterval(() => {
+      deductCoins();
+    }, 60000);
+
+    return () => clearInterval(billingInterval);
+  }, [joined, currentUser, db, currentUserProfile, callType]);
 
   useEffect(() => {
     const initAgora = async () => {
@@ -178,10 +229,6 @@ export default function CallPage() {
     };
   }, [currentUser, targetUserId, callType, db]);
 
-  const handleEndCall = () => {
-    router.back();
-  };
-
   const toggleMic = async () => {
     if (localAudioTrackRef.current) {
       await localAudioTrackRef.current.setEnabled(!micOn);
@@ -196,7 +243,7 @@ export default function CallPage() {
     }
   };
 
-  const displayName = profile?.displayName || "Contact";
+  const displayName = targetProfile?.displayName || "Contact";
   const initials = displayName.substring(0, 2).toUpperCase();
 
   if (errorMessage) {
@@ -248,7 +295,7 @@ export default function CallPage() {
               <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping opacity-30" />
               <div className="absolute inset-0 bg-primary/10 rounded-full animate-pulse blur-3xl" />
               <Avatar className="w-40 h-40 border-8 border-white/5 shadow-[0_0_80px_rgba(40,180,164,0.3)] relative z-10 rounded-full overflow-hidden">
-                <AvatarImage src={profile?.profilePictureUrl} className="object-cover rounded-full" />
+                <AvatarImage src={targetProfile?.profilePictureUrl} className="object-cover rounded-full" />
                 <AvatarFallback className="bg-primary/10 text-primary text-4xl font-black rounded-full">{initials}</AvatarFallback>
               </Avatar>
             </div>
