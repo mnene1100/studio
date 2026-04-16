@@ -3,7 +3,7 @@
 
 /**
  * @fileOverview Server Action for generating Agora RTC tokens securely.
- * This keeps the Agora App Certificate hidden from the client side.
+ * Updated to return a result object instead of throwing to prevent Next.js 15 SSR crashes.
  */
 
 import { RtcTokenBuilder, RtcRole } from 'agora-access-token';
@@ -14,7 +14,7 @@ export async function getAgoraToken(channelName: string, uid: string) {
 
   if (!appId || !appCertificate) {
     console.error('Agora credentials missing on server');
-    throw new Error('Calling service is currently unavailable. Please contact support.');
+    return { error: 'AGORA_CONFIGURATION_MISSING' };
   }
 
   const role = RtcRole.PUBLISHER;
@@ -33,9 +33,9 @@ export async function getAgoraToken(channelName: string, uid: string) {
       privilegeExpiredTs
     );
 
-    return token;
+    return { token };
   } catch (error) {
     console.error('Failed to generate Agora token:', error);
-    throw new Error('Authentication failed for call session.');
+    return { error: 'TOKEN_GENERATION_FAILED' };
   }
 }

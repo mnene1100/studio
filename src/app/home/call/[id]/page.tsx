@@ -31,6 +31,7 @@ export default function CallPage() {
   const [speakerOn, setSpeakerOn] = useState(true);
   const [isMinimized, setIsMinimized] = useState(false);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [configMissing, setConfigMissing] = useState(false);
   const [statusMessage, setStatusMessage] = useState('Initializing Secure Line...');
 
   const localVideoRef = useRef<HTMLDivElement>(null);
@@ -55,7 +56,8 @@ export default function CallPage() {
         const appId = process.env.NEXT_PUBLIC_AGORA_APP_ID;
         
         if (!appId) {
-          throw new Error("AGORA_CONFIGURATION_MISSING");
+          setConfigMissing(true);
+          return;
         }
 
         const AgoraRTC = (await import('agora-rtc-sdk-ng')).default;
@@ -99,10 +101,19 @@ export default function CallPage() {
         }
 
         setStatusMessage('Authenticating Session...');
-        const token = await getAgoraToken(channelName, currentUser?.uid as string);
+        const result = await getAgoraToken(channelName, currentUser?.uid as string);
+        
+        if (result.error === 'AGORA_CONFIGURATION_MISSING') {
+          setConfigMissing(true);
+          return;
+        }
+
+        if (result.error || !result.token) {
+          throw new Error(result.error || 'Failed to generate access token');
+        }
 
         setStatusMessage('Joining Channel...');
-        await agoraClientRef.current.join(appId, channelName, token, currentUser?.uid);
+        await agoraClientRef.current.join(appId, channelName, result.token, currentUser?.uid);
 
         const callId = `${currentUser?.uid}_${targetUserId}_${Date.now()}`;
         callIdRef.current = callId;
@@ -129,14 +140,12 @@ export default function CallPage() {
         setStatusMessage('Connected');
       } catch (error: any) {
         console.error("Call initialization failed:", error);
-        if (error.message !== "AGORA_CONFIGURATION_MISSING") {
-          toast({
-            variant: "destructive",
-            title: "Connection Error",
-            description: error.message || "Failed to establish a secure call.",
-          });
-          router.back();
-        }
+        toast({
+          variant: "destructive",
+          title: "Connection Error",
+          description: "Failed to establish a secure call. Please try again later.",
+        });
+        router.back();
       }
     };
 
@@ -195,8 +204,7 @@ export default function CallPage() {
   const displayName = profile?.displayName || "Contact";
   const initials = displayName.substring(0, 2).toUpperCase();
 
-  // Missing Agora Configuration Warning
-  if (!process.env.NEXT_PUBLIC_AGORA_APP_ID) {
+  if (configMissing) {
     return (
       <div className="fixed inset-0 bg-black z-[100] flex items-center justify-center p-8">
         <Alert variant="destructive" className="bg-zinc-900 border-red-500/50 rounded-none p-8 shadow-2xl">
@@ -204,7 +212,6 @@ export default function CallPage() {
           <AlertTitle className="text-xl font-black uppercase tracking-tight text-white">Agora ID Missing</AlertTitle>
           <AlertDescription className="text-[10px] font-medium text-white/50 leading-relaxed mt-2 uppercase tracking-widest">
             The calling engine has not been configured. Please add NEXT_PUBLIC_AGORA_APP_ID and AGORA_APP_CERTIFICATE to your environment variables. 
-            Visit console.agora.io to get your keys.
           </AlertDescription>
           <Button onClick={() => router.back()} className="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] h-14 rounded-none">
             Exit
@@ -221,7 +228,7 @@ export default function CallPage() {
           <AlertCircle className="h-6 w-6 mb-4 text-red-500" />
           <AlertTitle className="text-xl font-black uppercase tracking-tight text-white">Access Denied</AlertTitle>
           <AlertDescription className="text-[10px] font-medium text-white/50 leading-relaxed mt-2 uppercase tracking-widest">
-            NEXO requires {callType === 'video' ? 'Camera & Mic' : 'Microphone'} access. Please check your browser settings and refresh.
+            NEXO requires {callType === 'video' ? 'Camera & Mic' : 'Microphone'} access. Please check your browser settings.
           </AlertDescription>
           <Button onClick={() => router.back()} className="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] h-14 rounded-none">
             Exit Session
@@ -260,7 +267,7 @@ export default function CallPage() {
                     </div>
                   </div>
                 )}
-                {!joined && <Loader2 className="w-6 h-6 text-white/20 animate-spin mt-4" />}
+                {!joined && !configMissing && <Loader2 className="w-6 h-6 text-white/20 animate-spin mt-4" />}
               </div>
             </div>
           </div>

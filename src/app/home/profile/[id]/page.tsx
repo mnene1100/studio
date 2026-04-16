@@ -60,7 +60,7 @@ export default function UserProfilePage() {
     if (!profile?.lastOnlineAt) return false;
     const lastOnline = new Date(profile.lastOnlineAt).getTime();
     const now = Date.now();
-    // 90s threshold for 60s heartbeat
+    // 90s threshold for 60s heartbeat to ensure accuracy
     return now - lastOnline < 90000;
   }, [profile?.lastOnlineAt]);
 
@@ -202,7 +202,6 @@ export default function UserProfilePage() {
         </div>
       </div>
 
-      {/* User Details Screen: Fully straight edges as requested */}
       <div className="px-6 bg-white relative z-10 pt-8 flex-1 rounded-none border-t border-gray-100">
         <div className="mb-3">
           <div className={`inline-flex items-center px-3 py-1 rounded-none border ${isOnline ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
