@@ -20,7 +20,7 @@ function ChatListItem({ chat }: { chat: any }) {
   
   const { data: profile } = useDoc(targetUserRef);
 
-  // Consistent 90s threshold for online status
+  // Accurate online status: 90s threshold for 60s heartbeat
   const isOnline = profile?.lastOnlineAt ? (Date.now() - new Date(profile.lastOnlineAt).getTime() < 90000) : false;
 
   const lastMessageTime = chat.lastMessageSentAt || chat.updatedAt;
@@ -32,7 +32,7 @@ function ChatListItem({ chat }: { chat: any }) {
       className="flex items-center px-4 py-4 rounded-none active:bg-gray-50 transition-all group border border-transparent"
     >
       <div className="relative">
-        <Avatar className="w-14 h-14 rounded-full ring-2 ring-gray-50 shadow-sm overflow-hidden">
+        <Avatar className="w-14 h-14 rounded-full border-none shadow-sm overflow-hidden">
           <AvatarImage src={profile?.profilePictureUrl} className="object-cover" />
           <AvatarFallback className="bg-gray-100 text-lg font-bold rounded-full">
             <MessageCircle className="w-6 h-6 text-primary" />

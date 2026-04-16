@@ -25,7 +25,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   const { user, isUserLoading: isAuthLoading } = useUser();
   const db = useFirestore();
 
-  // Presence Tracking: Optimized to 60 seconds for better accuracy
+  // Presence Tracking: Optimized to 60 seconds heartbeat
   useEffect(() => {
     if (!db || !user?.uid) return;
 
@@ -38,7 +38,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     };
 
     updatePresence();
-    const interval = setInterval(updatePresence, 60000); // 1 minute
+    const interval = setInterval(updatePresence, 60000); 
     return () => clearInterval(interval);
   }, [db, user?.uid]);
 
@@ -55,7 +55,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   }, [profile, isProfileLoading]);
 
   useEffect(() => {
-    // Wait for both auth and profile state to be determined
+    // Gatekeeper: Prevents showing ANY home content if auth or profile is missing
     if (isAuthLoading || isProfileLoading) return;
 
     const isSessionActive = localStorage.getItem('nexo_session_active') === 'true';
@@ -65,16 +65,14 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
       return;
     }
 
-    // Only redirect to onboarding if we are CERTAIN the profile doesn't exist
+    // Only allow home if profile definitely exists in Firestore
     if (!profile) {
-      const localProfileCompleted = localStorage.getItem('nexo_profile_completed') === 'true';
-      if (!localProfileCompleted) {
-        router.replace('/onboarding');
-      }
+      localStorage.removeItem('nexo_profile_completed');
+      router.replace('/onboarding');
     }
   }, [user, isAuthLoading, profile, isProfileLoading, router]);
 
-  const shouldShowLoader = isAuthLoading || (isProfileLoading && !profile && localStorage.getItem('nexo_profile_completed') !== 'true');
+  const shouldShowLoader = isAuthLoading || isProfileLoading || !profile;
 
   if (shouldShowLoader) {
     return (

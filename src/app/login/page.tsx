@@ -6,8 +6,9 @@ import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Zap, Mail, ArrowRight, Lock, UserPlus, Loader2 } from "lucide-react";
-import { useAuth, useUser } from '@/firebase';
+import { useAuth, useUser, useFirestore } from '@/firebase';
 import { signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import { toast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
@@ -17,9 +18,10 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const auth = useAuth();
+  const db = useFirestore();
   const { user, isUserLoading } = useUser();
 
-  // Redirect to root if user is already logged in to let root handle onboarding vs home
+  // Handle automatic redirection for existing sessions
   useEffect(() => {
     const isSessionActive = localStorage.getItem('nexo_session_active') === 'true';
     if (!isUserLoading && user && isSessionActive) {
@@ -32,16 +34,17 @@ export default function LoginPage() {
     setIsLoading(true);
     
     try {
-      if (auth.currentUser && auth.currentUser.isAnonymous) {
-        localStorage.setItem('nexo_session_active', 'true');
-        router.replace('/');
-        return;
-      }
-      
       const userCredential = await signInAnonymously(auth);
       if (userCredential.user) {
         localStorage.setItem('nexo_session_active', 'true');
-        router.replace('/onboarding');
+        // Check if profile exists before deciding where to go
+        const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
+        if (userDoc.exists()) {
+          localStorage.setItem('nexo_profile_completed', 'true');
+          router.replace('/home');
+        } else {
+          router.replace('/onboarding');
+        }
       }
     } catch (error: any) {
       console.error("Fast login error:", error);
@@ -68,9 +71,17 @@ export default function LoginPage() {
     
     setIsLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       localStorage.setItem('nexo_session_active', 'true');
-      // Root will handle redirection based on profile existence
+      
+      // Verification step to ensure they have a profile
+      const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
+      if (userDoc.exists()) {
+        localStorage.setItem('nexo_profile_completed', 'true');
+        router.replace('/home');
+      } else {
+        router.replace('/onboarding');
+      }
     } catch (error: any) {
       console.error("Sign in error:", error);
       toast({
@@ -107,6 +118,7 @@ export default function LoginPage() {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       localStorage.setItem('nexo_session_active', 'true');
+      // New sign-ups ALWAYS go to onboarding
       router.replace('/onboarding');
     } catch (error: any) {
       console.error("Sign up error:", error);

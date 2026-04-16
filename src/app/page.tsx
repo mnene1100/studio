@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect } from 'react';
@@ -19,18 +20,18 @@ export default function EntryPage() {
       router.replace('/login');
     } else {
       const checkProfileStatus = async () => {
+        // First check local storage for a quick win
         const localFlag = localStorage.getItem('nexo_profile_completed') === 'true';
-        if (localFlag) {
-          router.replace('/home');
-          return;
-        }
-
+        
         try {
+          // Always verify with the source of truth (Firestore) to prevent session issues
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           if (userDoc.exists()) {
             localStorage.setItem('nexo_profile_completed', 'true');
             router.replace('/home');
           } else {
+            // No profile found, force onboarding
+            localStorage.removeItem('nexo_profile_completed');
             router.replace('/onboarding');
           }
         } catch (e) {
