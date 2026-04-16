@@ -5,97 +5,116 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Zap, Mail, Lock } from "lucide-react";
+import { Zap, Mail, ArrowRight } from "lucide-react";
+import { useAuth } from '@/firebase';
+import { initiateAnonymousSignIn } from '@/firebase/non-blocking-login';
 
-export default function LoginPage() {
+export default function WelcomePage() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [isEmailVisible, setIsEmailVisible] = useState(false);
   const router = useRouter();
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Mock login
-    localStorage.setItem('nexo_session', JSON.stringify({ email }));
-    router.push('/');
-  };
+  const auth = useAuth();
 
   const handleFastLogin = () => {
+    initiateAnonymousSignIn(auth);
     localStorage.setItem('nexo_session', JSON.stringify({ email: 'guest@nexo.io' }));
     router.push('/');
   };
 
+  const handleEmailContinue = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+    
+    // In a production app, this would trigger an OTP or magic link flow.
+    // For this prototype, we'll proceed to onboarding with the email.
+    localStorage.setItem('nexo_session', JSON.stringify({ email }));
+    router.push('/onboarding');
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-background premium-gradient">
-      <Card className="w-full max-w-md border-white/10 glass-panel shadow-2xl">
-        <CardHeader className="space-y-1 text-center">
-          <div className="mx-auto w-12 h-12 bg-accent rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-accent/20">
-            <Zap className="text-accent-foreground w-6 h-6" />
+    <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-background premium-gradient relative overflow-hidden">
+      {/* Background Glows */}
+      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/20 blur-[120px] rounded-full" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-accent/20 blur-[120px] rounded-full" />
+
+      <div className="w-full max-w-sm space-y-16 text-center z-10">
+        {/* App Branding */}
+        <div className="space-y-6 animate-in fade-in zoom-in duration-700">
+          <div className="mx-auto w-24 h-24 bg-accent rounded-[2rem] flex items-center justify-center shadow-2xl shadow-accent/30 rotate-12 transition-transform hover:rotate-0 duration-500">
+            <Zap className="text-accent-foreground w-12 h-12" />
           </div>
-          <CardTitle className="text-3xl font-bold tracking-tight text-white">NEXO</CardTitle>
-          <CardDescription className="text-muted-foreground">
-            Experience the future of communication
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <div className="space-y-2">
+            <h1 className="text-6xl font-black tracking-tighter text-white">NEXO</h1>
+            <p className="text-muted-foreground font-semibold tracking-[0.2em] uppercase text-[10px] opacity-70">
+              Premium Communication
+            </p>
+          </div>
+        </div>
+
+        {/* Action Area */}
+        <div className="space-y-5">
+          {!isEmailVisible ? (
+            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-6 duration-500">
+              <Button 
+                onClick={() => setIsEmailVisible(true)}
+                className="w-full h-16 bg-white text-black hover:bg-white/90 font-bold rounded-2xl text-lg flex items-center justify-center group shadow-xl"
+              >
+                <Mail className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+                Continue with Email
+              </Button>
+
+              <Button 
+                variant="ghost"
+                onClick={handleFastLogin}
+                className="w-full h-16 text-accent hover:text-accent hover:bg-accent/10 font-bold rounded-2xl text-lg flex items-center justify-center group"
+              >
+                <Zap className="mr-3 h-5 w-5 fill-accent/20 group-hover:scale-110 transition-transform" />
+                Fast Guest Login
+              </Button>
+            </div>
+          ) : (
+            <form 
+              onSubmit={handleEmailContinue} 
+              className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500"
+            >
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-accent transition-colors" />
                 <Input 
-                  id="email" 
                   type="email" 
                   placeholder="name@example.com" 
-                  className="pl-10 bg-secondary/50 border-white/10"
+                  className="pl-12 h-16 bg-white/5 border-white/10 rounded-2xl text-white placeholder:text-muted-foreground/50 focus-visible:ring-accent/50 focus-visible:border-accent/50 text-lg"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  autoFocus
                 />
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  id="password" 
-                  type="password" 
-                  className="pl-10 bg-secondary/50 border-white/10"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+              <div className="flex space-x-3">
+                <Button 
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setIsEmailVisible(false)}
+                  className="h-14 px-6 text-muted-foreground hover:text-white rounded-2xl"
+                >
+                  Back
+                </Button>
+                <Button 
+                  type="submit" 
+                  className="flex-1 h-14 bg-accent text-accent-foreground hover:bg-accent/90 font-bold rounded-2xl shadow-lg shadow-accent/20"
+                >
+                  Get Started
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
               </div>
-            </div>
-            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-6 rounded-xl transition-all">
-              Sign In
-            </Button>
-          </form>
-          
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-white/10"></span>
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-            </div>
-          </div>
-          
-          <Button 
-            variant="outline" 
-            className="w-full border-white/10 hover:bg-white/5 py-6 rounded-xl"
-            onClick={handleFastLogin}
-          >
-            <Zap className="mr-2 h-4 w-4 text-accent" />
-            Fast Guest Login
-          </Button>
-        </CardContent>
-        <CardFooter className="flex flex-col space-y-2 text-center text-sm text-muted-foreground">
-          <p>Don't have an account? <span className="text-accent hover:underline cursor-pointer">Register now</span></p>
-        </CardFooter>
-      </Card>
+            </form>
+          )}
+        </div>
+      </div>
+
+      {/* Footer Branding */}
+      <div className="absolute bottom-12 text-[9px] text-muted-foreground/40 font-bold tracking-[0.4em] uppercase">
+        Encrypted & Secure Ecosystem
+      </div>
     </div>
   );
 }
