@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
@@ -10,7 +9,7 @@ import {
   Volume2, VolumeX, Maximize2, Minimize2, AlertCircle
 } from "lucide-react";
 import { useFirestore, useDoc, useMemoFirebase, useUser, setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase';
-import { doc, updateDoc, increment, getDoc } from 'firebase/firestore';
+import { doc, updateDoc, increment, getDoc, onSnapshot } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -42,6 +41,7 @@ export default function CallPage() {
   const initializationStartedRef = useRef(false);
   const billingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const isBilledForFirstMinRef = useRef(false);
+  const isConnectedRef = useRef(false);
   
   const localAudioTrackRef = useRef<any>(null);
   const localVideoTrackRef = useRef<any>(null);
@@ -52,12 +52,41 @@ export default function CallPage() {
   }, [db, targetUserId]);
   const { data: targetProfile } = useDoc(targetUserRef);
 
-  const handleEndCall = () => {
+  const handleEndCall = (finalStatus?: string) => {
+    const status = finalStatus || (isConnectedRef.current ? 'ended' : 'cancelled');
+    
+    if (callIdRef.current && db) {
+      updateDocumentNonBlocking(doc(db, 'calls', callIdRef.current), {
+        status: status,
+        endTime: new Date().toISOString()
+      });
+    }
     router.back();
   };
 
+  // Listen for remote rejection or cancellation
+  useEffect(() => {
+    if (!db || !callIdRef.current) return;
+    
+    const unsubscribe = onSnapshot(doc(db, 'calls', callIdRef.current), (snapshot) => {
+      const data = snapshot.data();
+      if (data?.status === 'rejected') {
+        toast({
+          variant: "destructive",
+          title: "Call Rejected",
+          description: "The other user declined the call.",
+        });
+        handleEndCall('rejected');
+      }
+    });
+
+    return () => unsubscribe();
+  }, [db, callIdRef.current]);
+
   useEffect(() => {
     const isCallConnected = remoteUsers.length > 0;
+    if (isCallConnected) isConnectedRef.current = true;
+
     if (!isCallConnected || !currentUser || !db || billingIntervalRef.current) return;
 
     const costPerMin = callType === 'video' ? 160 : 80;
@@ -129,7 +158,7 @@ export default function CallPage() {
             title: 'Insufficient Balance',
             description: `You need at least ${costPerMin} coins for the first minute.`,
           });
-          handleEndCall();
+          handleEndCall('insufficient_balance');
           return;
         }
 
@@ -194,7 +223,6 @@ export default function CallPage() {
           await localVideoTrackRef.current.setEnabled(true);
           tracks.push(localVideoTrackRef.current);
           
-          // Small delay to ensure ref is bound
           setTimeout(() => {
             if (localVideoRef.current && localVideoTrackRef.current) {
               localVideoTrackRef.current.play(localVideoRef.current);
@@ -215,12 +243,6 @@ export default function CallPage() {
     initAgora();
 
     return () => {
-      if (callIdRef.current && db) {
-        updateDocumentNonBlocking(doc(db, 'calls', callIdRef.current), {
-          status: 'ended',
-          endTime: new Date().toISOString()
-        });
-      }
       if (localVideoTrackRef.current) {
         localVideoTrackRef.current.stop();
         localVideoTrackRef.current.close();
@@ -236,7 +258,7 @@ export default function CallPage() {
         clearInterval(billingIntervalRef.current);
       }
     };
-  }, [currentUser?.uid, targetUserId, callType, db, currentUserProfile]);
+  }, [currentUser?.uid, targetUserId, callType, db]);
 
   const toggleMic = async () => {
     if (localAudioTrackRef.current) {
@@ -251,7 +273,6 @@ export default function CallPage() {
       await localVideoTrackRef.current.setEnabled(newState);
       setCameraOn(newState);
       if (newState && localVideoRef.current) {
-        // Re-play explicitly to fix black screen issue
         localVideoTrackRef.current.play(localVideoRef.current);
       }
     }
@@ -271,7 +292,7 @@ export default function CallPage() {
               ? 'Agora credentials missing. Set AGORA_APP_ID and AGORA_APP_CERTIFICATE in secrets.' 
               : `An error occurred: ${errorMessage}.`}
           </p>
-          <Button onClick={() => router.back()} className="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] h-14 rounded-full">
+          <Button onClick={() => handleEndCall('error')} className="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] h-14 rounded-full">
             Exit Session
           </Button>
         </div>
@@ -288,7 +309,7 @@ export default function CallPage() {
           <p className="text-[10px] font-medium text-white/50 leading-relaxed mt-2 uppercase tracking-widest">
             NEXO requires {callType === 'video' ? 'Camera & Mic' : 'Microphone'} access.
           </p>
-          <Button onClick={() => router.back()} className="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] h-14 rounded-full">
+          <Button onClick={() => handleEndCall('permission_denied')} className="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] h-14 rounded-full">
             Exit Session
           </Button>
         </div>
@@ -330,7 +351,6 @@ export default function CallPage() {
         )}
       </div>
 
-      {/* Local Video View - Larger Square View */}
       {callType === 'video' && (
         <div 
           className={cn(
@@ -374,7 +394,7 @@ export default function CallPage() {
           </button>
 
           <button 
-            onClick={handleEndCall}
+            onClick={() => handleEndCall()}
             className="w-24 h-24 bg-red-500 rounded-full flex items-center justify-center shadow-[0_20px_60px_rgba(239,68,68,0.4)] active:scale-95 transition-all border-4 border-black ring-1 ring-white/10"
           >
             <PhoneOff className="w-10 h-10 text-white" />
