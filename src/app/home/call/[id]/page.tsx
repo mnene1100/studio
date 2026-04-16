@@ -186,15 +186,28 @@ export default function CallPage() {
         }, { merge: true });
 
         const tracks = [];
-        if (localAudioTrackRef.current) tracks.push(localAudioTrackRef.current);
+        if (localAudioTrackRef.current) {
+          await localAudioTrackRef.current.setEnabled(true);
+          tracks.push(localAudioTrackRef.current);
+        }
         if (callType === 'video' && localVideoTrackRef.current) {
+          await localVideoTrackRef.current.setEnabled(true);
           tracks.push(localVideoTrackRef.current);
-          if (localVideoRef.current) localVideoTrackRef.current.play(localVideoRef.current);
+          
+          // Small delay to ensure ref is bound
+          setTimeout(() => {
+            if (localVideoRef.current && localVideoTrackRef.current) {
+              localVideoTrackRef.current.play(localVideoRef.current);
+            }
+          }, 200);
         }
 
-        if (tracks.length > 0) await agoraClientRef.current.publish(tracks);
+        if (tracks.length > 0) {
+          await agoraClientRef.current.publish(tracks);
+        }
         setJoined(true);
       } catch (error: any) {
+        console.error("Agora Init Error:", error);
         setErrorMessage(error.message || 'CONNECTION_FAILED');
       }
     };
@@ -237,8 +250,8 @@ export default function CallPage() {
       const newState = !cameraOn;
       await localVideoTrackRef.current.setEnabled(newState);
       setCameraOn(newState);
-      // Re-trigger play if re-enabling camera to ensure video is visible
       if (newState && localVideoRef.current) {
+        // Re-play explicitly to fix black screen issue
         localVideoTrackRef.current.play(localVideoRef.current);
       }
     }
@@ -250,18 +263,18 @@ export default function CallPage() {
   if (errorMessage) {
     return (
       <div className="fixed inset-0 bg-black z-[100] flex items-center justify-center p-8 text-center">
-        <Alert variant="destructive" className="bg-zinc-900 border-red-500/50 rounded-[2.5rem] p-8 shadow-2xl">
-          <AlertCircle className="h-6 w-6 mb-4 text-red-500 mx-auto" />
-          <AlertTitle className="text-xl font-black uppercase tracking-tight text-white">Call Error</AlertTitle>
-          <AlertDescription className="text-[10px] font-medium text-white/50 leading-relaxed mt-2 uppercase tracking-widest">
+        <div className="bg-zinc-900 border border-red-500/50 rounded-[2.5rem] p-8 shadow-2xl max-w-xs w-full">
+          <AlertCircle className="h-8 w-8 mb-4 text-red-500 mx-auto" />
+          <h2 className="text-xl font-black uppercase tracking-tight text-white">Call Error</h2>
+          <p className="text-[10px] font-medium text-white/50 leading-relaxed mt-2 uppercase tracking-widest">
             {errorMessage === 'AGORA_CONFIGURATION_MISSING' 
               ? 'Agora credentials missing. Set AGORA_APP_ID and AGORA_APP_CERTIFICATE in secrets.' 
               : `An error occurred: ${errorMessage}.`}
-          </AlertDescription>
+          </p>
           <Button onClick={() => router.back()} className="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] h-14 rounded-full">
             Exit Session
           </Button>
-        </Alert>
+        </div>
       </div>
     );
   }
@@ -269,16 +282,16 @@ export default function CallPage() {
   if (hasPermission === false) {
     return (
       <div className="fixed inset-0 bg-black z-[100] flex items-center justify-center p-8">
-        <Alert variant="destructive" className="bg-zinc-900 border-red-500/50 rounded-[2.5rem] p-8 shadow-2xl text-center">
-          <AlertCircle className="h-6 w-6 mb-4 text-red-500 mx-auto" />
-          <AlertTitle className="text-xl font-black uppercase tracking-tight text-white">Access Denied</AlertTitle>
-          <AlertDescription className="text-[10px] font-medium text-white/50 leading-relaxed mt-2 uppercase tracking-widest">
+        <div className="bg-zinc-900 border border-red-500/50 rounded-[2.5rem] p-8 shadow-2xl text-center max-w-xs w-full">
+          <AlertCircle className="h-8 w-8 mb-4 text-red-500 mx-auto" />
+          <h2 className="text-xl font-black uppercase tracking-tight text-white">Access Denied</h2>
+          <p className="text-[10px] font-medium text-white/50 leading-relaxed mt-2 uppercase tracking-widest">
             NEXO requires {callType === 'video' ? 'Camera & Mic' : 'Microphone'} access.
-          </AlertDescription>
+          </p>
           <Button onClick={() => router.back()} className="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] h-14 rounded-full">
             Exit Session
           </Button>
-        </Alert>
+        </div>
       </div>
     );
   }
@@ -317,13 +330,13 @@ export default function CallPage() {
         )}
       </div>
 
-      {/* Local Video View - Always present in DOM if callType is video to prevent track release */}
+      {/* Local Video View - Larger Square View */}
       {callType === 'video' && (
         <div 
           className={cn(
             "absolute z-40 transition-all duration-500 rounded-[2.5rem] overflow-hidden border-4 border-white/20 shadow-2xl bg-black ring-8 ring-black/50 aspect-square",
             isMinimized ? "bottom-44 right-6 w-32 h-32" : "top-24 right-6 w-64 h-64",
-            !cameraOn && "opacity-0 pointer-events-none" // Hide instead of unmount to preserve ref
+            !cameraOn ? "opacity-0 pointer-events-none" : "opacity-100"
           )}
           ref={localVideoRef}
           onClick={() => setIsMinimized(!isMinimized)}
