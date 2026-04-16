@@ -31,7 +31,7 @@ export default function CallPage() {
   const [speakerOn, setSpeakerOn] = useState(true);
   const [isMinimized, setIsMinimized] = useState(false);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [configMissing, setConfigMissing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState('Initializing Secure Line...');
 
   const localVideoRef = useRef<HTMLDivElement>(null);
@@ -56,7 +56,7 @@ export default function CallPage() {
         const appId = process.env.NEXT_PUBLIC_AGORA_APP_ID;
         
         if (!appId) {
-          setConfigMissing(true);
+          setErrorMessage('AGORA_APP_ID missing in public env.');
           return;
         }
 
@@ -103,13 +103,14 @@ export default function CallPage() {
         setStatusMessage('Authenticating Session...');
         const result = await getAgoraToken(channelName, currentUser?.uid as string);
         
-        if (result.error === 'AGORA_CONFIGURATION_MISSING') {
-          setConfigMissing(true);
+        if (result.error) {
+          setErrorMessage(result.error);
           return;
         }
 
-        if (result.error || !result.token) {
-          throw new Error(result.error || 'Token generation failed');
+        if (!result.token) {
+          setErrorMessage('TOKEN_NOT_RECEIVED');
+          return;
         }
 
         setStatusMessage('Joining Channel...');
@@ -144,12 +145,7 @@ export default function CallPage() {
         setStatusMessage('Connected');
       } catch (error: any) {
         console.error("Call initialization failed:", error);
-        toast({
-          variant: "destructive",
-          title: "Connection Error",
-          description: error.message || "Failed to establish a secure call. Please try again later.",
-        });
-        router.back();
+        setErrorMessage(error.message || 'CONNECTION_FAILED');
       }
     };
 
@@ -179,13 +175,7 @@ export default function CallPage() {
         agoraClientRef.current.leave();
       }
     };
-  }, [currentUser, targetUserId, callType, router, db]);
-
-  useEffect(() => {
-    if (remoteUsers.length > 0 && remoteVideoRef.current) {
-      remoteUsers[0].videoTrack?.play(remoteVideoRef.current);
-    }
-  }, [remoteUsers]);
+  }, [currentUser, targetUserId, callType, db]);
 
   const handleEndCall = () => {
     router.back();
@@ -208,17 +198,17 @@ export default function CallPage() {
   const displayName = profile?.displayName || "Contact";
   const initials = displayName.substring(0, 2).toUpperCase();
 
-  if (configMissing) {
+  if (errorMessage) {
     return (
       <div className="fixed inset-0 bg-black z-[100] flex items-center justify-center p-8">
         <Alert variant="destructive" className="bg-zinc-900 border-red-500/50 rounded-[2rem] p-8 shadow-2xl">
           <AlertCircle className="h-6 w-6 mb-4 text-red-500" />
-          <AlertTitle className="text-xl font-black uppercase tracking-tight text-white">Agora ID Missing</AlertTitle>
+          <AlertTitle className="text-xl font-black uppercase tracking-tight text-white">Call Error</AlertTitle>
           <AlertDescription className="text-[10px] font-medium text-white/50 leading-relaxed mt-2 uppercase tracking-widest">
-            The calling engine has not been configured. Please add NEXT_PUBLIC_AGORA_APP_ID and AGORA_APP_CERTIFICATE to your environment variables. 
+            {errorMessage === 'AGORA_CONFIGURATION_MISSING' ? 'The Agora engine keys are missing on the server.' : `An error occurred: ${errorMessage}. Please check your configuration.`}
           </AlertDescription>
           <Button onClick={() => router.back()} className="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] h-14 rounded-full">
-            Exit
+            Exit Session
           </Button>
         </Alert>
       </div>
@@ -271,7 +261,7 @@ export default function CallPage() {
                     </div>
                   </div>
                 )}
-                {!joined && !configMissing && <Loader2 className="w-6 h-6 text-white/20 animate-spin mt-4" />}
+                {!joined && !errorMessage && <Loader2 className="w-6 h-6 text-white/20 animate-spin mt-4" />}
               </div>
             </div>
           </div>
