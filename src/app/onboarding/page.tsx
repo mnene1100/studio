@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { 
-  User, Calendar, MapPin, 
+  User as UserIcon, Calendar, MapPin, 
   ChevronRight, Sparkles, Loader2 
 } from "lucide-react";
 import { 
@@ -43,6 +43,8 @@ export default function OnboardingPage() {
     country: 'Kenya'
   });
 
+  const isFastLogin = user?.isAnonymous;
+
   const maxDate = useMemo(() => {
     const today = new Date();
     const year = today.getFullYear() - 18;
@@ -59,7 +61,9 @@ export default function OnboardingPage() {
 
   const handleComplete = async () => {
     if (!db || !user?.uid) return;
-    if (!formData.displayName.trim()) {
+    
+    // For email login, validate display name
+    if (!isFastLogin && !formData.displayName.trim()) {
       toast({ variant: "destructive", title: "Missing Name", description: "Please enter your display name." });
       return;
     }
@@ -69,11 +73,18 @@ export default function OnboardingPage() {
       const userRef = doc(db, 'users', user.uid);
       const numericId = (Math.floor(Math.random() * 900000000) + 100000000).toString();
       
+      const finalDisplayName = isFastLogin 
+        ? `Guest_${numericId.substring(0, 4)}` 
+        : formData.displayName.trim();
+
       const profileData = {
-        ...formData,
+        displayName: finalDisplayName,
+        gender: formData.gender,
+        dob: formData.dob,
+        country: formData.country,
         id: user.uid,
         numericId,
-        email: user.email || 'guest@nexo.com',
+        email: user.email || `${finalDisplayName.toLowerCase()}@nexo.com`,
         profilePictureUrl: `https://picsum.photos/seed/${user.uid}/200/200`,
         createdAt: new Date().toISOString(),
         lastOnlineAt: new Date().toISOString(),
@@ -111,7 +122,9 @@ export default function OnboardingPage() {
           <Sparkles className="w-6 h-6 text-primary fill-primary/20" />
           <h1 className="text-2xl font-black tracking-tight italic uppercase text-foreground">Set Up Profile</h1>
         </div>
-        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Personalize your experience</p>
+        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
+          {isFastLogin ? "Instant Access Details" : "Personalize your experience"}
+        </p>
       </header>
 
       <div className="flex-1 overflow-y-auto px-8 space-y-8 pb-32">
@@ -124,44 +137,47 @@ export default function OnboardingPage() {
         </div>
 
         <div className="space-y-6">
-          <div className="space-y-2">
-            <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Display Name</Label>
-            <div className="relative">
-              <Input 
-                placeholder="What should we call you?" 
-                className="h-14 bg-muted border-none rounded-[1.5rem] px-12 text-sm font-bold placeholder:font-medium"
-                value={formData.displayName}
-                onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
-              />
-              <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary opacity-40" />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Gender</Label>
-              <Select value={formData.gender} onValueChange={(val) => setFormData(prev => ({ ...prev, gender: val }))}>
-                <SelectTrigger className="h-14 bg-muted border-none rounded-[1.5rem] px-5 text-sm font-bold">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="rounded-2xl border-none shadow-2xl">
-                  {GENDERS.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Birthday</Label>
-              <div className="relative">
-                <Input 
-                  type="date"
-                  max={maxDate}
-                  className="h-14 bg-muted border-none rounded-[1.5rem] pl-12 text-xs font-bold"
-                  value={formData.dob}
-                  onChange={(e) => setFormData(prev => ({ ...prev, dob: e.target.value }))}
-                />
-                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-40" />
+          {!isFastLogin && (
+            <>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Display Name</Label>
+                <div className="relative">
+                  <Input 
+                    placeholder="What should we call you?" 
+                    className="h-14 bg-muted border-none rounded-[1.5rem] px-12 text-sm font-bold placeholder:font-medium"
+                    value={formData.displayName}
+                    onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
+                  />
+                  <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary opacity-40" />
+                </div>
               </div>
-            </div>
+
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Birthday</Label>
+                <div className="relative">
+                  <Input 
+                    type="date"
+                    max={maxDate}
+                    className="h-14 bg-muted border-none rounded-[1.5rem] pl-12 text-xs font-bold"
+                    value={formData.dob}
+                    onChange={(e) => setFormData(prev => ({ ...prev, dob: e.target.value }))}
+                  />
+                  <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-40" />
+                </div>
+              </div>
+            </>
+          )}
+
+          <div className="space-y-2">
+            <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Gender</Label>
+            <Select value={formData.gender} onValueChange={(val) => setFormData(prev => ({ ...prev, gender: val }))}>
+              <SelectTrigger className="h-14 bg-muted border-none rounded-[1.5rem] px-5 text-sm font-bold">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="rounded-2xl border-none shadow-2xl">
+                {GENDERS.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
@@ -184,12 +200,12 @@ export default function OnboardingPage() {
       <div className="fixed bottom-10 left-8 right-8 z-40">
         <Button 
           onClick={handleComplete}
-          disabled={isLoading || !formData.displayName.trim()}
+          disabled={isLoading || (!isFastLogin && !formData.displayName.trim())}
           className="w-full h-16 bg-primary text-white font-black rounded-[2rem] text-sm uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 active:scale-95 transition-all"
         >
           {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
             <>
-              Enter Nexo <ChevronRight className="ml-2 w-5 h-5" />
+              Complete Setup <ChevronRight className="ml-2 w-5 h-5" />
             </>
           )}
         </Button>
