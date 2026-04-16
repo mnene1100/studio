@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from 'react';
-import { RefreshCw, MessageSquare, UserCheck, Loader2, MessageCircle } from "lucide-react";
+import { RefreshCw, UserCheck, Loader2, MessageCircle } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { differenceInYears } from 'date-fns';
@@ -65,7 +65,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Recommended Sticky Label - Seamless (No Shadow) */}
+      {/* Recommended Sticky Label */}
       <div className="sticky top-0 z-40 bg-primary px-5 py-4">
         <div className="flex items-center justify-between">
           <h3 className="text-[10px] font-black text-white tracking-widest uppercase italic">Recommended</h3>
@@ -102,26 +102,25 @@ export default function HomePage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
                   
+                  {/* Chat Button - Top Right with Text + Icon */}
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/home/chat/${u.id}`);
+                    }}
+                    className="absolute top-3 right-3 h-8 px-4 bg-primary rounded-full flex items-center space-x-2 shadow-2xl active:scale-90 transition-all border border-white/20 z-10"
+                  >
+                    <span className="text-[10px] font-black text-white uppercase tracking-widest">Chat</span>
+                    <MessageCircle className="w-3.5 h-3.5 text-white fill-white" />
+                  </button>
+
                   <div className="absolute bottom-4 left-4 right-4">
                     <div className="flex items-center space-x-1.5 mb-2">
                       <h4 className="text-[14px] font-black text-white truncate tracking-tight">{u.displayName?.toLowerCase() || 'guest'}</h4>
                       {u.isVerified && <UserCheck className="w-3.5 h-3.5 text-primary fill-primary" />}
                     </div>
-                    <div className="flex items-center justify-between">
-                      <div className="h-5 px-2 bg-primary/30 backdrop-blur-md rounded-full border border-primary/40 flex items-center">
-                        <span className="text-[9px] font-black text-white uppercase">{u.gender === 'Female' ? '♀' : '♂'} {age}</span>
-                      </div>
-                      
-                      {/* Chat Button Restored */}
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          router.push(`/home/chat/${u.id}`);
-                        }}
-                        className="w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-all border border-white/20"
-                      >
-                        <MessageCircle className="w-4 h-4 text-white fill-white" />
-                      </button>
+                    <div className="h-5 w-fit px-2 bg-primary/30 backdrop-blur-md rounded-full border border-primary/40 flex items-center">
+                      <span className="text-[9px] font-black text-white uppercase">{u.gender === 'Female' ? '♀' : '♂'} {age}</span>
                     </div>
                   </div>
                 </div>

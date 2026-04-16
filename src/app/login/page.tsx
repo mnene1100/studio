@@ -26,13 +26,21 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!isUserLoading && user) {
-      router.replace('/home');
+      // Check if profile exists before sending to home
+      const checkProfile = async () => {
+        if (!db) return;
+        const userRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userRef);
+        if (userDoc.exists()) {
+          router.replace('/home');
+        }
+      };
+      checkProfile();
     }
-  }, [user, isUserLoading, router]);
+  }, [user, isUserLoading, router, db]);
 
   const detectCountry = async (): Promise<string> => {
     try {
-      // Using ipapi.co for simple IP-based location detection
       const response = await fetch('https://ipapi.co/json/');
       const data = await response.json();
       return data.country_name || 'Kenya';
@@ -71,7 +79,6 @@ export default function LoginPage() {
       await setDoc(userRef, defaultProfile, { merge: true });
     }
     localStorage.setItem('nexo_session_active', 'true');
-    localStorage.setItem('nexo_profile_completed', 'true');
   };
 
   const handleFastLogin = async () => {

@@ -53,7 +53,7 @@ export default function UserProfilePage() {
     return differenceInYears(new Date(), new Date(profile.dob));
   }, [profile?.dob]);
 
-  // Accurate presence: 90s threshold
+  // Accurate presence: 90s threshold for 60s heartbeat
   const isOnline = profile?.lastOnlineAt 
     ? (Date.now() - new Date(profile.lastOnlineAt).getTime() < 90000) 
     : false;
@@ -122,7 +122,7 @@ export default function UserProfilePage() {
             <ChevronLeft />
           </Button>
 
-          {/* Three Dots Menu Restored */}
+          {/* Three Dots Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button 
@@ -148,10 +148,10 @@ export default function UserProfilePage() {
         </div>
       </div>
 
-      {/* Profile Details - STRAIGHT EDGES (rounded-none) */}
+      {/* Profile Details - STRAIGHT EDGES */}
       <div className="px-6 bg-white pt-8 flex-1 rounded-none border-t border-gray-100">
         <div className="mb-4">
-          <div className={`inline-flex items-center px-3 py-1 border ${isOnline ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
+          <div className={`inline-flex items-center px-3 py-1 border rounded-none ${isOnline ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
             <div className={`w-1.5 h-1.5 ${isOnline ? 'bg-primary' : 'bg-gray-300'} rounded-full mr-2`} />
             <span className="text-[8px] font-black uppercase tracking-widest">{isOnline ? "Online" : "Offline"}</span>
           </div>
@@ -171,11 +171,11 @@ export default function UserProfilePage() {
 
         {/* Life Info */}
         <div className="grid grid-cols-2 gap-4 pb-10">
-          <div className="bg-gray-50 p-4 border border-gray-100">
+          <div className="bg-gray-50 p-4 border border-gray-100 rounded-none">
             <h4 className="text-[7px] font-black text-gray-300 uppercase tracking-widest mb-1">Education</h4>
             <p className="text-[10px] font-bold text-gray-900 truncate">{profile.education || "Not specified"}</p>
           </div>
-          <div className="bg-gray-50 p-4 border border-gray-100">
+          <div className="bg-gray-50 p-4 border border-gray-100 rounded-none">
             <h4 className="text-[7px] font-black text-gray-300 uppercase tracking-widest mb-1">Looking for</h4>
             <p className="text-[10px] font-bold text-gray-900 truncate">{profile.lookingFor || "Friends"}</p>
           </div>

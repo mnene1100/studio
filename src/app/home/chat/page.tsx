@@ -33,7 +33,7 @@ function ChatListItem({ chat }: { chat: any }) {
     >
       <div className="relative">
         <Avatar className="w-14 h-14 rounded-full border-none shadow-sm overflow-hidden">
-          <AvatarImage src={profile?.profilePictureUrl} className="object-cover" />
+          <AvatarImage src={profile?.profilePictureUrl} className="object-cover rounded-full" />
           <AvatarFallback className="bg-gray-100 text-lg font-bold rounded-full">
             <MessageCircle className="w-6 h-6 text-primary" />
           </AvatarFallback>
