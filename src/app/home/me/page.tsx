@@ -97,28 +97,28 @@ export default function MePage() {
         </div>
 
         {/* Floating Balance Cards */}
-        <div className="absolute bottom-[-60px] left-0 right-0 px-6 grid grid-cols-2 gap-4 z-20">
-          <div className="bg-card rounded-[2rem] p-4 flex flex-col items-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-border group">
+        <div className="absolute bottom-[-75px] left-0 right-0 px-6 grid grid-cols-2 gap-4 z-20">
+          <div className="bg-card rounded-[2rem] p-5 flex flex-col items-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-border group">
             <div className="w-8 h-8 bg-primary/10 rounded-xl flex items-center justify-center mb-2">
               <Coins className="w-4 h-4 text-primary" />
             </div>
             <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-0.5">Balance</p>
-            <h3 className="text-xl font-black text-foreground mb-3 tracking-tight">{profile.balance ?? 0}</h3>
+            <h3 className="text-xl font-black text-foreground mb-4 tracking-tight">{profile.balance ?? 0}</h3>
             <button 
               onClick={() => router.push('/home/wallet')}
-              className="w-full h-8 bg-primary text-white rounded-full text-[9px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-primary/20"
+              className="w-full h-11 bg-primary text-white rounded-full text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-primary/20"
             >
               Recharge
             </button>
           </div>
 
-          <div className="bg-card rounded-[2rem] p-4 flex flex-col items-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-border group">
+          <div className="bg-card rounded-[2rem] p-5 flex flex-col items-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-border group">
             <div className="w-8 h-8 bg-blue-500/10 rounded-xl flex items-center justify-center mb-2">
               <Diamond className="w-4 h-4 text-blue-500" />
             </div>
             <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-0.5">Earnings</p>
-            <h3 className="text-xl font-black text-foreground mb-3 tracking-tight">{profile.earnings ?? 0}</h3>
-            <button className="w-full h-8 bg-foreground text-background rounded-full text-[9px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg">
+            <h3 className="text-xl font-black text-foreground mb-4 tracking-tight">{profile.earnings ?? 0}</h3>
+            <button className="w-full h-11 bg-foreground text-background rounded-full text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg">
               Income
             </button>
           </div>
@@ -126,7 +126,7 @@ export default function MePage() {
       </div>
 
       {/* Content Spacer */}
-      <div className="h-20 shrink-0" />
+      <div className="h-24 shrink-0" />
 
       {/* Main Actions Area */}
       <div className="px-6 mt-8 space-y-4">
