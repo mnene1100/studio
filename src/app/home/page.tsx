@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
@@ -21,8 +20,8 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen pb-32 bg-black">
-      {/* Compact Scrollable Header Area */}
-      <div className="bg-primary pt-4 pb-6 px-6 shadow-2xl">
+      {/* Compact Scrollable Header Area - Reduced top padding */}
+      <div className="bg-primary pt-6 pb-6 px-6 shadow-2xl">
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-white/10 backdrop-blur-xl rounded-[1.75rem] flex flex-col items-center justify-center p-4 border border-white/20 active:scale-95 transition-all cursor-pointer h-24 shadow-lg group">
             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-2 group-hover:rotate-12 transition-transform">
@@ -98,8 +97,14 @@ export default function HomePage() {
                 </Link>
               ))
             ) : (
-              <div className="col-span-2 p-16 text-center bg-muted/5 rounded-[2.5rem] border border-dashed border-white/5">
-                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Searching for matches...</p>
+              <div className="col-span-2 p-16 text-center bg-muted/5 rounded-[2.5rem] border border-dashed border-white/5 flex flex-col items-center justify-center space-y-4">
+                <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center">
+                  <RefreshCw className="w-6 h-6 text-muted-foreground/40" />
+                </div>
+                <h2 className="text-xl font-black text-white tracking-tighter uppercase italic">No users yet</h2>
+                <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.3em] leading-relaxed">
+                  We're still looking for matches in your area.
+                </p>
               </div>
             )}
           </div>
