@@ -37,14 +37,13 @@ export default function CallPage() {
   const remoteVideoRef = useRef<HTMLDivElement>(null);
   const agoraClientRef = useRef<any>(null);
 
-  // 1. Get Target User Profile
+  // Get Target User Profile
   const targetUserRef = useMemoFirebase(() => {
     if (!db || !targetUserId) return null;
     return doc(db, 'userProfiles', targetUserId as string);
   }, [db, targetUserId]);
   const { data: profile } = useDoc(targetUserRef);
 
-  // Agora Initialization
   useEffect(() => {
     const initAgora = async () => {
       if (typeof window === 'undefined') return;
@@ -63,7 +62,6 @@ export default function CallPage() {
 
       agoraClientRef.current = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
 
-      // Event handlers
       agoraClientRef.current.on("user-published", async (user: any, mediaType: string) => {
         await agoraClientRef.current.subscribe(user, mediaType);
         if (mediaType === "video") {
@@ -78,16 +76,19 @@ export default function CallPage() {
         setRemoteUsers((prev) => prev.filter((u) => u.uid !== user.uid));
       });
 
-      // Join Channel and Request Permissions
       try {
         const channelName = [currentUser?.uid, targetUserId].sort().join('_');
         
-        // Request Permissions based on call type
         let audioTrack;
         let videoTrack;
 
         try {
-          audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+          // Request permissions based on call type
+          audioTrack = await AgoraRTC.createMicrophoneAudioTrack({
+            AEC: true,
+            ANS: true,
+            AGC: true,
+          });
           setLocalAudioTrack(audioTrack);
 
           if (callType === 'video') {
@@ -103,7 +104,6 @@ export default function CallPage() {
 
         await agoraClientRef.current.join(appId, channelName, null, currentUser?.uid);
 
-        // Publish Tracks
         if (callType === 'video' && videoTrack) {
           await agoraClientRef.current.publish([audioTrack, videoTrack]);
           if (localVideoRef.current) {
@@ -111,6 +111,7 @@ export default function CallPage() {
           }
         } else {
           await agoraClientRef.current.publish([audioTrack]);
+          // Note: In audio-only calls, browsers typically default to handset routing
         }
 
         setJoined(true);
@@ -119,7 +120,7 @@ export default function CallPage() {
         toast({
           variant: "destructive",
           title: "Connection Failed",
-          description: "Could not establish a call connection.",
+          description: "Could not establish a secure call connection.",
         });
       }
     };
@@ -129,7 +130,6 @@ export default function CallPage() {
     }
 
     return () => {
-      // Cleanup
       localVideoTrack?.stop();
       localVideoTrack?.close();
       localAudioTrack?.stop();
@@ -138,7 +138,6 @@ export default function CallPage() {
     };
   }, [currentUser, targetUserId, callType]);
 
-  // Handle Remote Video Rendering
   useEffect(() => {
     if (remoteUsers.length > 0 && remoteVideoRef.current) {
       remoteUsers[0].videoTrack?.play(remoteVideoRef.current);
@@ -169,14 +168,14 @@ export default function CallPage() {
   if (hasPermission === false) {
     return (
       <div className="fixed inset-0 bg-black z-[100] flex items-center justify-center p-8">
-        <Alert variant="destructive" className="bg-zinc-900 border-red-500/50">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Permission Denied</AlertTitle>
-          <AlertDescription>
-            NEXO needs access to your {callType === 'video' ? 'camera and microphone' : 'microphone'} to start the call. Please enable them in your browser settings.
+        <Alert variant="destructive" className="bg-zinc-900 border-red-500/50 rounded-[2.5rem] p-8">
+          <AlertCircle className="h-6 w-6 mb-4" />
+          <AlertTitle className="text-xl font-black uppercase tracking-tight">Permission Required</AlertTitle>
+          <AlertDescription className="text-xs font-medium text-white/60 leading-relaxed mt-2">
+            NEXO needs access to your {callType === 'video' ? 'camera and microphone' : 'microphone'} to start this call. Please enable them in your browser settings and try again.
           </AlertDescription>
-          <Button onClick={() => router.back()} className="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-widest text-[10px]">
-            Back to Chat
+          <Button onClick={() => router.back()} className="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] h-14 rounded-2xl">
+            Go Back
           </Button>
         </Alert>
       </div>
@@ -185,7 +184,7 @@ export default function CallPage() {
 
   return (
     <div className="fixed inset-0 bg-black z-[100] flex flex-col overflow-hidden">
-      {/* Background/Remote Video View */}
+      {/* Immersive View */}
       <div className="absolute inset-0 z-0">
         {callType === 'video' && remoteUsers.length > 0 ? (
           <div ref={remoteVideoRef} className="w-full h-full object-cover" />
@@ -204,88 +203,88 @@ export default function CallPage() {
                 {joined ? 'Secure HD Line' : 'Connecting...'}
               </p>
               {callType === 'audio' && joined && (
-                <p className="text-[9px] font-bold text-primary mt-4 uppercase tracking-widest bg-primary/10 px-4 py-1.5 rounded-full inline-block">
-                  Handset Mode Active
-                </p>
+                <div className="mt-6 flex flex-col items-center">
+                  <p className="text-[9px] font-bold text-primary uppercase tracking-widest bg-primary/10 px-5 py-2 rounded-full inline-block border border-primary/20">
+                    Handset Mode Active
+                  </p>
+                  <p className="mt-3 text-[8px] font-medium text-white/30 uppercase tracking-widest">Hold to your ear</p>
+                </div>
               )}
             </div>
           </div>
         )}
       </div>
 
-      {/* Local Video Overlay (PIP) */}
+      {/* Picture in Picture */}
       {callType === 'video' && cameraOn && (
         <div 
           className={cn(
-            "absolute z-20 transition-all duration-500 rounded-[2rem] overflow-hidden border-2 border-white/10 shadow-2xl bg-black",
+            "absolute z-20 transition-all duration-500 rounded-[2.5rem] overflow-hidden border-2 border-white/10 shadow-2xl bg-black",
             isMinimized 
-              ? "bottom-32 right-6 w-24 h-36" 
-              : "top-12 right-6 w-32 h-48"
+              ? "bottom-36 right-6 w-28 h-40" 
+              : "top-14 right-6 w-36 h-52"
           )}
           ref={localVideoRef}
           onClick={() => setIsMinimized(!isMinimized)}
         />
       )}
 
-      {/* Top Header Controls */}
+      {/* Header Controls */}
       <div className="absolute top-0 left-0 right-0 safe-top p-6 z-30 flex items-center justify-between">
         <button 
           onClick={() => setIsMinimized(!isMinimized)}
-          className="w-10 h-10 bg-white/10 backdrop-blur-xl rounded-full flex items-center justify-center border border-white/10"
+          className="w-12 h-12 bg-white/10 backdrop-blur-2xl rounded-full flex items-center justify-center border border-white/10 active:scale-90 transition-all"
         >
           {isMinimized ? <Maximize2 className="w-5 h-5 text-white" /> : <Minimize2 className="w-5 h-5 text-white" />}
         </button>
-        <div className="bg-black/20 backdrop-blur-xl px-4 py-2 rounded-full border border-white/5 flex items-center space-x-2">
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-          <span className="text-[9px] font-black text-white uppercase tracking-widest">
-            {callType === 'video' ? 'Video Encrypted' : 'Voice Encrypted'}
+        <div className="bg-black/40 backdrop-blur-2xl px-5 py-2.5 rounded-full border border-white/5 flex items-center space-x-2.5 shadow-xl">
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+          <span className="text-[9px] font-black text-white uppercase tracking-[0.2em]">
+            {callType === 'video' ? 'Video Encrypted' : 'Voice Secure'}
           </span>
         </div>
-        <div className="w-10 h-10" /> {/* Spacer */}
+        <div className="w-12 h-12" />
       </div>
 
-      {/* Bottom Main Controls */}
-      <div className="absolute bottom-0 left-0 right-0 pb-16 pt-12 px-8 z-30 bg-gradient-to-t from-black via-black/80 to-transparent">
+      {/* Footer Controls */}
+      <div className="absolute bottom-0 left-0 right-0 pb-16 pt-16 px-8 z-30 bg-gradient-to-t from-black via-black/90 to-transparent">
         <div className="flex items-center justify-around max-w-sm mx-auto">
-          {/* Mic Toggle */}
           <button 
             onClick={toggleMic}
             className={cn(
-              "w-14 h-14 rounded-full flex items-center justify-center border transition-all active:scale-90",
-              micOn ? "bg-white/10 border-white/20 text-white" : "bg-red-500 border-red-500 text-white"
+              "w-16 h-16 rounded-full flex items-center justify-center border transition-all active:scale-90 shadow-lg",
+              micOn ? "bg-white/10 border-white/20 text-white" : "bg-red-500 border-red-500 text-white shadow-red-500/30"
             )}
           >
-            {micOn ? <Mic className="w-6 h-6" /> : <MicOff className="w-6 h-6" />}
+            {micOn ? <Mic className="w-7 h-7" /> : <MicOff className="w-7 h-7" />}
           </button>
 
-          {/* End Call (Center Piece) */}
           <button 
             onClick={handleEndCall}
-            className="w-20 h-20 bg-red-500 rounded-full flex items-center justify-center shadow-2xl shadow-red-500/40 active:scale-90 transition-all border-4 border-black ring-4 ring-red-500/20"
+            className="w-24 h-24 bg-red-500 rounded-full flex items-center justify-center shadow-2xl shadow-red-500/40 active:scale-95 transition-all border-4 border-black ring-8 ring-red-500/10"
           >
-            <PhoneOff className="w-8 h-8 text-white" />
+            <PhoneOff className="w-10 h-10 text-white" />
           </button>
 
-          {/* Camera/Speaker Toggle */}
           {callType === 'video' ? (
             <button 
               onClick={toggleCamera}
               className={cn(
-                "w-14 h-14 rounded-full flex items-center justify-center border transition-all active:scale-90",
-                cameraOn ? "bg-white/10 border-white/20 text-white" : "bg-red-500 border-red-500 text-white"
+                "w-16 h-16 rounded-full flex items-center justify-center border transition-all active:scale-90 shadow-lg",
+                cameraOn ? "bg-white/10 border-white/20 text-white" : "bg-red-500 border-red-500 text-white shadow-red-500/30"
               )}
             >
-              {cameraOn ? <Video className="w-6 h-6" /> : <VideoOff className="w-6 h-6" />}
+              {cameraOn ? <Video className="w-7 h-7" /> : <VideoOff className="w-7 h-7" />}
             </button>
           ) : (
             <button 
               onClick={() => setSpeakerOn(!speakerOn)}
               className={cn(
-                "w-14 h-14 rounded-full flex items-center justify-center border transition-all active:scale-90",
+                "w-16 h-16 rounded-full flex items-center justify-center border transition-all active:scale-90 shadow-lg",
                 speakerOn ? "bg-white/10 border-white/20 text-white" : "bg-zinc-800 border-white/5 text-white/50"
               )}
             >
-              {speakerOn ? <Volume2 className="w-6 h-6" /> : <VolumeX className="w-6 h-6" />}
+              {speakerOn ? <Volume2 className="w-7 h-7" /> : <VolumeX className="w-7 h-7" />}
             </button>
           )}
         </div>

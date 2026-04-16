@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -71,7 +72,6 @@ export default function WalletPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white pb-24">
-      {/* Seamless Header */}
       <header className="bg-primary safe-top sticky top-0 z-50">
         <div className="px-4 h-16 flex items-center justify-between">
           <Button 
@@ -97,123 +97,118 @@ export default function WalletPage() {
       </header>
 
       <div className="p-4 space-y-4">
-        {/* Compact Wallet Balance Card */}
-        <div className="bg-gradient-to-br from-gray-900 to-black rounded-[1.75rem] p-4 text-white shadow-xl relative overflow-hidden">
+        <div className="bg-gradient-to-br from-gray-900 to-black rounded-[2.5rem] p-6 text-white shadow-2xl relative overflow-hidden">
           <div className="relative z-10">
-            <div className="flex items-center space-x-2 mb-1">
-              <div className="w-5 h-5 bg-white/10 backdrop-blur-md rounded-lg flex items-center justify-center border border-white/10">
-                <Coins className="w-3 h-3 text-primary" />
+            <div className="flex items-center space-x-2.5 mb-2">
+              <div className="w-6 h-6 bg-primary/20 backdrop-blur-md rounded-lg flex items-center justify-center border border-white/10">
+                <Coins className="w-3.5 h-3.5 text-primary" />
               </div>
-              <span className="text-[7px] font-black uppercase tracking-widest text-white/50">Balance</span>
+              <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/40">Coin Balance</span>
             </div>
-            <div className="flex items-baseline space-x-1.5">
-              <h2 className="text-2xl font-black tracking-tighter">
+            <div className="flex items-baseline space-x-2">
+              <h2 className="text-4xl font-black tracking-tighter">
                 {profile?.balance?.toLocaleString() || "0"}
               </h2>
-              <span className="text-[8px] font-black text-primary uppercase tracking-widest italic">Coins</span>
+              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] italic">NX</span>
             </div>
           </div>
-          <div className="absolute top-0 right-0 w-24 h-24 bg-primary/20 blur-3xl rounded-full -mr-12 -mt-12" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-[60px] rounded-full -mr-16 -mt-16" />
         </div>
 
-        {/* Region Selector */}
         <div className="max-w-[40%]">
-          <label className="text-[7px] font-black text-muted-foreground uppercase tracking-widest mb-1 block px-1">Region</label>
+          <label className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1.5 block px-1">Region</label>
           <Select defaultValue="kenya">
-            <SelectTrigger className="w-full h-8 bg-gray-50 border-none rounded-lg px-2 text-[9px] font-black text-gray-900 focus:ring-0 shadow-none">
-              <div className="flex items-center space-x-1.5">
-                <Globe className="w-2.5 h-2.5 text-primary" />
+            <SelectTrigger className="w-full h-10 bg-gray-50 border-none rounded-xl px-3 text-[10px] font-black text-gray-900 focus:ring-0 shadow-none">
+              <div className="flex items-center space-x-2">
+                <Globe className="w-3 h-3 text-primary" />
                 <SelectValue />
               </div>
             </SelectTrigger>
-            <SelectContent className="bg-white rounded-xl border-none shadow-2xl p-1">
-              <SelectItem value="kenya" className="py-2 font-black text-[8px] uppercase tracking-widest rounded-lg">Kenya (KES)</SelectItem>
-              <SelectItem value="uganda" className="py-2 font-black text-[8px] uppercase tracking-widest rounded-lg">Uganda (UGX)</SelectItem>
-              <SelectItem value="tanzania" className="py-2 font-black text-[8px] uppercase tracking-widest rounded-lg">Tanzania (TZS)</SelectItem>
+            <SelectContent className="bg-white rounded-2xl border-none shadow-2xl p-1">
+              <SelectItem value="kenya" className="py-3 font-black text-[9px] uppercase tracking-widest rounded-xl">Kenya (KES)</SelectItem>
+              <SelectItem value="uganda" className="py-3 font-black text-[9px] uppercase tracking-widest rounded-xl">Uganda (UGX)</SelectItem>
+              <SelectItem value="tanzania" className="py-3 font-black text-[9px] uppercase tracking-widest rounded-xl">Tanzania (TZS)</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        {/* Packages Grid */}
-        <div className="space-y-2">
+        <div className="space-y-3">
           <div className="flex items-center justify-between px-1">
-            <h3 className="text-[7px] font-black text-muted-foreground uppercase tracking-widest">Select Package</h3>
-            <div className="flex items-center space-x-1">
-               <Zap className="w-2 h-2 text-primary fill-primary" />
-               <span className="text-[6px] font-black text-primary uppercase tracking-widest">Instant STK</span>
+            <h3 className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">Select Package</h3>
+            <div className="flex items-center space-x-1.5">
+               <Zap className="w-2.5 h-2.5 text-primary fill-primary" />
+               <span className="text-[8px] font-black text-primary uppercase tracking-widest">Instant STK</span>
             </div>
           </div>
           
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-3">
             {PACKAGES.map((pkg) => (
               <div 
                 key={pkg.id} 
                 onClick={() => setSelectedPackage(pkg)}
                 className={cn(
-                  "relative bg-white rounded-[1.25rem] p-3 flex flex-col items-center border transition-all duration-200 cursor-pointer",
+                  "relative bg-white rounded-[2rem] p-5 flex flex-col items-center border transition-all duration-300 cursor-pointer",
                   selectedPackage?.id === pkg.id 
-                    ? "border-primary bg-primary/[0.02] scale-[1.01]" 
-                    : "border-gray-50 shadow-none"
+                    ? "border-primary bg-primary/[0.02] shadow-xl scale-[1.02]" 
+                    : "border-gray-50 hover:bg-gray-50/50"
                 )}
               >
                 {pkg.badge && (
-                  <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 bg-primary text-white text-[5px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full z-10">
+                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-primary text-white text-[6px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full z-10 shadow-lg">
                     {pkg.badge}
                   </div>
                 )}
                 <div className={cn(
-                  "w-6 h-6 rounded-lg flex items-center justify-center mb-1 transition-all",
+                  "w-10 h-10 rounded-2xl flex items-center justify-center mb-2.5 transition-all shadow-sm",
                   selectedPackage?.id === pkg.id ? "bg-primary text-white" : "bg-gray-50 text-gray-300"
                 )}>
-                  <Coins className="w-3.5 h-3.5" />
+                  <Coins className="w-5 h-5" />
                 </div>
-                <span className="text-base font-black text-gray-900 tracking-tight">{pkg.coins}</span>
-                <span className="text-[7px] font-black text-muted-foreground uppercase tracking-widest mb-1">{pkg.label}</span>
+                <span className="text-xl font-black text-gray-900 tracking-tight">{pkg.coins}</span>
+                <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-3">{pkg.label}</span>
                 <div className={cn(
-                  "w-4 h-4 rounded-full flex items-center justify-center border-2 transition-all",
-                  selectedPackage?.id === pkg.id ? "bg-primary border-primary text-white" : "border-gray-50 bg-white"
+                  "w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all",
+                  selectedPackage?.id === pkg.id ? "bg-primary border-primary text-white shadow-lg" : "border-gray-100 bg-white"
                 )}>
-                  {selectedPackage?.id === pkg.id && <ArrowRight className="w-2 h-2" />}
+                  {selectedPackage?.id === pkg.id && <ArrowRight className="w-3 h-3" />}
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Vendors Link */}
-        <div className="bg-gray-50 rounded-[1.25rem] p-2.5 flex items-center justify-between border-none">
-          <div className="flex items-center space-x-2">
-            <div className="w-7 h-7 bg-white rounded-lg shadow-sm flex items-center justify-center">
-              <Users className="w-3.5 h-3.5 text-primary" />
+        <div className="bg-gray-50 rounded-[2rem] p-4 flex items-center justify-between border-none">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center">
+              <Users className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="text-[9px] font-black text-gray-900 tracking-tight">Official Sellers</p>
-              <p className="text-[6px] font-black text-muted-foreground uppercase tracking-widest">Authorized Vendors</p>
+              <p className="text-[11px] font-black text-gray-900 tracking-tight">Official Sellers</p>
+              <p className="text-[7px] font-black text-muted-foreground uppercase tracking-widest">Authorized Network</p>
             </div>
           </div>
           <Button 
             variant="ghost" 
             size="icon" 
             onClick={() => router.push('/home/wallet/sellers')}
-            className="w-7 h-7 rounded-lg bg-white shadow-sm"
+            className="w-10 h-10 rounded-xl bg-white shadow-sm hover:bg-gray-50"
           >
-            <UserPlus className="w-3 h-3 text-primary" />
+            <UserPlus className="w-4 h-4 text-primary" />
           </Button>
         </div>
       </div>
 
-      {/* Floating Recharge Button */}
-      <div className="fixed bottom-6 left-4 right-4 z-50">
+      <div className="fixed bottom-8 left-6 right-6 z-50">
         <Button 
           onClick={handlePayment}
           disabled={!isFormValid || isLoading}
           className={cn(
-            "w-full h-14 rounded-2xl text-[10px] font-black transition-all uppercase tracking-[0.2em] shadow-none",
-            isFormValid ? "bg-primary text-white" : "bg-gray-100 text-gray-400"
+            "w-full h-16 rounded-[2rem] text-[11px] font-black transition-all uppercase tracking-[0.3em] shadow-2xl active:scale-95",
+            isFormValid ? "bg-primary text-white shadow-primary/30" : "bg-gray-100 text-gray-400"
           )}
         >
           {isLoading ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
+            <Loader2 className="w-6 h-6 animate-spin" />
           ) : (
             selectedPackage ? `Recharge ${selectedPackage.label}` : "Select a Package"
           )}
