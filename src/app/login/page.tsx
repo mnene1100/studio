@@ -61,7 +61,7 @@ export default function LoginPage() {
         numericId: (Math.floor(Math.random() * 900000000) + 100000000).toString(),
         email: firebaseUser.email || 'guest@nexo.com',
         displayName: randomName,
-        gender: 'Female', // Default to female to ensure free start for guests if they don't onboarding
+        gender: 'Female', // Default to female for guests
         dob: '2000-01-01',
         country: detectedCountry,
         education: 'N/A',

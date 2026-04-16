@@ -97,7 +97,7 @@ export default function CallPage() {
       }
     };
 
-    // First minute deduction happens immediately upon remote user join
+    // First minute deduction happens immediately upon remote user join (answer)
     if (!isBilledForFirstMinRef.current) {
       isBilledForFirstMinRef.current = true;
       deductCoins();
@@ -124,12 +124,12 @@ export default function CallPage() {
         const costPerMin = callType === 'video' ? 160 : 80;
         const currentBalance = currentUserProfile?.balance ?? 0;
 
-        // Check if user has enough coins for at least the first minute before starting
+        // Ensure first minute coverage before starting
         if (currentBalance < costPerMin) {
           toast({
             variant: 'destructive',
             title: 'Insufficient Balance',
-            description: `You need at least ${costPerMin} coins to start this call.`,
+            description: `You need at least ${costPerMin} coins for the first minute.`,
           });
           handleEndCall();
           return;
@@ -251,7 +251,7 @@ export default function CallPage() {
   if (errorMessage) {
     return (
       <div className="fixed inset-0 bg-black z-[100] flex items-center justify-center p-8 text-center">
-        <Alert variant="destructive" className="bg-zinc-900 border-red-500/50 rounded-[2rem] p-8 shadow-2xl">
+        <Alert variant="destructive" className="bg-zinc-900 border-red-500/50 rounded-[2.5rem] p-8 shadow-2xl">
           <AlertCircle className="h-6 w-6 mb-4 text-red-500 mx-auto" />
           <AlertTitle className="text-xl font-black uppercase tracking-tight text-white">Call Error</AlertTitle>
           <AlertDescription className="text-[10px] font-medium text-white/50 leading-relaxed mt-2 uppercase tracking-widest">
@@ -270,7 +270,7 @@ export default function CallPage() {
   if (hasPermission === false) {
     return (
       <div className="fixed inset-0 bg-black z-[100] flex items-center justify-center p-8">
-        <Alert variant="destructive" className="bg-zinc-900 border-red-500/50 rounded-[2rem] p-8 shadow-2xl text-center">
+        <Alert variant="destructive" className="bg-zinc-900 border-red-500/50 rounded-[2.5rem] p-8 shadow-2xl text-center">
           <AlertCircle className="h-6 w-6 mb-4 text-red-500 mx-auto" />
           <AlertTitle className="text-xl font-black uppercase tracking-tight text-white">Access Denied</AlertTitle>
           <AlertDescription className="text-[10px] font-medium text-white/50 leading-relaxed mt-2 uppercase tracking-widest">
@@ -312,14 +312,6 @@ export default function CallPage() {
                 <p className="text-[11px] font-black text-primary uppercase tracking-[0.4em] animate-pulse">
                   {remoteUsers.length > 0 ? 'Connected' : statusMessage}
                 </p>
-                {callType === 'audio' && remoteUsers.length > 0 && (
-                  <div className="flex flex-col items-center animate-in slide-in-from-bottom-4 duration-500">
-                    <div className="flex items-center space-x-2 bg-primary/10 px-5 py-2.5 rounded-full border border-primary/20 shadow-lg">
-                      <Volume2 className="w-3 h-3 text-primary animate-bounce" />
-                      <span className="text-[9px] font-black text-white uppercase tracking-widest">Handset Mode</span>
-                    </div>
-                  </div>
-                )}
                 {remoteUsers.length === 0 && !errorMessage && <Loader2 className="w-6 h-6 text-white/20 animate-spin mt-4" />}
               </div>
             </div>
@@ -354,7 +346,6 @@ export default function CallPage() {
             {remoteUsers.length > 0 ? (callType === 'video' ? 'Live Encrypted' : 'Voice Secure') : 'Waiting...'}
           </span>
         </div>
-        <div className="w-12 h-12" />
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 pb-20 pt-20 px-10 z-50 bg-gradient-to-t from-black via-black/90 to-transparent">

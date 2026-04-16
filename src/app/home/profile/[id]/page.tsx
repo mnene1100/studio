@@ -148,47 +148,47 @@ export default function UserProfilePage() {
         </div>
       </div>
 
-      {/* Profile Details - STRAIGHT EDGES AS REQUESTED */}
-      <div className="px-6 bg-white pt-8 flex-1 rounded-none border-t border-gray-100">
+      {/* Profile Details - ROUNDED CORNERS */}
+      <div className="px-6 bg-white pt-10 -mt-12 flex-1 rounded-t-[3rem] relative z-10">
         <div className="mb-4">
-          <div className={`inline-flex items-center px-3 py-1 border rounded-none ${isOnline ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
-            <div className={`w-1.5 h-1.5 ${isOnline ? 'bg-primary' : 'bg-gray-300'} rounded-full mr-2`} />
-            <span className="text-[8px] font-black uppercase tracking-widest">{isOnline ? "Online" : "Offline"}</span>
+          <div className={`inline-flex items-center px-4 py-1.5 rounded-full border ${isOnline ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
+            <div className={`w-2 h-2 ${isOnline ? 'bg-primary shadow-[0_0_8px_rgba(40,180,164,0.5)]' : 'bg-gray-300'} rounded-full mr-2`} />
+            <span className="text-[9px] font-black uppercase tracking-widest">{isOnline ? "Online" : "Offline"}</span>
           </div>
         </div>
 
-        <h1 className="text-xl font-black text-gray-900 tracking-tight mb-1">{profile.displayName}</h1>
-        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">
+        <h1 className="text-2xl font-black text-gray-900 tracking-tight mb-1">{profile.displayName}</h1>
+        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-8">
           {profile.gender} {age ? `• ${age} Years` : ''} • {profile.country || "KENYA"}
         </p>
 
         <div className="mb-8">
-           <h3 className="text-[8px] font-black text-gray-300 uppercase tracking-widest mb-2">About</h3>
-           <p className="text-gray-600 font-medium text-[13px] leading-relaxed">
-             {profile.statusMessage || "No bio yet."}
+           <h3 className="text-[9px] font-black text-gray-300 uppercase tracking-widest mb-2.5">About</h3>
+           <p className="text-gray-600 font-medium text-[14px] leading-relaxed">
+             {profile.statusMessage || "Hey! I'm using NEXO."}
            </p>
         </div>
 
-        {/* Life Info - STRAIGHT EDGES */}
-        <div className="grid grid-cols-2 gap-4 pb-10">
-          <div className="bg-gray-50 p-4 border border-gray-100 rounded-none">
-            <h4 className="text-[7px] font-black text-gray-300 uppercase tracking-widest mb-1">Education</h4>
-            <p className="text-[10px] font-bold text-gray-900 truncate">{profile.education || "Not specified"}</p>
+        {/* Life Info - ROUNDED BLOCKS */}
+        <div className="grid grid-cols-2 gap-4 pb-12">
+          <div className="bg-gray-50 p-5 border border-gray-100 rounded-[2rem]">
+            <h4 className="text-[8px] font-black text-gray-300 uppercase tracking-widest mb-1.5">Education</h4>
+            <p className="text-[11px] font-bold text-gray-900 truncate">{profile.education || "Not specified"}</p>
           </div>
-          <div className="bg-gray-50 p-4 border border-gray-100 rounded-none">
-            <h4 className="text-[7px] font-black text-gray-300 uppercase tracking-widest mb-1">Looking for</h4>
-            <p className="text-[10px] font-bold text-gray-900 truncate">{profile.lookingFor || "Friends"}</p>
+          <div className="bg-gray-50 p-5 border border-gray-100 rounded-[2rem]">
+            <h4 className="text-[8px] font-black text-gray-300 uppercase tracking-widest mb-1.5">Looking for</h4>
+            <p className="text-[11px] font-bold text-gray-900 truncate">{profile.lookingFor || "Making Friends"}</p>
           </div>
         </div>
       </div>
 
-      {/* Fixed Chat Action */}
-      <div className="fixed bottom-6 left-6 right-6 z-30">
+      {/* Fixed Chat Action - ROUNDED BUTTON */}
+      <div className="fixed bottom-10 left-8 right-8 z-30">
         <Button 
           onClick={() => router.push(`/home/chat/${profile.id}`)} 
-          className="w-full h-14 bg-primary text-white font-black rounded-none uppercase tracking-widest shadow-2xl shadow-primary/30 active:scale-95 transition-all"
+          className="w-full h-16 bg-primary text-white font-black rounded-[2rem] uppercase tracking-widest shadow-2xl shadow-primary/30 active:scale-95 transition-all"
         >
-          <MessageCircle className="mr-2 h-4 w-4 fill-white" /> Start Chat
+          <MessageCircle className="mr-2 h-5 w-5 fill-white" /> Start Chat
         </Button>
       </div>
     </div>
