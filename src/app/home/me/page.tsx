@@ -8,20 +8,11 @@ import {
   Eye, Pencil, Coins, Diamond, Settings, Gamepad2
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
-import { doc } from 'firebase/firestore';
+import { useHomeData } from '../layout';
 
 export default function MePage() {
   const router = useRouter();
-  const { user } = useUser();
-  const db = useFirestore();
-
-  const userRef = useMemoFirebase(() => {
-    if (!db || !user?.uid) return null;
-    return doc(db, 'userProfiles', user.uid);
-  }, [db, user?.uid]);
-
-  const { data: profile, isLoading } = useDoc(userRef);
+  const { profile } = useHomeData();
 
   const copyId = () => {
     if (profile?.numericId) {
@@ -37,12 +28,6 @@ export default function MePage() {
     }
   };
 
-  if (isLoading) return (
-    <div className="flex items-center justify-center h-screen bg-black">
-      <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin"></div>
-    </div>
-  );
-
   if (!profile) return null;
 
   const displayName = profile.displayName || "Guest_user";
@@ -50,30 +35,28 @@ export default function MePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-black pb-32">
-      {/* Top Teal Section - Reduced Height */}
+      {/* Top Teal Section */}
       <div className="bg-primary pt-10 pb-8 px-6 relative flex flex-col items-center shadow-2xl">
-        {/* Visitors Button (Top Right) */}
-        <button className="absolute top-4 right-6 flex flex-col items-center space-y-1 group active:scale-95 transition-all z-10">
+        {/* Visitors Button */}
+        <button className="absolute top-4 right-6 flex flex-col items-center space-y-1 active:scale-95 transition-all z-10">
           <div className="p-2.5 bg-white/10 backdrop-blur-xl rounded-xl border border-white/20">
             <Eye className="w-4 h-4 text-white" />
           </div>
           <span className="text-[9px] font-black text-white/80 uppercase tracking-[0.2em]">Visitors</span>
         </button>
 
-        {/* Profile Avatar - Reduced Size */}
-        <div className="relative mb-4 mt-2">
-          <div className="p-1 bg-white/10 rounded-full backdrop-blur-md shadow-2xl">
-            <Avatar className="w-24 h-24 border-none ring-0">
-              <AvatarImage src={profile.profilePictureUrl} />
-              <AvatarFallback className="bg-white/10 text-white text-3xl font-black">{initials}</AvatarFallback>
-            </Avatar>
-          </div>
-          <button className="absolute bottom-0 right-0 p-2 bg-black rounded-full border-2 border-primary shadow-2xl active:scale-90 transition-transform">
+        {/* Profile Avatar */}
+        <div className="relative mb-3 mt-2">
+          <Avatar className="w-24 h-24 border-none ring-0 shadow-2xl">
+            <AvatarImage src={profile.profilePictureUrl} />
+            <AvatarFallback className="bg-white/10 text-white text-3xl font-black">{initials}</AvatarFallback>
+          </Avatar>
+          <button className="absolute bottom-0 right-0 p-2 bg-black rounded-full border border-primary active:scale-90 transition-transform">
             <Pencil className="w-3.5 h-3.5 text-white" />
           </button>
         </div>
         
-        <h2 className="text-xl font-black text-white mb-1.5 tracking-tight">{displayName}</h2>
+        <h2 className="text-xl font-black text-white mb-1 tracking-tight">{displayName}</h2>
 
         {/* ID Pill */}
         <div 
@@ -84,7 +67,7 @@ export default function MePage() {
           <Copy className="w-3.5 h-3.5 text-white/60 group-hover:text-white transition-colors" />
         </div>
 
-        {/* Recharge & Income Cards - Reduced Height */}
+        {/* Action Cards */}
         <div className="grid grid-cols-2 gap-4 w-full max-w-sm">
           <div className="bg-white/10 backdrop-blur-xl rounded-[2rem] p-4 flex flex-col items-center justify-center text-center border border-white/20 shadow-xl active:scale-95 transition-all cursor-pointer h-24 group">
             <div className="p-2 bg-white/20 rounded-xl mb-1.5 group-hover:scale-110 transition-transform">
@@ -104,8 +87,8 @@ export default function MePage() {
         </div>
       </div>
 
-      {/* Account & Safety Section - Scaled Down */}
-      <div className="px-6 mt-8 space-y-5">
+      {/* Account & Safety Section */}
+      <div className="px-6 mt-8 space-y-4">
         <div className="flex items-center space-x-3">
           <h3 className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.2em] whitespace-nowrap">Account & Safety</h3>
           <div className="h-[1px] w-full bg-white/5" />
@@ -120,7 +103,7 @@ export default function MePage() {
             <ChevronRight className="w-5 h-5 text-white/40 group-active:translate-x-1 transition-transform" />
           </button>
 
-          <button className="w-full flex items-center p-4 bg-card rounded-[1.75rem] border border-white/5 active:scale-[0.98] transition-all group">
+          <button className="w-full flex items-center p-4 bg-white/5 rounded-[1.75rem] border border-white/5 active:scale-[0.98] transition-all group">
             <div className="p-2.5 bg-primary/10 rounded-xl mr-4">
               <Headset className="w-5 h-5 text-primary" />
             </div>
@@ -128,7 +111,7 @@ export default function MePage() {
             <ChevronRight className="w-5 h-5 text-white/10 group-active:translate-x-1 transition-transform" />
           </button>
 
-          <button className="w-full flex items-center p-4 bg-card rounded-[1.75rem] border border-white/5 active:scale-[0.98] transition-all group">
+          <button className="w-full flex items-center p-4 bg-white/5 rounded-[1.75rem] border border-white/5 active:scale-[0.98] transition-all group">
             <div className="p-2.5 bg-orange-500/10 rounded-xl mr-4">
               <Gamepad2 className="w-5 h-5 text-orange-500" />
             </div>
@@ -138,7 +121,7 @@ export default function MePage() {
 
           <button 
             onClick={() => router.push('/home/me/settings')}
-            className="w-full flex items-center p-4 bg-card rounded-[1.75rem] border border-white/5 active:scale-[0.98] transition-all group"
+            className="w-full flex items-center p-4 bg-white/5 rounded-[1.75rem] border border-white/5 active:scale-[0.98] transition-all group"
           >
             <div className="p-2.5 bg-white/5 rounded-xl mr-4">
               <Settings className="w-5 h-5 text-muted-foreground" />
