@@ -24,6 +24,7 @@ function ChatListItem({ chat }: { chat: any }) {
   const isOnline = profile?.lastOnlineAt ? (Date.now() - new Date(profile.lastOnlineAt).getTime() < 120000) : false;
 
   const lastMessageTime = chat.lastMessageSentAt || chat.updatedAt;
+  const lastMessagePreview = chat.lastMessageContent || "Start a conversation...";
 
   return (
     <Link 
@@ -50,7 +51,9 @@ function ChatListItem({ chat }: { chat: any }) {
           </span>
         </div>
         <div className="flex items-center justify-between">
-          <p className="text-[11px] text-gray-400 line-clamp-1 font-medium">Continue your conversation...</p>
+          <p className="text-[11px] text-gray-400 line-clamp-1 font-medium italic">
+            {lastMessagePreview}
+          </p>
         </div>
       </div>
     </Link>

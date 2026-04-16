@@ -121,6 +121,10 @@
           "format": "date-time",
           "description": "Timestamp of the last sent message."
         },
+        "lastMessageContent": {
+          "type": "string",
+          "description": "The text preview of the last message sent."
+        },
         "createdAt": {
           "type": "string",
           "format": "date-time"

@@ -93,10 +93,11 @@ export default function ChatDetailPage() {
     if (!input.trim() || !chatId || !currentUser) return;
     
     const now = new Date().toISOString();
+    const messageContent = input.trim();
     const messageData = {
       chatId: chatId,
       senderId: currentUser.uid,
-      content: input,
+      content: messageContent,
       sentAt: now,
       type: 'text'
     };
@@ -107,7 +108,8 @@ export default function ChatDetailPage() {
     const chatRef = doc(db, 'chatConversations', chatId);
     updateDocumentNonBlocking(chatRef, {
       updatedAt: now,
-      lastMessageSentAt: now // Explicitly track that a message has been sent
+      lastMessageSentAt: now,
+      lastMessageContent: messageContent // Store content preview
     });
 
     setInput('');
