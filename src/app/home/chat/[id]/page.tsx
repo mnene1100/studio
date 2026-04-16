@@ -186,7 +186,7 @@ export default function ChatDetailPage() {
 
       {/* Scrollable Messages Area */}
       <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col space-y-4 bg-white" ref={scrollRef}>
-        {messages.map((msg: any, i: number) => {
+        {(messages || []).map((msg: any, i: number) => {
           const isMe = msg.senderId === currentUser?.uid;
           return (
             <div key={i} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
