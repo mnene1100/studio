@@ -35,15 +35,15 @@ export default function SettingsPage() {
   const handleLogout = async () => {
     if (!auth) return;
     try {
-      // Clear flags FIRST to ensure layout effect triggers correctly
-      localStorage.removeItem('nexo_session_active');
-      localStorage.removeItem('nexo_profile_completed');
+      // Clear all state FIRST to ensure no stale data remains
+      localStorage.clear();
+      sessionStorage.clear();
       
       // Perform sign out
       await signOut(auth);
       
-      // Use replace to overwrite history
-      router.replace('/login');
+      // Force a full clean redirect to the login page
+      window.location.href = '/login';
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -61,11 +61,12 @@ export default function SettingsPage() {
       await deleteUser(user);
       
       localStorage.clear();
+      sessionStorage.clear();
       toast({
         title: "Account Deleted",
         description: "Your data has been removed from the NEXO network.",
       });
-      router.replace('/login');
+      window.location.href = '/login';
     } catch (error: any) {
       toast({
         variant: "destructive",

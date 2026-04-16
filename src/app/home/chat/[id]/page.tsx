@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { useFirestore, useDoc, useCollection, useMemoFirebase, useUser, addDocumentNonBlocking, updateDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase';
 import { doc, collection, query, orderBy, limit, where, getDocs, updateDoc, increment } from 'firebase/firestore';
-import { aiSuggestedConversationStarters } from "@/ai/flows/ai-suggested-conversation-starters";
+import { aiSuggested conversationStarters } from "@/ai/flows/ai-suggested-conversation-starters";
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useHomeData } from '../../layout';

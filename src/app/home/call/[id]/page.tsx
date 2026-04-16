@@ -204,7 +204,7 @@ export default function CallPage() {
         agoraClientRef.current.leave();
       }
     };
-  }, [currentUser?.uid, targetUserId, callType, db]);
+  }, [currentUser?.uid, targetUserId, callType, db, currentUserProfile]); // Watch profile but ref prevents re-init
 
   const toggleMic = async () => {
     if (localAudioTrackRef.current) {
