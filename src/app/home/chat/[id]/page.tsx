@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from 'react';
@@ -135,7 +136,8 @@ export default function ChatDetailPage() {
     if (!profile?.lastOnlineAt) return false;
     const lastOnline = new Date(profile.lastOnlineAt).getTime();
     const now = Date.now();
-    return now - lastOnline < 120000;
+    // Use 90s threshold for more accurate status relative to 60s update interval
+    return now - lastOnline < 90000;
   }, [profile?.lastOnlineAt]);
 
   const lastSeenText = useMemo(() => {

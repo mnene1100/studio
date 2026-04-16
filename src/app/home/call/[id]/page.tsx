@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
@@ -37,13 +38,12 @@ export default function CallPage() {
   const agoraClientRef = useRef<any>(null);
   const callIdRef = useRef<string | null>(null);
   
-  // Track refs for immediate and reliable cleanup
   const localAudioTrackRef = useRef<any>(null);
   const localVideoTrackRef = useRef<any>(null);
 
   const targetUserRef = useMemoFirebase(() => {
     if (!db || !targetUserId) return null;
-    return doc(db, 'userProfiles', targetUserId as string);
+    return doc(db, 'users', targetUserId as string);
   }, [db, targetUserId]);
   const { data: profile } = useDoc(targetUserRef);
 
@@ -52,13 +52,13 @@ export default function CallPage() {
       if (typeof window === 'undefined') return;
 
       try {
-        const AgoraRTC = (await import('agora-rtc-sdk-ng')).default;
         const appId = process.env.NEXT_PUBLIC_AGORA_APP_ID;
         
         if (!appId) {
-          throw new Error("Agora App ID Missing");
+          throw new Error("AGORA_CONFIGURATION_MISSING");
         }
 
+        const AgoraRTC = (await import('agora-rtc-sdk-ng')).default;
         agoraClientRef.current = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
 
         agoraClientRef.current.on("user-published", async (user: any, mediaType: string) => {
@@ -80,7 +80,6 @@ export default function CallPage() {
         setStatusMessage('Requesting Permissions...');
         
         try {
-          // Always create audio track
           const audioTrack = await AgoraRTC.createMicrophoneAudioTrack({
             AEC: true,
             ANS: true,
@@ -88,7 +87,6 @@ export default function CallPage() {
           });
           localAudioTrackRef.current = audioTrack;
 
-          // Conditionally create video track
           if (callType === 'video') {
             const videoTrack = await AgoraRTC.createCameraVideoTrack();
             localVideoTrackRef.current = videoTrack;
@@ -106,7 +104,6 @@ export default function CallPage() {
         setStatusMessage('Joining Channel...');
         await agoraClientRef.current.join(appId, channelName, token, currentUser?.uid);
 
-        // PERSIST CALL TO FIRESTORE
         const callId = `${currentUser?.uid}_${targetUserId}_${Date.now()}`;
         callIdRef.current = callId;
         const callRef = doc(db!, 'calls', callId);
@@ -132,12 +129,14 @@ export default function CallPage() {
         setStatusMessage('Connected');
       } catch (error: any) {
         console.error("Call initialization failed:", error);
-        toast({
-          variant: "destructive",
-          title: "Connection Error",
-          description: error.message || "Failed to establish a secure call.",
-        });
-        router.back();
+        if (error.message !== "AGORA_CONFIGURATION_MISSING") {
+          toast({
+            variant: "destructive",
+            title: "Connection Error",
+            description: error.message || "Failed to establish a secure call.",
+          });
+          router.back();
+        }
       }
     };
 
@@ -145,7 +144,6 @@ export default function CallPage() {
       initAgora();
     }
 
-    // CRITICAL: Cleanup function disconnects all hardware and updates call record
     return () => {
       if (callIdRef.current && db) {
         const callRef = doc(db, 'calls', callIdRef.current);
@@ -177,7 +175,6 @@ export default function CallPage() {
   }, [remoteUsers]);
 
   const handleEndCall = () => {
-    // Navigating back triggers the useEffect cleanup
     router.back();
   };
 
@@ -198,16 +195,35 @@ export default function CallPage() {
   const displayName = profile?.displayName || "Contact";
   const initials = displayName.substring(0, 2).toUpperCase();
 
+  // Missing Agora Configuration Warning
+  if (!process.env.NEXT_PUBLIC_AGORA_APP_ID) {
+    return (
+      <div className="fixed inset-0 bg-black z-[100] flex items-center justify-center p-8">
+        <Alert variant="destructive" className="bg-zinc-900 border-red-500/50 rounded-none p-8 shadow-2xl">
+          <AlertCircle className="h-6 w-6 mb-4 text-red-500" />
+          <AlertTitle className="text-xl font-black uppercase tracking-tight text-white">Agora ID Missing</AlertTitle>
+          <AlertDescription className="text-[10px] font-medium text-white/50 leading-relaxed mt-2 uppercase tracking-widest">
+            The calling engine has not been configured. Please add NEXT_PUBLIC_AGORA_APP_ID and AGORA_APP_CERTIFICATE to your environment variables. 
+            Visit console.agora.io to get your keys.
+          </AlertDescription>
+          <Button onClick={() => router.back()} className="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] h-14 rounded-none">
+            Exit
+          </Button>
+        </Alert>
+      </div>
+    );
+  }
+
   if (hasPermission === false) {
     return (
       <div className="fixed inset-0 bg-black z-[100] flex items-center justify-center p-8">
-        <Alert variant="destructive" className="bg-zinc-900 border-red-500/50 rounded-[2.5rem] p-8 shadow-2xl">
+        <Alert variant="destructive" className="bg-zinc-900 border-red-500/50 rounded-none p-8 shadow-2xl">
           <AlertCircle className="h-6 w-6 mb-4 text-red-500" />
           <AlertTitle className="text-xl font-black uppercase tracking-tight text-white">Access Denied</AlertTitle>
           <AlertDescription className="text-[10px] font-medium text-white/50 leading-relaxed mt-2 uppercase tracking-widest">
             NEXO requires {callType === 'video' ? 'Camera & Mic' : 'Microphone'} access. Please check your browser settings and refresh.
           </AlertDescription>
-          <Button onClick={() => router.back()} className="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] h-14 rounded-2xl">
+          <Button onClick={() => router.back()} className="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] h-14 rounded-none">
             Exit Session
           </Button>
         </Alert>
@@ -217,7 +233,6 @@ export default function CallPage() {
 
   return (
     <div className="fixed inset-0 bg-black z-[100] flex flex-col overflow-hidden">
-      {/* Immersive View */}
       <div className="absolute inset-0 z-0">
         {callType === 'video' && remoteUsers.length > 0 ? (
           <div ref={remoteVideoRef} className="w-full h-full object-cover animate-in fade-in duration-700" />
@@ -243,7 +258,6 @@ export default function CallPage() {
                       <Volume2 className="w-3 h-3 text-primary animate-bounce" />
                       <span className="text-[9px] font-black text-white uppercase tracking-widest">Handset Mode</span>
                     </div>
-                    <p className="mt-4 text-[8px] font-bold text-white/30 uppercase tracking-[0.3em]">Audio routed to earpiece</p>
                   </div>
                 )}
                 {!joined && <Loader2 className="w-6 h-6 text-white/20 animate-spin mt-4" />}
@@ -253,11 +267,10 @@ export default function CallPage() {
         )}
       </div>
 
-      {/* Picture in Picture */}
       {callType === 'video' && cameraOn && (
         <div 
           className={cn(
-            "absolute z-40 transition-all duration-500 rounded-[2.5rem] overflow-hidden border-2 border-white/20 shadow-2xl bg-black ring-4 ring-black/50",
+            "absolute z-40 transition-all duration-500 rounded-none overflow-hidden border-2 border-white/20 shadow-2xl bg-black ring-4 ring-black/50",
             isMinimized 
               ? "bottom-40 right-6 w-28 h-44" 
               : "top-20 right-6 w-32 h-48"
@@ -267,7 +280,6 @@ export default function CallPage() {
         />
       )}
 
-      {/* Header Controls */}
       <div className="absolute top-0 left-0 right-0 safe-top p-6 z-50 flex items-center justify-between">
         <button 
           onClick={() => setIsMinimized(!isMinimized)}
@@ -287,13 +299,12 @@ export default function CallPage() {
         <div className="w-12 h-12" />
       </div>
 
-      {/* Footer Controls */}
       <div className="absolute bottom-0 left-0 right-0 pb-20 pt-20 px-10 z-50 bg-gradient-to-t from-black via-black/90 to-transparent">
         <div className="flex items-center justify-around max-w-sm mx-auto">
           <button 
             onClick={toggleMic}
             className={cn(
-              "w-16 h-16 rounded-[1.75rem] flex items-center justify-center border transition-all active:scale-90 shadow-2xl",
+              "w-16 h-16 rounded-none flex items-center justify-center border transition-all active:scale-90 shadow-2xl",
               micOn ? "bg-white/5 border-white/10 text-white" : "bg-red-500 border-red-500 text-white shadow-red-500/40"
             )}
           >
@@ -302,7 +313,7 @@ export default function CallPage() {
 
           <button 
             onClick={handleEndCall}
-            className="w-24 h-24 bg-red-500 rounded-[2.5rem] flex items-center justify-center shadow-[0_20px_60px_rgba(239,68,68,0.4)] active:scale-95 transition-all border-4 border-black ring-1 ring-white/10"
+            className="w-24 h-24 bg-red-500 rounded-none flex items-center justify-center shadow-[0_20px_60px_rgba(239,68,68,0.4)] active:scale-95 transition-all border-4 border-black ring-1 ring-white/10"
           >
             <PhoneOff className="w-10 h-10 text-white" />
           </button>
@@ -311,7 +322,7 @@ export default function CallPage() {
             <button 
               onClick={toggleCamera}
               className={cn(
-                "w-16 h-16 rounded-[1.75rem] flex items-center justify-center border transition-all active:scale-90 shadow-2xl",
+                "w-16 h-16 rounded-none flex items-center justify-center border transition-all active:scale-90 shadow-2xl",
                 cameraOn ? "bg-white/5 border-white/10 text-white" : "bg-red-500 border-red-500 text-white shadow-red-500/40"
               )}
             >
@@ -321,7 +332,7 @@ export default function CallPage() {
             <button 
               onClick={() => setSpeakerOn(!speakerOn)}
               className={cn(
-                "w-16 h-16 rounded-[1.75rem] flex items-center justify-center border transition-all active:scale-90 shadow-2xl",
+                "w-16 h-16 rounded-none flex items-center justify-center border transition-all active:scale-90 shadow-2xl",
                 speakerOn ? "bg-primary border-primary text-white shadow-primary/30" : "bg-white/5 border-white/10 text-white/40"
               )}
             >

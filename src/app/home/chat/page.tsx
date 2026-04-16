@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -19,7 +20,8 @@ function ChatListItem({ chat }: { chat: any }) {
   
   const { data: profile } = useDoc(targetUserRef);
 
-  const isOnline = profile?.lastOnlineAt ? (Date.now() - new Date(profile.lastOnlineAt).getTime() < 120000) : false;
+  // Consistent 90s threshold for online status
+  const isOnline = profile?.lastOnlineAt ? (Date.now() - new Date(profile.lastOnlineAt).getTime() < 90000) : false;
 
   const lastMessageTime = chat.lastMessageSentAt || chat.updatedAt;
   const lastMessagePreview = chat.lastMessageContent || "Start a conversation...";
@@ -27,12 +29,12 @@ function ChatListItem({ chat }: { chat: any }) {
   return (
     <Link 
       href={`/home/chat/${otherParticipantId}`}
-      className="flex items-center px-4 py-4 rounded-3xl active:bg-gray-50 transition-all group border border-transparent"
+      className="flex items-center px-4 py-4 rounded-none active:bg-gray-50 transition-all group border border-transparent"
     >
       <div className="relative">
-        <Avatar className="w-14 h-14 rounded-full ring-2 ring-gray-50 shadow-sm">
+        <Avatar className="w-14 h-14 rounded-none ring-2 ring-gray-50 shadow-sm">
           <AvatarImage src={profile?.profilePictureUrl} />
-          <AvatarFallback className="bg-gray-100 text-lg font-bold">
+          <AvatarFallback className="bg-gray-100 text-lg font-bold rounded-none">
             <MessageCircle className="w-6 h-6 text-primary" />
           </AvatarFallback>
         </Avatar>
@@ -62,7 +64,6 @@ export default function ChatListPage() {
   const { user } = useUser();
   const db = useFirestore();
 
-  // Simplified query: No OrderBy to avoid index requirement during prototype
   const chatsQuery = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
     return query(
@@ -72,7 +73,6 @@ export default function ChatListPage() {
   }, [db, user?.uid]);
   const { data: chats, isLoading: isChatsLoading } = useCollection(chatsQuery);
 
-  // Client-side sorting for reliability
   const filteredAndSortedChats = (chats || [])
     .filter(chat => !!chat.lastMessageSentAt)
     .sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime());
@@ -83,7 +83,7 @@ export default function ChatListPage() {
         <h1 className="text-3xl text-white font-black italic tracking-tight uppercase pt-2">
           Chats
         </h1>
-        <button className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 active:scale-90 transition-all mt-2">
+        <button className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-none flex items-center justify-center border border-white/20 active:scale-90 transition-all mt-2">
           <MessageSquare className="w-4 h-4 text-white fill-white" />
         </button>
       </header>
@@ -101,7 +101,7 @@ export default function ChatListPage() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-[60vh] text-center">
-            <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6 border border-gray-100 shadow-sm">
+            <div className="w-24 h-24 bg-gray-50 rounded-none flex items-center justify-center mb-6 border border-gray-100 shadow-sm">
               <MessageSquare className="w-10 h-10 text-gray-200" />
             </div>
             <h2 className="text-[10px] font-black text-gray-300 tracking-[0.3em] uppercase italic">

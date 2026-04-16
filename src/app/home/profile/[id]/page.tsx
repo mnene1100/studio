@@ -58,7 +58,8 @@ export default function UserProfilePage() {
     if (!profile?.lastOnlineAt) return false;
     const lastOnline = new Date(profile.lastOnlineAt).getTime();
     const now = Date.now();
-    return now - lastOnline < 120000;
+    // Tighter threshold (90s) to better reflect real-time activity based on heartbeat
+    return now - lastOnline < 90000;
   }, [profile?.lastOnlineAt]);
 
   const statusText = useMemo(() => {
@@ -187,10 +188,10 @@ export default function UserProfilePage() {
         </div>
       </div>
 
-      {/* Profile Details Area - Edges made fully straight by removing all rounded classes and negative margins */}
+      {/* Profile Details Area - Edges made fully straight per user request */}
       <div className="px-6 bg-white relative z-10 pt-8 flex-1 rounded-none border-t border-gray-100">
         <div className="mb-3">
-          <div className={`inline-flex items-center px-3 py-1 rounded-full border ${isOnline ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
+          <div className={`inline-flex items-center px-3 py-1 rounded-none border ${isOnline ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
             <div className={`w-1.5 h-1.5 ${isOnline ? 'bg-primary' : 'bg-gray-300'} rounded-full mr-1.5`} />
             <span className="text-[8px] font-black uppercase tracking-widest">
               {statusText}
@@ -212,7 +213,7 @@ export default function UserProfilePage() {
         <div className="flex items-center space-x-3 mb-8">
           <div 
             onClick={copyId}
-            className="flex items-center space-x-1.5 bg-gray-50 px-4 py-2 rounded-full border border-gray-100 cursor-pointer active:scale-95 transition-all shadow-sm group"
+            className="flex items-center space-x-1.5 bg-gray-50 px-4 py-2 rounded-none border border-gray-100 cursor-pointer active:scale-95 transition-all shadow-sm group"
           >
             <span className="text-[9px] font-black text-gray-900 tracking-widest">ID: {profile.numericId}</span>
             <Copy className="w-3 h-3 text-gray-300 group-hover:text-primary transition-colors" />
@@ -233,7 +234,7 @@ export default function UserProfilePage() {
         <div className="max-w-md mx-auto pointer-events-auto">
           <Button 
             onClick={() => router.push(`/home/chat/${profile.id}`)}
-            className="w-full h-14 bg-primary text-white hover:bg-primary/90 font-black rounded-full text-sm shadow-2xl shadow-primary/40 transition-all active:scale-95 uppercase tracking-[0.2em] flex items-center justify-center space-x-2.5"
+            className="w-full h-14 bg-primary text-white hover:bg-primary/90 font-black rounded-none text-sm shadow-2xl shadow-primary/40 transition-all active:scale-95 uppercase tracking-[0.2em] flex items-center justify-center space-x-2.5"
           >
             <MessageCircle className="w-4 h-4 fill-white" />
             <span>Start Chat</span>
