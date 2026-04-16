@@ -92,7 +92,7 @@ export default function WalletPage() {
       </header>
 
       <div className="p-6 space-y-8">
-        {/* Balance Card - More striking visual */}
+        {/* Balance Card */}
         <div className="bg-gradient-to-br from-gray-900 to-black rounded-[2.5rem] p-8 text-white shadow-2xl relative overflow-hidden group">
           <div className="absolute -right-6 -top-6 w-40 h-40 bg-primary/30 rounded-full blur-[60px] group-hover:bg-primary/40 transition-all duration-700" />
           <div className="absolute -left-10 -bottom-10 w-32 h-32 bg-blue-500/10 rounded-full blur-[40px]" />
@@ -117,7 +117,7 @@ export default function WalletPage() {
           </div>
         </div>
 
-        {/* Region Selector - Premium look */}
+        {/* Region Selector */}
         <div>
           <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-4 block px-2">Select Your Region</label>
           <div className="relative group">
@@ -137,7 +137,7 @@ export default function WalletPage() {
           </div>
         </div>
 
-        {/* Package Grid - High fidelity cards */}
+        {/* Package Grid */}
         <div className="space-y-4">
           <div className="flex items-center justify-between px-2">
             <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Select Package</h3>
@@ -188,18 +188,23 @@ export default function WalletPage() {
           </div>
         </div>
 
-        {/* Support Banner */}
+        {/* Official Sellers Banner */}
         <div className="bg-gray-50 rounded-[2rem] p-6 flex items-center justify-between border border-gray-100 shadow-inner group">
           <div className="flex items-center space-x-4">
             <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center transition-transform group-hover:rotate-12">
               <Users className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <p className="text-sm font-black text-gray-900 tracking-tight">Large Purchase?</p>
-              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Connect with official sellers</p>
+              <p className="text-sm font-black text-gray-900 tracking-tight">Official Sellers</p>
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Connect with verified vendors</p>
             </div>
           </div>
-          <Button variant="ghost" size="icon" className="w-11 h-11 rounded-2xl bg-white shadow-sm hover:bg-primary hover:text-white transition-all active:scale-90">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => router.push('/home/wallet/sellers')}
+            className="w-11 h-11 rounded-2xl bg-white shadow-sm hover:bg-primary hover:text-white transition-all active:scale-90"
+          >
             <UserPlus className="w-5 h-5" />
           </Button>
         </div>

@@ -53,7 +53,7 @@ export default function MePage() {
           <div className="relative w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 mb-1 shadow-lg">
             <Eye className="w-5 h-5 text-white" />
             {hasNewVisitors && (
-              <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-primary animate-pulse" />
+              <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-primary" />
             )}
           </div>
           <span className="text-[9px] font-black text-white uppercase tracking-widest">Visitors</span>
@@ -106,7 +106,7 @@ export default function MePage() {
             <h3 className="text-xl font-black text-foreground mb-4 tracking-tight">{profile.balance ?? 0}</h3>
             <button 
               onClick={() => router.push('/home/wallet')}
-              className="w-full h-11 bg-primary text-white rounded-full text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-primary/20"
+              className="w-full h-12 bg-primary text-white rounded-full text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-primary/20"
             >
               Recharge
             </button>
@@ -118,7 +118,7 @@ export default function MePage() {
             </div>
             <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-0.5">Earnings</p>
             <h3 className="text-xl font-black text-foreground mb-4 tracking-tight">{profile.earnings ?? 0}</h3>
-            <button className="w-full h-11 bg-foreground text-background rounded-full text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg">
+            <button className="w-full h-12 bg-foreground text-background rounded-full text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg">
               Income
             </button>
           </div>
