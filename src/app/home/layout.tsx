@@ -25,7 +25,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   const { user, isUserLoading: isAuthLoading } = useUser();
   const db = useFirestore();
 
-  // Presence Tracking: Optimized to 2 minutes to reduce writes
+  // Presence Tracking: Optimized to 60 seconds for better accuracy
   useEffect(() => {
     if (!db || !user?.uid) return;
 
@@ -38,7 +38,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     };
 
     updatePresence();
-    const interval = setInterval(updatePresence, 120000); // 2 minutes
+    const interval = setInterval(updatePresence, 60000); // 1 minute
     return () => clearInterval(interval);
   }, [db, user?.uid]);
 
@@ -55,7 +55,8 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   }, [profile, isProfileLoading]);
 
   useEffect(() => {
-    if (isAuthLoading) return;
+    // Wait for both auth and profile state to be determined
+    if (isAuthLoading || isProfileLoading) return;
 
     const isSessionActive = localStorage.getItem('nexo_session_active') === 'true';
 
@@ -64,8 +65,8 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
       return;
     }
 
-    // Only redirect to onboarding if we are sure the profile doesn't exist
-    if (!isProfileLoading && !profile && !isAuthLoading) {
+    // Only redirect to onboarding if we are CERTAIN the profile doesn't exist
+    if (!profile) {
       const localProfileCompleted = localStorage.getItem('nexo_profile_completed') === 'true';
       if (!localProfileCompleted) {
         router.replace('/onboarding');
@@ -73,8 +74,6 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     }
   }, [user, isAuthLoading, profile, isProfileLoading, router]);
 
-  // Improved loading guard: Don't show the spinner if we already have the profile data,
-  // even if a background re-validation is happening.
   const shouldShowLoader = isAuthLoading || (isProfileLoading && !profile && localStorage.getItem('nexo_profile_completed') !== 'true');
 
   if (shouldShowLoader) {

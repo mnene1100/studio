@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -18,11 +19,11 @@ export default function LoginPage() {
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
 
-  // Redirect if user is already logged in
+  // Redirect to root if user is already logged in to let root handle onboarding vs home
   useEffect(() => {
     const isSessionActive = localStorage.getItem('nexo_session_active') === 'true';
     if (!isUserLoading && user && isSessionActive) {
-      router.replace('/home');
+      router.replace('/');
     }
   }, [user, isUserLoading, router]);
 
@@ -31,10 +32,9 @@ export default function LoginPage() {
     setIsLoading(true);
     
     try {
-      // Check for existing anonymous session first
       if (auth.currentUser && auth.currentUser.isAnonymous) {
         localStorage.setItem('nexo_session_active', 'true');
-        router.replace('/home');
+        router.replace('/');
         return;
       }
       
@@ -48,9 +48,7 @@ export default function LoginPage() {
       toast({
         variant: "destructive",
         title: "Connection Issue",
-        description: error.code === 'auth/network-request-failed' 
-          ? "Network error. Please check your connection and try again."
-          : (error.message || "Could not sign in anonymously."),
+        description: "Could not sign in anonymously. Please try again.",
       });
     } finally {
       setIsLoading(false);
@@ -72,22 +70,13 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       localStorage.setItem('nexo_session_active', 'true');
-      // The useEffect will handle the redirect once the auth state is updated
+      // Root will handle redirection based on profile existence
     } catch (error: any) {
       console.error("Sign in error:", error);
-      let message = "Invalid email or password.";
-      if (error.code === 'auth/network-request-failed') {
-        message = "Network error. Please check your connection.";
-      } else if (error.code === 'auth/user-not-found') {
-        message = "No account found with this email.";
-      } else if (error.code === 'auth/wrong-password') {
-        message = "Incorrect password.";
-      }
-      
       toast({
         variant: "destructive",
         title: "Sign in failed",
-        description: message,
+        description: "Invalid email or password.",
       });
     } finally {
       setIsLoading(false);
@@ -100,7 +89,7 @@ export default function LoginPage() {
       toast({
         variant: "destructive",
         title: "Missing fields",
-        description: "Please enter both email and password to create an account.",
+        description: "Please enter both email and password.",
       });
       return;
     }
@@ -118,21 +107,13 @@ export default function LoginPage() {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       localStorage.setItem('nexo_session_active', 'true');
-      // Direct redirect for new accounts to ensure they hit onboarding
       router.replace('/onboarding');
     } catch (error: any) {
       console.error("Sign up error:", error);
-      let message = "Could not create account.";
-      if (error.code === 'auth/network-request-failed') {
-        message = "Network error. Please check your connection.";
-      } else if (error.code === 'auth/email-already-in-use') {
-        message = "An account with this email already exists.";
-      }
-      
       toast({
         variant: "destructive",
         title: "Sign up failed",
-        description: message,
+        description: error.message || "Could not create account.",
       });
     } finally {
       setIsLoading(false);

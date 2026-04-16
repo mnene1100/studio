@@ -35,7 +35,6 @@ export default function UserProfilePage() {
 
   const { data: profile, isLoading } = useDoc(userRef);
 
-  // Optimized Visitor Recording: Only write once per session to reduce writes
   useEffect(() => {
     if (!db || !currentUser || !id || currentUser.uid === id || visitorRecordedRef.current) return;
     
@@ -61,7 +60,8 @@ export default function UserProfilePage() {
     if (!profile?.lastOnlineAt) return false;
     const lastOnline = new Date(profile.lastOnlineAt).getTime();
     const now = Date.now();
-    return now - lastOnline < 150000; // Aligned with 2min heartbeat
+    // 90s threshold for 60s interval
+    return now - lastOnline < 90000;
   }, [profile?.lastOnlineAt]);
 
   const statusText = useMemo(() => {
