@@ -14,7 +14,7 @@ export default function HomePage() {
     <div className="flex flex-col min-h-screen pb-32 bg-background">
       {/* Top Section - Structural teal header with extra top space */}
       <div className="bg-primary safe-top px-5 pb-8 pt-12 shadow-lg">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 mt-6">
           <div className="bg-white/20 backdrop-blur-md rounded-[1.75rem] flex flex-col items-center justify-center p-5 border border-white/20 transition-all cursor-pointer h-36 shadow-lg group active:scale-95">
             <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-2xl flex items-center justify-center mb-2 shadow-xl transform group-hover:rotate-6 transition-transform">
                <HelpCircle className="w-6 h-6 text-white" />
@@ -94,14 +94,14 @@ export default function HomePage() {
                     
                     <div className="flex flex-wrap gap-1.5">
                       {/* Gender/Age Badge */}
-                      <div className="px-2.5 py-1 bg-[#00FFFF] rounded-full flex items-center space-x-1">
+                      <div className="px-2.5 py-0.5 bg-[#00FFFF] rounded-full flex items-center space-x-1">
                         <span className="text-[8px] font-black text-black uppercase tracking-tighter">
                           {u.gender === 'Female' ? '♀' : '♂'} {age}
                         </span>
                       </div>
                       
                       {/* Country Badge */}
-                      <div className="px-2.5 py-1 bg-[#D9FF00] rounded-full">
+                      <div className="px-2.5 py-0.5 bg-[#D9FF00] rounded-full">
                         <span className="text-[8px] font-black text-black uppercase tracking-widest">
                           {u.country?.substring(0, 5) || 'Kenya'}
                         </span>
