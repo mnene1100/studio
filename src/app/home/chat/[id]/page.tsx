@@ -7,17 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { 
   ChevronLeft, Phone, Video, Send, 
-  Sparkles, Gift, MessageCircle 
+  Gift 
 } from "lucide-react";
 import { useFirestore, useDoc, useCollection, useMemoFirebase, useUser, addDocumentNonBlocking, updateDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase';
 import { doc, collection, query, orderBy, limit, where, getDocs } from 'firebase/firestore';
-import { summarizeChatHistory } from "@/ai/flows/ai-summarized-chat-highlights";
 import { aiSuggestedConversationStarters } from "@/ai/flows/ai-suggested-conversation-starters";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  Dialog, DialogContent, DialogHeader, 
-  DialogTitle, DialogTrigger 
-} from "@/components/ui/dialog";
 import { formatDistanceToNow } from 'date-fns';
 
 export default function ChatDetailPage() {
@@ -28,8 +22,6 @@ export default function ChatDetailPage() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const [input, setInput] = useState('');
-  const [isSummaryLoading, setIsSummaryLoading] = useState(false);
-  const [summary, setSummary] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [chatId, setChatId] = useState<string | null>(null);
 
@@ -117,22 +109,6 @@ export default function ChatDetailPage() {
     setInput('');
   };
 
-  const handleGetSummary = async () => {
-    if (!messages.length) return;
-    setIsSummaryLoading(true);
-    try {
-      const result = await summarizeChatHistory({
-        chatHistory: messages.map(m => ({ sender: m.senderId === currentUser?.uid ? 'Me' : 'Contact', message: m.content })),
-        contactName: profile?.displayName || 'Contact'
-      });
-      setSummary(result.summary);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsSummaryLoading(false);
-    }
-  };
-
   const handleGetSuggestions = async () => {
     if (!messages.length) return;
     try {
@@ -204,24 +180,6 @@ export default function ChatDetailPage() {
             <Button variant="ghost" size="icon" className="w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10">
               <Video className="w-4 h-4" />
             </Button>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10" onClick={handleGetSummary}>
-                  <Sparkles className="w-4 h-4" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="bg-white border-none rounded-[2rem] max-w-xs shadow-2xl">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center text-primary font-black uppercase tracking-widest text-xs">
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Chat Analysis
-                  </DialogTitle>
-                </DialogHeader>
-                <div className="py-2 text-[13px] text-gray-500 font-medium leading-relaxed">
-                  {isSummaryLoading ? "AI is analyzing..." : summary || "Get a summary of your conversation."}
-                </div>
-              </DialogContent>
-            </Dialog>
           </div>
         </div>
       </header>
