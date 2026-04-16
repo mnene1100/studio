@@ -1,12 +1,12 @@
-
 "use client";
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { 
   ChevronLeft, History, Globe, 
-  Users, UserPlus, Loader2, Coins, ArrowRight, Zap 
+  Users, UserPlus, Loader2, Coins, ArrowRight, Zap, Phone 
 } from "lucide-react";
 import { 
   Select, 
@@ -33,21 +33,30 @@ export default function WalletPage() {
   const router = useRouter();
   const { profile } = useHomeData();
   const [selectedPackage, setSelectedPackage] = useState<typeof PACKAGES[0] | null>(null);
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePayment = async () => {
     if (!selectedPackage || !profile) return;
 
+    if (!phoneNumber.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Phone Number Required",
+        description: "Please enter your M-Pesa or payment phone number.",
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // Pass the coin amount in the callback URL so we can credit it on success
       const coinAmount = selectedPackage.coins.replace(',', '');
       const callbackUrl = `${window.location.origin}/home/wallet/callback?coins=${coinAmount}`;
       
       const result = await createPesapalOrder({
         amount: selectedPackage.price,
         email: profile.email || "guest@nexo.com",
-        phoneNumber: "", 
+        phoneNumber: phoneNumber.trim(), 
         firstName: profile.displayName || "Nexo",
         lastName: "User",
         description: `Recharge ${selectedPackage.coins} Nexo Coins`,
@@ -70,9 +79,10 @@ export default function WalletPage() {
     }
   };
 
+  const isFormValid = selectedPackage && phoneNumber.trim().length >= 10;
+
   return (
     <div className="flex flex-col min-h-screen bg-white pb-24">
-      {/* Seamless Header */}
       <header className="bg-primary safe-top sticky top-0 z-50">
         <div className="px-4 h-16 flex items-center justify-between">
           <Button 
@@ -98,10 +108,8 @@ export default function WalletPage() {
       </header>
 
       <div className="p-4 space-y-6">
-        {/* Balance Card - More Compact */}
         <div className="bg-gradient-to-br from-gray-900 to-black rounded-[2rem] p-6 text-white shadow-xl relative overflow-hidden group">
           <div className="absolute -right-6 -top-6 w-32 h-32 bg-primary/20 rounded-full blur-[50px]" />
-          
           <div className="relative z-10">
             <div className="flex items-center space-x-2 mb-2">
               <div className="w-8 h-8 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/10">
@@ -109,7 +117,6 @@ export default function WalletPage() {
               </div>
               <span className="text-[9px] font-black uppercase tracking-widest text-white/50">Balance</span>
             </div>
-            
             <div className="flex items-baseline space-x-2">
               <h2 className="text-4xl font-black tracking-tighter">
                 {profile?.balance?.toLocaleString() || "0"}
@@ -119,25 +126,39 @@ export default function WalletPage() {
           </div>
         </div>
 
-        {/* Region Selector - More Compact */}
-        <div>
-          <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-2 block px-1">Region</label>
-          <Select defaultValue="kenya">
-            <SelectTrigger className="w-full h-12 bg-gray-50 border-gray-100 rounded-2xl px-4 text-xs font-black text-gray-900 focus:ring-primary/10">
-              <div className="flex items-center space-x-2">
-                <Globe className="w-3.5 h-3.5 text-primary" />
-                <SelectValue />
-              </div>
-            </SelectTrigger>
-            <SelectContent className="bg-white rounded-2xl border border-gray-100 shadow-xl p-1">
-              <SelectItem value="kenya" className="py-3 font-black text-[10px] uppercase tracking-widest rounded-xl">Kenya (KES)</SelectItem>
-              <SelectItem value="uganda" className="py-3 font-black text-[10px] uppercase tracking-widest rounded-xl">Uganda (UGX)</SelectItem>
-              <SelectItem value="tanzania" className="py-3 font-black text-[10px] uppercase tracking-widest rounded-xl">Tanzania (TZS)</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-2 block px-1">Region</label>
+            <Select defaultValue="kenya">
+              <SelectTrigger className="w-full h-12 bg-gray-50 border-gray-100 rounded-2xl px-4 text-xs font-black text-gray-900 focus:ring-primary/10">
+                <div className="flex items-center space-x-2">
+                  <Globe className="w-3.5 h-3.5 text-primary" />
+                  <SelectValue />
+                </div>
+              </SelectTrigger>
+              <SelectContent className="bg-white rounded-2xl border border-gray-100 shadow-xl p-1">
+                <SelectItem value="kenya" className="py-3 font-black text-[10px] uppercase tracking-widest rounded-xl">Kenya (KES)</SelectItem>
+                <SelectItem value="uganda" className="py-3 font-black text-[10px] uppercase tracking-widest rounded-xl">Uganda (UGX)</SelectItem>
+                <SelectItem value="tanzania" className="py-3 font-black text-[10px] uppercase tracking-widest rounded-xl">Tanzania (TZS)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-2 block px-1">Phone Number</label>
+            <div className="relative">
+              <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-primary" />
+              <Input 
+                type="tel"
+                placeholder="0712..."
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                className="w-full h-12 bg-gray-50 border-gray-100 rounded-2xl pl-9 pr-4 text-xs font-black text-gray-900 focus:ring-primary/10"
+              />
+            </div>
+          </div>
         </div>
 
-        {/* Package Grid - More Compact */}
         <div className="space-y-3">
           <div className="flex items-center justify-between px-1">
             <h3 className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Packages</h3>
@@ -164,17 +185,14 @@ export default function WalletPage() {
                     {pkg.badge}
                   </div>
                 )}
-
                 <div className={cn(
                   "w-10 h-10 rounded-xl flex items-center justify-center mb-2 transition-all",
                   selectedPackage?.id === pkg.id ? "bg-primary text-white" : "bg-gray-50 text-gray-300"
                 )}>
                   <Coins className="w-5 h-5" />
                 </div>
-                
                 <span className="text-xl font-black text-gray-900 tracking-tight">{pkg.coins}</span>
                 <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-3">{pkg.label}</span>
-                
                 <div className={cn(
                   "w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all",
                   selectedPackage?.id === pkg.id ? "bg-primary border-primary text-white" : "border-gray-50 bg-white"
@@ -186,7 +204,6 @@ export default function WalletPage() {
           </div>
         </div>
 
-        {/* Sellers Section - More Compact */}
         <div className="bg-gray-50 rounded-[1.5rem] p-4 flex items-center justify-between border border-gray-100">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center">
@@ -211,16 +228,16 @@ export default function WalletPage() {
       <div className="fixed bottom-6 left-4 right-4 z-50">
         <Button 
           onClick={handlePayment}
-          disabled={!selectedPackage || isLoading}
+          disabled={!isFormValid || isLoading}
           className={cn(
             "w-full h-14 rounded-2xl text-[10px] font-black shadow-xl transition-all uppercase tracking-[0.2em]",
-            selectedPackage ? "bg-primary text-white" : "bg-gray-100 text-gray-400"
+            isFormValid ? "bg-primary text-white" : "bg-gray-100 text-gray-400"
           )}
         >
           {isLoading ? (
             <Loader2 className="w-5 h-5 animate-spin" />
           ) : (
-            selectedPackage ? `Pay ${selectedPackage.label}` : "Select Package"
+            selectedPackage ? `Pay ${selectedPackage.label}` : "Select Package & Phone"
           )}
         </Button>
       </div>

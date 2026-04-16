@@ -48,8 +48,6 @@ export async function createPesapalOrder(input: PesapalOrderInput) {
     const token = authData.token;
 
     // 2. Register IPN
-    // We construct the IPN URL based on the callback URL.
-    // For Vercel production, this will resolve to your https://nexo-green-ten.vercel.app domain.
     const ipnResponse = await fetch(`${baseUrl}/api/URLSetup/RegisterIPN`, {
       method: 'POST',
       headers: {
@@ -84,7 +82,7 @@ export async function createPesapalOrder(input: PesapalOrderInput) {
         notification_id: ipnId,
         billing_address: {
           email_address: input.email,
-          phone_number: input.phoneNumber || '0700000000',
+          phone_number: input.phoneNumber, // REMOVED HARDCODED FALLBACK
           country_code: 'KE',
           first_name: input.firstName,
           last_name: input.lastName,
