@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
@@ -9,7 +8,7 @@ import {
   PhoneOff, Mic, MicOff, Video, VideoOff, 
   Volume2, VolumeX, Maximize2, Minimize2, AlertCircle, Loader2
 } from "lucide-react";
-import { useFirestore, useDoc, useMemoFirebase, useUser } from '@/firebase';
+import { useFirestore, useDoc, useMemoFirebase, useUser, setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
@@ -36,6 +35,7 @@ export default function CallPage() {
   const localVideoRef = useRef<HTMLDivElement>(null);
   const remoteVideoRef = useRef<HTMLDivElement>(null);
   const agoraClientRef = useRef<any>(null);
+  const callIdRef = useRef<string | null>(null);
   
   // Track refs for immediate and reliable cleanup
   const localAudioTrackRef = useRef<any>(null);
@@ -106,6 +106,19 @@ export default function CallPage() {
         setStatusMessage('Joining Channel...');
         await agoraClientRef.current.join(appId, channelName, token, currentUser?.uid);
 
+        // PERSIST CALL TO FIRESTORE
+        const callId = `${currentUser?.uid}_${targetUserId}_${Date.now()}`;
+        callIdRef.current = callId;
+        const callRef = doc(db!, 'calls', callId);
+        setDocumentNonBlocking(callRef, {
+          id: callId,
+          callerId: currentUser?.uid,
+          participantIds: [currentUser?.uid, targetUserId],
+          type: callType,
+          startTime: new Date().toISOString(),
+          status: 'ongoing'
+        }, { merge: true });
+
         if (callType === 'video' && localVideoTrackRef.current) {
           await agoraClientRef.current.publish([localAudioTrackRef.current, localVideoTrackRef.current]);
           if (localVideoRef.current) {
@@ -128,12 +141,19 @@ export default function CallPage() {
       }
     };
 
-    if (currentUser && targetUserId) {
+    if (currentUser && targetUserId && db) {
       initAgora();
     }
 
-    // CRITICAL: Cleanup function disconnects all hardware
+    // CRITICAL: Cleanup function disconnects all hardware and updates call record
     return () => {
+      if (callIdRef.current && db) {
+        const callRef = doc(db, 'calls', callIdRef.current);
+        updateDocumentNonBlocking(callRef, {
+          status: 'ended',
+          endTime: new Date().toISOString()
+        });
+      }
       if (localVideoTrackRef.current) {
         localVideoTrackRef.current.stop();
         localVideoTrackRef.current.close();
@@ -148,7 +168,7 @@ export default function CallPage() {
         agoraClientRef.current.leave();
       }
     };
-  }, [currentUser, targetUserId, callType, router]);
+  }, [currentUser, targetUserId, callType, router, db]);
 
   useEffect(() => {
     if (remoteUsers.length > 0 && remoteVideoRef.current) {
