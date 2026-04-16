@@ -88,15 +88,15 @@ export default function HomePage() {
                   {/* Gradient Overlay for bottom text legibility */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
                   
-                  {/* Flush Corner Chat Button */}
+                  {/* Rounded Chat Button */}
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
                       router.push(`/home/chat/${u.id}`);
                     }}
-                    className="absolute top-0 right-0 z-20"
+                    className="absolute top-3 right-3 z-20"
                   >
-                    <div className="bg-primary px-5 py-2.5 rounded-bl-[1.5rem] flex items-center justify-center shadow-lg active:scale-95 transition-all">
+                    <div className="bg-primary px-4 py-2 rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-all border border-white/10">
                       <MessageSquare className="w-3.5 h-3.5 text-white fill-white mr-1.5" />
                       <span className="text-[10px] font-black text-white uppercase italic tracking-wider">Chat</span>
                     </div>
