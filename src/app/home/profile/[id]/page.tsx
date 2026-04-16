@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo } from 'react';
@@ -10,7 +11,7 @@ import {
   Globe, Calendar, Ban, Flag, MessageCircle 
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { differenceInYears } from 'date-fns';
+import { differenceInYears, formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
 import {
   DropdownMenu,
@@ -39,6 +40,23 @@ export default function UserProfilePage() {
       return null;
     }
   }, [profile?.dob]);
+
+  const isOnline = useMemo(() => {
+    if (!profile?.lastOnlineAt) return false;
+    const lastOnline = new Date(profile.lastOnlineAt).getTime();
+    const now = Date.now();
+    return now - lastOnline < 120000;
+  }, [profile?.lastOnlineAt]);
+
+  const statusText = useMemo(() => {
+    if (isOnline) return "Online Now";
+    if (!profile?.lastOnlineAt) return "Offline";
+    try {
+      return `Last seen ${formatDistanceToNow(new Date(profile.lastOnlineAt), { addSuffix: true })}`;
+    } catch (e) {
+      return "Offline";
+    }
+  }, [isOnline, profile?.lastOnlineAt]);
 
   const copyId = () => {
     if (profile?.numericId) {
@@ -78,7 +96,6 @@ export default function UserProfilePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white relative pb-40 overflow-x-hidden">
-      {/* Hero Image Section */}
       <div className="relative w-full aspect-[4/5] overflow-hidden bg-muted">
         <Image 
           src={profile.profilePictureUrl || `https://picsum.photos/seed/${profile.id}/800/1200`}
@@ -89,11 +106,9 @@ export default function UserProfilePage() {
           sizes="(max-width: 768px) 100vw, 400px"
         />
         
-        {/* Subtle Gradient Overlays */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent h-1/3" />
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-white via-white/10 to-transparent h-24" />
 
-        {/* Header Overlay Buttons */}
         <div className="absolute top-12 left-6 right-6 flex items-center justify-between z-20">
           <Button 
             variant="ghost" 
@@ -133,18 +148,16 @@ export default function UserProfilePage() {
           </DropdownMenu>
         </div>
 
-        {/* Status Badge */}
         <div className="absolute bottom-6 left-8 z-10">
           <div className="bg-primary/90 backdrop-blur-md px-4 py-2 rounded-full flex items-center space-x-2 border border-white/20 shadow-lg">
-            <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+            <div className={`w-2 h-2 ${isOnline ? 'bg-green-400 animate-pulse' : 'bg-white/50'} rounded-full`} />
             <span className="text-[9px] font-black text-white uppercase tracking-widest">
-              Online Now
+              {statusText}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Profile Details Content */}
       <div className="px-8 -mt-8 bg-white rounded-t-[3.5rem] relative z-10 pt-10 flex-1">
         <div className="flex items-start justify-between mb-4">
           <div>
@@ -161,7 +174,6 @@ export default function UserProfilePage() {
         </div>
 
         <div className="flex items-center space-x-4 mb-10">
-          {/* ID Pill */}
           <div 
             onClick={copyId}
             className="flex items-center space-x-2 bg-gray-50 px-5 py-3 rounded-full border border-gray-100 cursor-pointer active:scale-95 transition-all shadow-sm group"
@@ -173,7 +185,6 @@ export default function UserProfilePage() {
           <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest">{profile.country || "KENYA"}</span>
         </div>
 
-        {/* Bio/Status Section */}
         <div className="mb-10">
            <h3 className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em] mb-4">About Me</h3>
            <p className="text-gray-600 font-medium leading-relaxed text-[15px]">
@@ -181,7 +192,6 @@ export default function UserProfilePage() {
            </p>
         </div>
 
-        {/* User Information Section - Conditional */}
         {hasInformation && (
           <div className="space-y-6 pb-20">
             <h3 className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em]">Information</h3>
@@ -205,7 +215,6 @@ export default function UserProfilePage() {
         )}
       </div>
 
-      {/* FIXED BOTTOM ACTION BAR */}
       <div className="fixed bottom-8 left-0 right-0 px-8 z-30 pointer-events-none">
         <div className="max-w-md mx-auto pointer-events-auto">
           <Button 

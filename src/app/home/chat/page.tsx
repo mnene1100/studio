@@ -1,9 +1,59 @@
+
 "use client";
 
 import Link from 'next/link';
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MessageSquare, MessageCircle } from "lucide-react";
 import { useHomeData } from '../layout';
+import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
+
+function ChatListItem({ chat }: { chat: any }) {
+  const { user } = useUser();
+  const db = useFirestore();
+  
+  const otherParticipantId = chat.participantIds.find((id: string) => id !== user?.uid);
+  
+  const targetUserRef = useMemoFirebase(() => {
+    if (!db || !otherParticipantId) return null;
+    return doc(db, 'userProfiles', otherParticipantId);
+  }, [db, otherParticipantId]);
+  
+  const { data: profile } = useDoc(targetUserRef);
+
+  const isOnline = profile?.lastOnlineAt ? (Date.now() - new Date(profile.lastOnlineAt).getTime() < 120000) : false;
+
+  return (
+    <Link 
+      href={`/home/chat/${otherParticipantId}`}
+      className="flex items-center px-4 py-4 rounded-[2rem] active:bg-muted/50 transition-all group border border-transparent"
+    >
+      <div className="relative">
+        <Avatar className="w-14 h-14 rounded-full ring-2 ring-muted shadow-sm">
+          <AvatarImage src={profile?.profilePictureUrl} />
+          <AvatarFallback className="bg-muted text-lg font-bold">
+            <MessageCircle className="w-6 h-6 text-primary" />
+          </AvatarFallback>
+        </Avatar>
+        {isOnline && (
+          <div className="absolute top-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
+        )}
+      </div>
+      
+      <div className="ml-4 flex-1">
+        <div className="flex items-center justify-between mb-0.5">
+          <h3 className="font-bold text-gray-900 text-base tracking-tight">{profile?.displayName || 'Loading...'}</h3>
+          <span className="text-[10px] font-bold text-gray-400">
+            {chat.updatedAt ? new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <p className="text-[13px] text-gray-500 line-clamp-1 font-medium">Click to continue your chat...</p>
+        </div>
+      </div>
+    </Link>
+  );
+}
 
 export default function ChatListPage() {
   const { chats, isChatsLoading } = useHomeData();
@@ -16,7 +66,6 @@ export default function ChatListPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white pb-32">
-      {/* Reference Image Header: Teal background, script 'Chats' title */}
       <header className="bg-primary px-6 pt-10 pb-4 flex items-center justify-between shadow-sm sticky top-0 z-10">
         <h1 className="text-4xl text-white font-medium italic tracking-tight" style={{ fontFamily: 'cursive, sans-serif' }}>
           Chats
@@ -42,36 +91,10 @@ export default function ChatListPage() {
         ) : sortedChats.length > 0 ? (
           <div className="space-y-1">
             {sortedChats.map((chat) => (
-              <Link 
-                key={chat.id} 
-                href={`/home/chat/${chat.id}`}
-                className="flex items-center px-4 py-4 rounded-[2rem] active:bg-muted/50 transition-all group border border-transparent"
-              >
-                <div className="relative">
-                  <Avatar className="w-14 h-14 rounded-full ring-2 ring-muted shadow-sm">
-                    <AvatarFallback className="bg-muted text-lg font-bold">
-                      <MessageCircle className="w-6 h-6 text-primary" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="absolute top-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
-                </div>
-                
-                <div className="ml-4 flex-1">
-                  <div className="flex items-center justify-between mb-0.5">
-                    <h3 className="font-bold text-gray-900 text-base tracking-tight">Conversation</h3>
-                    <span className="text-[10px] font-bold text-gray-400">
-                      {chat.updatedAt ? new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <p className="text-[13px] text-gray-500 line-clamp-1 font-medium">Click to continue your chat...</p>
-                  </div>
-                </div>
-              </Link>
+              <ChatListItem key={chat.id} chat={chat} />
             ))}
           </div>
         ) : (
-          /* Empty State exactly matching the provided screenshot */
           <div className="flex flex-col items-center justify-center h-[60vh] text-center">
             <div className="w-32 h-32 bg-gray-50 rounded-full flex items-center justify-center mb-8 border border-gray-100 shadow-sm">
               <MessageSquare className="w-14 h-14 text-gray-200" />

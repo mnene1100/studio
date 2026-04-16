@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,8 +10,8 @@ import {
   ChevronLeft, Phone, Video, Send, 
   Sparkles, Zap, MessageCircle 
 } from "lucide-react";
-import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
-import { doc } from 'firebase/firestore';
+import { useFirestore, useDoc, useCollection, useMemoFirebase, useUser, addDocumentNonBlocking, updateDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase';
+import { doc, collection, query, orderBy, limit, where, getDocs } from 'firebase/firestore';
 import { summarizeChatHistory } from "@/ai/flows/ai-summarized-chat-highlights";
 import { aiSuggestedConversationStarters } from "@/ai/flows/ai-suggested-conversation-starters";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -19,28 +19,75 @@ import {
   Dialog, DialogContent, DialogHeader, 
   DialogTitle, DialogTrigger 
 } from "@/components/ui/dialog";
+import { formatDistanceToNow } from 'date-fns';
 
 export default function ChatDetailPage() {
-  const { id } = useParams();
+  const { id: targetUserId } = useParams();
   const router = useRouter();
   const db = useFirestore();
+  const { user: currentUser } = useUser();
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const [messages, setMessages] = useState([
-    { sender: 'Other', message: 'Hey! Are we still on for the meeting tomorrow?', timestamp: '10:00 AM' },
-    { sender: 'Me', message: 'Yes, absolutely. 9 AM works for you?', timestamp: '10:02 AM' },
-  ]);
   const [input, setInput] = useState('');
   const [isSummaryLoading, setIsSummaryLoading] = useState(false);
   const [summary, setSummary] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [chatId, setChatId] = useState<string | null>(null);
 
-  const userRef = useMemoFirebase(() => {
-    if (!db || !id) return null;
-    return doc(db, 'userProfiles', id as string);
-  }, [db, id]);
+  // 1. Get Target User Profile
+  const targetUserRef = useMemoFirebase(() => {
+    if (!db || !targetUserId) return null;
+    return doc(db, 'userProfiles', targetUserId as string);
+  }, [db, targetUserId]);
+  const { data: profile } = useDoc(targetUserRef);
 
-  const { data: profile } = useDoc(userRef);
+  // 2. Find or Create Chat Conversation
+  useEffect(() => {
+    if (!db || !currentUser || !targetUserId) return;
+
+    const findConversation = async () => {
+      const q = query(
+        collection(db, 'chatConversations'),
+        where('participantIds', 'array-contains', currentUser.uid)
+      );
+      const querySnapshot = await getDocs(q);
+      let found = false;
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.participantIds.includes(targetUserId)) {
+          setChatId(doc.id);
+          found = true;
+        }
+      });
+
+      if (!found) {
+        // Create new conversation
+        const newChatId = [currentUser.uid, targetUserId].sort().join('_');
+        const chatRef = doc(db, 'chatConversations', newChatId);
+        setDocumentNonBlocking(chatRef, {
+          id: newChatId,
+          type: 'private',
+          participantIds: [currentUser.uid, targetUserId],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+        setChatId(newChatId);
+      }
+    };
+
+    findConversation();
+  }, [db, currentUser, targetUserId]);
+
+  // 3. Listen to Real-time Messages
+  const messagesQuery = useMemoFirebase(() => {
+    if (!db || !chatId) return null;
+    return query(
+      collection(db, 'chatConversations', chatId, 'messages'),
+      orderBy('sentAt', 'asc'),
+      limit(50)
+    );
+  }, [db, chatId]);
+  const { data: messages = [] } = useCollection(messagesQuery);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -49,20 +96,34 @@ export default function ChatDetailPage() {
   }, [messages]);
 
   const handleSendMessage = () => {
-    if (!input.trim()) return;
-    setMessages([...messages, { 
-      sender: 'Me', 
-      message: input, 
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
-    }]);
+    if (!input.trim() || !chatId || !currentUser) return;
+    
+    const messageData = {
+      chatId: chatId,
+      senderId: currentUser.uid,
+      content: input,
+      sentAt: new Date().toISOString(),
+      type: 'text'
+    };
+
+    const messagesColRef = collection(db, 'chatConversations', chatId, 'messages');
+    addDocumentNonBlocking(messagesColRef, messageData);
+
+    // Update conversation timestamp
+    const chatRef = doc(db, 'chatConversations', chatId);
+    updateDocumentNonBlocking(chatRef, {
+      updatedAt: new Date().toISOString()
+    });
+
     setInput('');
   };
 
   const handleGetSummary = async () => {
+    if (!messages.length) return;
     setIsSummaryLoading(true);
     try {
       const result = await summarizeChatHistory({
-        chatHistory: messages.map(m => ({ sender: m.sender, message: m.message })),
+        chatHistory: messages.map(m => ({ sender: m.senderId === currentUser?.uid ? 'Me' : 'Contact', message: m.content })),
         contactName: profile?.displayName || 'Contact'
       });
       setSummary(result.summary);
@@ -74,9 +135,10 @@ export default function ChatDetailPage() {
   };
 
   const handleGetSuggestions = async () => {
+    if (!messages.length) return;
     try {
       const result = await aiSuggestedConversationStarters({ 
-        chatHistory: messages.map(m => ({ sender: m.sender, message: m.message }))
+        chatHistory: messages.map(m => ({ sender: m.senderId === currentUser?.uid ? 'Me' : 'Contact', message: m.content }))
       });
       setSuggestions(result.suggestions);
     } catch (e) {
@@ -84,12 +146,28 @@ export default function ChatDetailPage() {
     }
   };
 
-  const displayName = profile?.displayName || "Guest_user";
+  const isOnline = useMemo(() => {
+    if (!profile?.lastOnlineAt) return false;
+    const lastOnline = new Date(profile.lastOnlineAt).getTime();
+    const now = Date.now();
+    return now - lastOnline < 120000; // 2 minutes threshold
+  }, [profile?.lastOnlineAt]);
+
+  const lastSeenText = useMemo(() => {
+    if (isOnline) return "Online";
+    if (!profile?.lastOnlineAt) return "Offline";
+    try {
+      return `Last seen ${formatDistanceToNow(new Date(profile.lastOnlineAt), { addSuffix: true })}`;
+    } catch (e) {
+      return "Offline";
+    }
+  }, [isOnline, profile?.lastOnlineAt]);
+
+  const displayName = profile?.displayName || "Loading...";
   const initials = displayName.substring(0, 2).toUpperCase();
 
   return (
     <div className="flex flex-col h-screen bg-white">
-      {/* Header - Teal Background as per screenshot */}
       <header className="bg-primary px-4 h-20 flex items-center justify-between shadow-md relative z-20">
         <div className="flex items-center space-x-2">
           <Button 
@@ -102,13 +180,18 @@ export default function ChatDetailPage() {
           </Button>
           
           <div className="flex items-center space-x-3">
-            <Avatar className="w-10 h-10 border border-white/20">
-              <AvatarImage src={profile?.profilePictureUrl} />
-              <AvatarFallback className="bg-white/10 text-white font-bold">{initials}</AvatarFallback>
-            </Avatar>
+            <div className="relative">
+              <Avatar className="w-10 h-10 border border-white/20">
+                <AvatarImage src={profile?.profilePictureUrl} />
+                <AvatarFallback className="bg-white/10 text-white font-bold">{initials}</AvatarFallback>
+              </Avatar>
+              {isOnline && (
+                <div className="absolute top-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-primary" />
+              )}
+            </div>
             <div className="flex flex-col">
               <h3 className="text-sm font-black text-white leading-tight tracking-tight">{displayName}</h3>
-              <span className="text-[9px] font-black text-white/70 uppercase tracking-widest">Offline</span>
+              <span className="text-[9px] font-black text-white/70 uppercase tracking-widest">{lastSeenText}</span>
             </div>
           </div>
         </div>
@@ -141,24 +224,22 @@ export default function ChatDetailPage() {
         </div>
       </header>
 
-      {/* Messages Area - Pure White Background */}
       <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col space-y-4 bg-white" ref={scrollRef}>
-        {messages.map((msg, i) => {
-          const isMe = msg.sender === 'Me';
+        {messages.map((msg: any, i: number) => {
+          const isMe = msg.senderId === currentUser?.uid;
           return (
             <div key={i} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
               <div className={isMe ? 'chat-bubble-user' : 'chat-bubble-contact'}>
-                <p className="text-[14px] font-medium">{msg.message}</p>
+                <p className="text-[14px] font-medium">{msg.content}</p>
               </div>
               <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest mt-1 mx-2">
-                {msg.timestamp}
+                {msg.sentAt ? new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
               </span>
             </div>
           );
         })}
       </div>
 
-      {/* Input Area - Pill Style as per screenshot */}
       <div className="px-6 py-4 bg-white border-t border-gray-100 flex items-center space-x-3">
         <Button 
           variant="ghost" 
@@ -187,7 +268,6 @@ export default function ChatDetailPage() {
         </div>
       </div>
       
-      {/* Suggestions Overlay */}
       {suggestions.length > 0 && (
         <div className="px-6 pb-4 bg-white flex space-x-2 overflow-x-auto">
           {suggestions.map((s, i) => (

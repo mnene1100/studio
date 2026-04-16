@@ -4,8 +4,8 @@
 import { useEffect, useState, createContext, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { Navigation } from "@/components/navigation";
-import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase } from '@/firebase';
-import { doc, collection, query, where, limit } from 'firebase/firestore';
+import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase, updateDocumentNonBlocking } from '@/firebase';
+import { doc, collection, query, where, limit, serverTimestamp } from 'firebase/firestore';
 
 interface HomeDataContextType {
   profile: any;
@@ -29,7 +29,25 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   const { user, isUserLoading: isAuthLoading } = useUser();
   const db = useFirestore();
 
-  // Persistent Listeners: These stay active as long as the user is within the /home sub-routes.
+  // Presence Tracking
+  useEffect(() => {
+    if (!db || !user?.uid) return;
+
+    const userRef = doc(db, 'userProfiles', user.uid);
+    
+    // Heartbeat: update last online status every 1 minute
+    const updatePresence = () => {
+      updateDocumentNonBlocking(userRef, {
+        lastOnlineAt: new Date().toISOString()
+      });
+    };
+
+    updatePresence();
+    const interval = setInterval(updatePresence, 60000);
+    return () => clearInterval(interval);
+  }, [db, user?.uid]);
+
+  // Persistent Listeners
   const profileRef = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
     return doc(db, 'userProfiles', user.uid);
