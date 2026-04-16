@@ -2,8 +2,49 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Basic rule: User must be authenticated
     match /{document=**} {
       allow read, write: if request.auth != null;
+    }
+
+    // User Profile Rules
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+
+      // Visitors sub-collection
+      match /visitors/{visitorId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if request.auth != null;
+      }
+
+      // AI Recommendations sub-collection
+      match /aiRecommendations/{recommendationId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // Chat Rooms Rules
+    match /chatRooms/{chatRoomId} {
+      allow read: if request.auth != null && (request.auth.uid in resource.data.participantIds);
+      allow write: if request.auth != null;
+
+      match /messages/{messageId} {
+        allow read: if request.auth != null; // Ideally check participantIds on parent, but this is simpler for MVP
+        allow write: if request.auth != null;
+      }
+    }
+
+    // Call Records Rules
+    match /calls/{callId} {
+      allow read: if request.auth != null && (request.auth.uid in resource.data.participantIds);
+      allow write: if request.auth != null;
+    }
+
+    // Transactions Rules
+    match /transactions/{transactionId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow write: if request.auth != null;
     }
   }
 }

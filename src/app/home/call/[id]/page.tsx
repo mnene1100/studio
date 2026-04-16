@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
@@ -72,7 +73,6 @@ export default function CallPage() {
     router.back();
   };
 
-  // Listen for remote rejection or cancellation
   useEffect(() => {
     if (!db || !callIdRef.current) return;
     
@@ -152,7 +152,7 @@ export default function CallPage() {
         billingIntervalRef.current = null;
       }
     };
-  }, [remoteUsers.length > 0, currentUser?.uid, db, callType]);
+  }, [remoteUsers.length, currentUser?.uid, db, callType]);
 
   useEffect(() => {
     if (initializationStartedRef.current || !currentUser || !targetUserId || !db || !currentUserProfile) return;
@@ -186,7 +186,10 @@ export default function CallPage() {
 
         agoraClientRef.current.on("user-published", async (user: any, mediaType: string) => {
           await agoraClientRef.current.subscribe(user, mediaType);
-          if (mediaType === "video") setRemoteUsers((prev) => [...prev, user]);
+          setRemoteUsers((prev) => {
+            if (prev.find(u => u.uid === user.uid)) return prev;
+            return [...prev, user];
+          });
           if (mediaType === "audio") user.audioTrack.play();
         });
 
@@ -302,9 +305,7 @@ export default function CallPage() {
           <AlertCircle className="h-8 w-8 mb-4 text-red-500 mx-auto" />
           <h2 className="text-xl font-black uppercase tracking-tight text-white">Call Error</h2>
           <p className="text-[10px] font-medium text-white/50 leading-relaxed mt-2 uppercase tracking-widest">
-            {errorMessage === 'AGORA_CONFIGURATION_MISSING' 
-              ? 'Agora credentials missing. Set AGORA_APP_ID and AGORA_APP_CERTIFICATE in secrets.' 
-              : `An error occurred: ${errorMessage}.`}
+            {errorMessage}
           </p>
           <Button onClick={() => handleEndCall('error')} className="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] h-14 rounded-full">
             Exit Session

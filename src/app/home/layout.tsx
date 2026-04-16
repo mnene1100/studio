@@ -85,9 +85,6 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     if (isAuthLoading || isProfileLoading) return;
     if (!user) {
       router.replace('/login');
-    } else if (!profile) {
-      // Authenticated but no Firestore profile exists - send to setup
-      router.replace('/onboarding');
     }
   }, [user, profile, isAuthLoading, isProfileLoading, router]);
 

@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Zap, Mail, UserPlus, Loader2 } from "lucide-react";
 import { useAuth, useUser, useFirestore } from '@/firebase';
-import { signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword, User } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { toast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
@@ -21,18 +21,41 @@ export default function LoginPage() {
   const db = useFirestore();
   const { user, isUserLoading } = useUser();
 
+  const createInitialProfile = async (firebaseUser: User) => {
+    if (!db) return;
+    const userRef = doc(db, 'users', firebaseUser.uid);
+    const userDoc = await getDoc(userRef);
+    
+    if (!userDoc.exists()) {
+      const numericId = (Math.floor(Math.random() * 900000000) + 100000000).toString();
+      const isGuest = firebaseUser.isAnonymous;
+      const displayName = isGuest ? `Guest_${numericId.substring(0, 4)}` : (firebaseUser.email?.split('@')[0] || `User_${numericId.substring(0, 4)}`);
+      
+      await setDoc(userRef, {
+        id: firebaseUser.uid,
+        numericId,
+        displayName: displayName,
+        email: firebaseUser.email || `${displayName.toLowerCase()}@nexo.com`,
+        gender: 'Male',
+        dob: '2000-01-01',
+        country: 'Kenya',
+        profilePictureUrl: `https://picsum.photos/seed/${firebaseUser.uid}/200/200`,
+        createdAt: new Date().toISOString(),
+        lastOnlineAt: new Date().toISOString(),
+        statusMessage: "Hey there! I'm using NEXO.",
+        balance: 500,
+        earnings: 0,
+        isVerified: false,
+        education: 'Undergraduate Degree',
+        horoscope: 'Aries',
+        lookingFor: 'Making Friends'
+      }, { merge: true });
+    }
+  };
+
   useEffect(() => {
     if (!isUserLoading && user && db) {
-      const checkProfile = async () => {
-        const userRef = doc(db, 'users', user.uid);
-        const userDoc = await getDoc(userRef);
-        if (userDoc.exists()) {
-          router.replace('/home');
-        } else {
-          router.replace('/onboarding');
-        }
-      };
-      checkProfile();
+      router.replace('/home');
     }
   }, [user, isUserLoading, router, db]);
 
@@ -41,14 +64,8 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       const userCredential = await signInAnonymously(auth);
-      const userRef = doc(db, 'users', userCredential.user.uid);
-      const userDoc = await getDoc(userRef);
-      
-      if (!userDoc.exists()) {
-        router.replace('/onboarding');
-      } else {
-        router.replace('/home');
-      }
+      await createInitialProfile(userCredential.user);
+      router.replace('/home');
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -66,16 +83,14 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       const credential = await signInWithEmailAndPassword(auth, email, password);
-      const userRef = doc(db, 'users', credential.user.uid);
-      const userDoc = await getDoc(userRef);
-      
-      if (userDoc.exists()) {
-        router.replace('/home');
-      } else {
-        router.replace('/onboarding');
-      }
+      await createInitialProfile(credential.user);
+      router.replace('/home');
     } catch (error: any) {
-      toast({ variant: "destructive", title: "Sign in failed", description: "Check credentials and connection." });
+      toast({ 
+        variant: "destructive", 
+        title: "Sign in failed", 
+        description: "Please check your email and password." 
+      });
     } finally {
       setIsLoading(false);
     }
@@ -86,10 +101,15 @@ export default function LoginPage() {
     if (!email.trim() || !password.trim() || !auth) return;
     setIsLoading(true);
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      router.replace('/onboarding');
+      const credential = await createUserWithEmailAndPassword(auth, email, password);
+      await createInitialProfile(credential.user);
+      router.replace('/home');
     } catch (error: any) {
-      toast({ variant: "destructive", title: "Sign up failed", description: error.message });
+      toast({ 
+        variant: "destructive", 
+        title: "Sign up failed", 
+        description: error.message 
+      });
     } finally {
       setIsLoading(false);
     }
@@ -111,27 +131,27 @@ export default function LoginPage() {
         <div className="space-y-5">
           {!isEmailVisible ? (
             <div className="space-y-4">
-              <Button onClick={() => setIsEmailVisible(true)} className="w-full h-16 bg-white text-black font-black rounded-2xl uppercase tracking-widest shadow-xl">
+              <Button onClick={() => setIsEmailVisible(true)} className="w-full h-16 bg-white text-black font-black rounded-2xl uppercase tracking-widest shadow-xl active:scale-95 transition-all">
                 <Mail className="mr-3 h-5 w-5" /> Continue With Email
               </Button>
-              <Button variant="ghost" onClick={handleFastLogin} className="w-full h-16 text-white font-black rounded-2xl uppercase tracking-widest">
+              <Button variant="ghost" onClick={handleFastLogin} className="w-full h-16 text-white font-black rounded-2xl uppercase tracking-widest active:scale-95 transition-all">
                 {isLoading ? <Loader2 className="mr-3 h-5 w-5 animate-spin" /> : <Zap className="mr-3 h-5 w-5" />} Fast Login
               </Button>
             </div>
           ) : (
             <form onSubmit={handleSignIn} className="space-y-4 text-left animate-in slide-in-from-bottom-4">
               <div className="space-y-3">
-                <Input type="email" placeholder="Email address" className="h-14 bg-white/10 border-white/10 text-white rounded-2xl placeholder:text-white/40" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                <Input type="password" placeholder="Password" className="h-14 bg-white/10 border-white/10 text-white rounded-2xl placeholder:text-white/40" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                <Input type="email" placeholder="Email address" className="h-14 bg-white/10 border-white/10 text-white rounded-2xl placeholder:text-white/40 focus:ring-primary/50" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <Input type="password" placeholder="Password" className="h-14 bg-white/10 border-white/10 text-white rounded-2xl placeholder:text-white/40 focus:ring-primary/50" value={password} onChange={(e) => setPassword(e.target.value)} required />
               </div>
               <div className="flex flex-col space-y-3 pt-2">
-                <Button type="submit" disabled={isLoading} className="w-full h-14 bg-primary text-white font-black rounded-2xl shadow-lg shadow-primary/20 uppercase tracking-widest">
+                <Button type="submit" disabled={isLoading} className="w-full h-14 bg-primary text-white font-black rounded-2xl shadow-lg shadow-primary/20 uppercase tracking-widest active:scale-95 transition-all">
                   {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Sign In"}
                 </Button>
-                <Button type="button" variant="outline" onClick={handleSignUp} className="w-full h-14 border-white/10 bg-white/5 text-white font-black rounded-2xl uppercase tracking-widest">
+                <Button type="button" variant="outline" onClick={handleSignUp} className="w-full h-14 border-white/10 bg-white/5 text-white font-black rounded-2xl uppercase tracking-widest active:scale-95 transition-all">
                   <UserPlus className="mr-2 h-5 w-5" /> New Account
                 </Button>
-                <Button type="button" variant="ghost" onClick={() => setIsEmailVisible(false)} className="text-white/40 text-[10px] uppercase tracking-widest">Back</Button>
+                <Button type="button" variant="ghost" onClick={() => setIsEmailVisible(false)} className="text-white/40 text-[10px] uppercase tracking-widest mx-auto">Back</Button>
               </div>
             </form>
           )}
