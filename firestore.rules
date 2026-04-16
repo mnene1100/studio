@@ -3,46 +3,14 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * NEXO PROTOTYPE SECURITY RULES
+     * NEXO PROTOTYPE SECURITY RULES - FULLY OPEN
      * 
-     * These rules are set to be fully permissive for any authenticated user.
-     * This allows for rapid prototyping and avoids "Missing or insufficient permissions" errors
-     * during the development of features like User Discovery, Chat, and Wallet.
+     * These rules allow anyone (even unauthenticated users) to read and write.
+     * Use this ONLY for rapid prototyping.
      */
 
     match /{document=**} {
-      // Allow read and write access to all documents if the user is signed in.
-      allow read, write: if request.auth != null;
-    }
-
-    // Explicitly handle common collections used in the app to ensure clarity
-    
-    match /users/{userId} {
-      allow read, write: if request.auth != null;
-      
-      match /visitors/{visitorId} {
-        allow read, write: if request.auth != null;
-      }
-      
-      match /aiRecommendations/{recId} {
-        allow read, write: if request.auth != null;
-      }
-    }
-
-    match /chatConversations/{chatId} {
-      allow read, write: if request.auth != null;
-      
-      match /messages/{messageId} {
-        allow read, write: if request.auth != null;
-      }
-    }
-
-    match /calls/{callId} {
-      allow read, write: if request.auth != null;
-    }
-
-    match /transactions/{transId} {
-      allow read, write: if request.auth != null;
+      allow read, write: if true;
     }
   }
 }

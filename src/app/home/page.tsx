@@ -16,14 +16,15 @@ export default function HomePage() {
   const [pageSize, setPageSize] = useState(6);
 
   // Screen-specific paginated listener
+  // Wait for user.uid to ensure the auth token is attached to the request
   const discoveryQuery = useMemoFirebase(() => {
-    if (!db) return null;
+    if (!db || !user?.uid) return null;
     return query(
       collection(db, 'users'), 
       orderBy('lastOnlineAt', 'desc'),
       limit(pageSize)
     );
-  }, [db, pageSize]);
+  }, [db, user?.uid, pageSize]);
   
   const { data: allUsers, isLoading: isUsersLoading } = useCollection(discoveryQuery);
   const discoveryUsers = allUsers?.filter(u => u.id !== user?.uid) || [];
@@ -38,14 +39,14 @@ export default function HomePage() {
         <div className="grid grid-cols-2 gap-4 mt-6">
           <div className="bg-white/20 backdrop-blur-md rounded-[1.75rem] flex flex-col items-center justify-center p-5 border border-white/20 transition-all cursor-pointer h-36 shadow-lg group active:scale-95">
             <div className="w-16 h-16 relative mb-2 transform group-hover:rotate-6 transition-transform">
-               <Image src="/mystery.png" alt="Mystery Note" fill className="object-contain" priority />
+               <Image src="https://picsum.photos/seed/mystery/200/200" alt="Mystery Note" fill className="object-contain" priority />
             </div>
             <span className="text-white font-black text-[8px] tracking-[0.15em] uppercase text-center">Mystery Note</span>
           </div>
 
           <div className="bg-white/20 backdrop-blur-md rounded-[1.75rem] flex flex-col items-center justify-center p-5 border border-white/20 transition-all cursor-pointer h-36 shadow-lg group active:scale-95">
             <div className="w-16 h-16 relative mb-2 transform group-hover:-rotate-6 transition-transform">
-              <Image src="/task.png" alt="Task Center" fill className="object-contain" priority />
+              <Image src="https://picsum.photos/seed/task/200/200" alt="Task Center" fill className="object-contain" priority />
             </div>
             <span className="text-white font-black text-[8px] tracking-[0.15em] uppercase text-center">Task Center</span>
           </div>

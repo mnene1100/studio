@@ -26,10 +26,11 @@ export default function UserProfilePage() {
   const { user: currentUser } = useUser();
   const [isFullScreen, setIsFullScreen] = useState(false);
 
+  // Wait for currentUser to be available before querying
   const userRef = useMemoFirebase(() => {
-    if (!db || !id) return null;
+    if (!db || !id || !currentUser?.uid) return null;
     return doc(db, 'users', id as string);
-  }, [db, id]);
+  }, [db, id, currentUser?.uid]);
 
   const { data: profile, isLoading } = useDoc(userRef);
 
