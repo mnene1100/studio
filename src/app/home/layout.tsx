@@ -54,7 +54,6 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   const discoveryUsers = allUsers?.filter(u => u.id !== user?.uid) || [];
 
   useEffect(() => {
-    // Only perform redirection logic once the initial auth state is resolved
     if (isAuthLoading) return;
 
     if (!user) {
@@ -62,7 +61,6 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
       return;
     }
 
-    // Once we have a user, check for profile completion
     if (!isProfileLoading) {
       const localProfileCompleted = localStorage.getItem('nexo_profile_completed');
       if (!profile && !localProfileCompleted) {
@@ -71,10 +69,9 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     }
   }, [user, isAuthLoading, profile, isProfileLoading, router]);
 
-  // Initial loading gate for auth and primary profile data
   if (isAuthLoading || (isProfileLoading && !profile && !localStorage.getItem('nexo_profile_completed'))) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black">
+      <div className="flex items-center justify-center min-h-screen bg-white">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
@@ -89,7 +86,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
       isChatsLoading,
       isUsersLoading
     }}>
-      <div className="min-h-screen bg-black relative">
+      <div className="min-h-screen bg-white relative">
         <main className="max-w-md mx-auto min-h-screen pb-20">
           {children}
         </main>

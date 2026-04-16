@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -33,8 +33,9 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="theme-color" content="#28B4A4" />
       </head>
-      <body className="font-body antialiased bg-background text-foreground min-h-screen overflow-x-hidden pb-safe">
+      <body className="font-body antialiased bg-white text-foreground min-h-screen overflow-x-hidden pb-safe">
         <FirebaseClientProvider>
           {children}
           <Toaster />

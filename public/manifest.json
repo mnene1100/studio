@@ -1,14 +1,12 @@
 
 {
-  "name": "NEXO | Premium Communication",
+  "name": "NEXO Premium",
   "short_name": "NEXO",
-  "description": "Seamless real-time video, voice, and text messaging platform.",
+  "description": "Seamless real-time communication platform.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
+  "background_color": "#ffffff",
   "theme_color": "#28B4A4",
-  "orientation": "portrait",
-  "scope": "/",
   "icons": [
     {
       "src": "https://picsum.photos/seed/nexo-logo/192/192",
