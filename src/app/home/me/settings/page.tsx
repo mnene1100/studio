@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRouter } from 'next/navigation';
@@ -32,8 +33,16 @@ export default function SettingsPage() {
   const { theme, toggleTheme } = useTheme();
 
   const handleLogout = async () => {
-    if (!auth) return;
+    if (!auth || !user) return;
     try {
+      // If anonymous, we "soft logout" to allow persistence on this device
+      if (user.isAnonymous) {
+        localStorage.removeItem('nexo_session_active');
+        router.replace('/login');
+        return;
+      }
+      
+      // Email users get fully signed out
       await signOut(auth);
       localStorage.clear(); 
       router.replace('/login');
@@ -81,7 +90,7 @@ export default function SettingsPage() {
           >
             <ChevronLeft className="w-6 h-6" />
           </Button>
-          <h1 className="text-xl font-black text-white tracking-[0.2em] uppercase">Settings</h1>
+          <h1 className="text-base font-black text-white tracking-[0.2em] uppercase italic">Settings</h1>
         </div>
       </header>
 

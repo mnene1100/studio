@@ -113,6 +113,7 @@ export default function OnboardingPage() {
     const userRef = doc(db, 'userProfiles', user.uid);
     setDocumentNonBlocking(userRef, profileData, { merge: true });
     localStorage.setItem('nexo_profile_completed', 'true');
+    localStorage.setItem('nexo_session_active', 'true');
     router.push('/home');
   };
 

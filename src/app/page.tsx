@@ -14,7 +14,9 @@ export default function EntryPage() {
   useEffect(() => {
     if (isUserLoading) return;
 
-    if (!user) {
+    const isSessionActive = localStorage.getItem('nexo_session_active') === 'true';
+
+    if (!user || !isSessionActive) {
       router.push('/login');
     } else {
       const checkProfile = async () => {

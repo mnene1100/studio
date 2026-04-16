@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -19,7 +20,9 @@ export default function LoginPage() {
   const { user } = useUser();
 
   useEffect(() => {
-    if (user) {
+    // Only auto-redirect if a session is marked as active in this browser
+    const isSessionActive = localStorage.getItem('nexo_session_active') === 'true';
+    if (user && isSessionActive) {
       router.push('/');
     }
   }, [user, router]);
@@ -27,13 +30,21 @@ export default function LoginPage() {
   const handleFastLogin = async () => {
     setIsLoading(true);
     try {
+      // If we already have an anonymous user session in the background, just activate it
+      if (auth.currentUser && auth.currentUser.isAnonymous) {
+        localStorage.setItem('nexo_session_active', 'true');
+        router.push('/');
+        return;
+      }
+      
       await signInAnonymously(auth);
+      localStorage.setItem('nexo_session_active', 'true');
       router.push('/');
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Login failed",
-        description: error.message || "Could not sign in anonymously.",
+        description: error.message || "Could not sign in.",
       });
     } finally {
       setIsLoading(false);
@@ -54,6 +65,7 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      localStorage.setItem('nexo_session_active', 'true');
       router.push('/');
     } catch (error: any) {
       let message = "Invalid email or password.";
@@ -93,6 +105,7 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await createUserWithEmailAndPassword(auth, email, password);
+      localStorage.setItem('nexo_session_active', 'true');
       router.push('/');
     } catch (error: any) {
       let message = "Could not create account.";
@@ -118,13 +131,13 @@ export default function LoginPage() {
         muted
         loop
         playsInline
-        className="absolute inset-0 w-full h-full object-cover z-0"
+        className="absolute inset-0 w-full h-full object-cover z-0 opacity-40"
       >
         <source src="/background.mp4" type="video/mp4" />
       </video>
 
       {/* Dark Overlay for Readability */}
-      <div className="absolute inset-0 bg-black/60 z-[1]" />
+      <div className="absolute inset-0 bg-black/40 z-[1]" />
 
       <div className="w-full max-w-sm space-y-16 text-center z-10">
         <div className="space-y-6 animate-in fade-in zoom-in duration-700">
@@ -132,8 +145,8 @@ export default function LoginPage() {
             <Zap className="text-white w-12 h-12" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-6xl text-white italic font-['Pacifico'] font-normal">NEXO</h1>
-            <p className="text-white/70 font-black tracking-[0.3em] uppercase text-[10px]">
+            <h1 className="text-5xl text-white font-['Pacifico'] font-light tracking-tight">NEXO</h1>
+            <p className="text-white/40 font-black tracking-[0.4em] uppercase text-[9px]">
               Premium Communication
             </p>
           </div>
@@ -145,7 +158,7 @@ export default function LoginPage() {
               <Button 
                 onClick={() => setIsEmailVisible(true)}
                 disabled={isLoading}
-                className="w-full h-16 bg-white text-black hover:bg-white/90 font-black rounded-2xl text-lg flex items-center justify-center group shadow-xl uppercase tracking-widest"
+                className="w-full h-16 bg-white text-black hover:bg-white/90 font-black rounded-2xl text-base flex items-center justify-center group shadow-xl uppercase tracking-widest"
               >
                 <Mail className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
                 Continue With Email
@@ -155,7 +168,7 @@ export default function LoginPage() {
                 variant="ghost"
                 onClick={handleFastLogin}
                 disabled={isLoading}
-                className="w-full h-16 text-white hover:text-white hover:bg-white/10 font-black rounded-2xl text-lg flex items-center justify-center group uppercase tracking-widest"
+                className="w-full h-16 text-white hover:text-white hover:bg-white/10 font-black rounded-2xl text-base flex items-center justify-center group uppercase tracking-widest"
               >
                 {isLoading ? (
                   <Loader2 className="mr-3 h-5 w-5 animate-spin" />
@@ -232,9 +245,9 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="fixed bottom-10 flex flex-col items-center space-y-2 z-10 px-6 text-center">
-        <p className="text-[8px] font-black text-white/30 uppercase tracking-[0.1em] leading-relaxed max-w-xs">
-          By signing up, you agree to our <span className="text-white/50 underline">Terms</span> and <span className="text-white/50 underline">Privacy Policy</span>.
+      <div className="absolute bottom-10 left-0 right-0 flex flex-col items-center space-y-2 z-10 px-10 text-center">
+        <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.15em] leading-relaxed max-w-xs">
+          By signing up, you agree to our <span className="text-white/40 underline">Terms</span> and <span className="text-white/40 underline">Privacy Policy</span>.
         </p>
       </div>
     </div>
