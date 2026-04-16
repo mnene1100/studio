@@ -1,3 +1,4 @@
+
 {
   "placeholderImages": [
     {
@@ -23,6 +24,18 @@
       "description": "Abstract premium tech logo",
       "imageUrl": "https://picsum.photos/seed/nexo-logo/400/400",
       "imageHint": "abstract logo"
+    },
+    {
+      "id": "mystery-icon",
+      "description": "Mystery note icon",
+      "imageUrl": "/mystery.png",
+      "imageHint": "mystery note"
+    },
+    {
+      "id": "task-icon",
+      "description": "Task center icon",
+      "imageUrl": "/task.png",
+      "imageHint": "task center"
     }
   ]
 }
