@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Phone, Video, PhoneOutgoing, PhoneIncoming, PhoneMissed, Loader2, XCircle, Ban } from "lucide-react";
 import { useUser, useFirestore, useCollection, useMemoFirebase, useDoc } from '@/firebase';
-import { collection, query, where, orderBy, limit, doc } from 'firebase/firestore';
+import { collection, query, where, limit, doc } from 'firebase/firestore';
 import { formatDistanceToNow } from 'date-fns';
 
 function CallItem({ call }: { call: any }) {
@@ -39,7 +39,7 @@ function CallItem({ call }: { call: any }) {
   }, [call.status, isCaller]);
 
   return (
-    <div className="flex items-center px-4 py-4 rounded-[2rem] hover:bg-muted/50 transition-all group bg-card/50 shadow-sm mb-2 mx-2 border border-transparent">
+    <div className="flex items-center px-4 py-4 rounded-[2.5rem] hover:bg-muted/50 transition-all group bg-card/50 shadow-sm mb-2 mx-2 border border-transparent">
       <Avatar className="w-14 h-14 ring-2 ring-muted shadow-sm overflow-hidden">
         <AvatarImage src={profile?.profilePictureUrl} className="object-cover rounded-full" />
         <AvatarFallback className="bg-primary/10 text-primary font-black rounded-full">
@@ -73,16 +73,24 @@ export default function CallsPage() {
 
   const callsQuery = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
-    // Note: The participantIds query works well with fully permissive rules or targeted list rules.
+    // Removed orderBy to prevent index requirement which causes permission errors
     return query(
       collection(db, 'calls'),
       where('participantIds', 'array-contains', user.uid),
-      orderBy('startTime', 'desc'),
-      limit(20)
+      limit(50)
     );
   }, [db, user?.uid]);
 
-  const { data: calls, isLoading } = useCollection(callsQuery);
+  const { data: callsData, isLoading } = useCollection(callsQuery);
+
+  const sortedCalls = useMemo(() => {
+    if (!callsData) return [];
+    return [...callsData].sort((a, b) => {
+      const timeA = new Date(a.startTime || 0).getTime();
+      const timeB = new Date(b.startTime || 0).getTime();
+      return timeB - timeA;
+    });
+  }, [callsData]);
 
   return (
     <div className="flex flex-col min-h-screen bg-background pb-32">
@@ -95,9 +103,9 @@ export default function CallsPage() {
           <div className="flex justify-center pt-20">
             <Loader2 className="w-8 h-8 text-primary animate-spin" />
           </div>
-        ) : calls && calls.length > 0 ? (
+        ) : sortedCalls.length > 0 ? (
           <div className="space-y-1">
-            {calls.map((call) => (
+            {sortedCalls.map((call) => (
               <CallItem key={call.id} call={call} />
             ))}
           </div>

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from 'react';
@@ -83,10 +84,10 @@ export default function ChatDetailPage() {
 
   const callsQuery = useMemoFirebase(() => {
     if (!db || !chatId) return null;
+    // Removed orderBy to avoid index requirement for better cross-platform support
     return query(
       collection(db, 'calls'),
       where('chatRoomId', '==', chatId),
-      orderBy('startTime', 'asc'),
       limit(50)
     );
   }, [db, chatId]);
