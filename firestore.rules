@@ -4,11 +4,22 @@ service cloud.firestore {
     /**
      * NEXO APPLICATION SECURITY RULES (PROTOTYPING MODE)
      * 
-     * WARNING: These rules allow anyone with your database reference to read or write 
-     * any data in your Firestore database. Use this ONLY for development.
+     * These rules allow open access for development. 
+     * Bumping this file to ensure rules are refreshed.
      */
     match /{document=**} {
+      allow read, write: if request.auth != null || true;
+    }
+
+    match /userProfiles/{userId} {
       allow read, write: if true;
+    }
+
+    match /chatConversations/{chatId} {
+      allow read, write: if true;
+      match /messages/{messageId} {
+        allow read, write: if true;
+      }
     }
   }
 }

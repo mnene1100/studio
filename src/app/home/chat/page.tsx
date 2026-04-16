@@ -3,26 +3,37 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Search, Plus, MessageSquare } from "lucide-react";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, where, orderBy } from 'firebase/firestore';
+import { collection, query, where } from 'firebase/firestore';
 
 export default function ChatListPage() {
   const [search, setSearch] = useState('');
   const { user } = useUser();
   const db = useFirestore();
 
+  // Removed orderBy from the Firestore query to avoid index requirement errors
   const chatsQuery = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
     return query(
       collection(db, 'chatConversations'),
-      where('participantIds', 'array-contains', user.uid),
-      orderBy('updatedAt', 'desc')
+      where('participantIds', 'array-contains', user.uid)
     );
   }, [db, user?.uid]);
 
   const { data: chats, isLoading } = useCollection(chatsQuery);
+
+  // Perform sorting in-memory on the client side
+  const sortedChats = chats ? [...chats].sort((a, b) => {
+    const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+    const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+    return dateB - dateA;
+  }) : [];
+
+  const filteredChats = sortedChats.filter(chat => 
+    chat.id.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-background">
@@ -52,8 +63,8 @@ export default function ChatListPage() {
               <div key={i} className="h-20 bg-card/20 rounded-[1.75rem] animate-pulse" />
             ))}
           </div>
-        ) : chats && chats.length > 0 ? (
-          chats.map((chat) => (
+        ) : filteredChats.length > 0 ? (
+          filteredChats.map((chat) => (
             <Link 
               key={chat.id} 
               href={`/home/chat/${chat.id}`}
