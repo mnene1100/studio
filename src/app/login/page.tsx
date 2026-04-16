@@ -5,16 +5,15 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Zap, Mail, ArrowRight, Lock } from "lucide-react";
+import { Zap, Mail, ArrowRight, Lock, UserPlus } from "lucide-react";
 import { useAuth } from '@/firebase';
 import { initiateAnonymousSignIn, initiateEmailSignIn, initiateEmailSignUp } from '@/firebase/non-blocking-login';
 import { toast } from "@/hooks/use-toast";
 
-export default function WelcomePage() {
+export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isEmailVisible, setIsEmailVisible] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
   const router = useRouter();
   const auth = useAuth();
 
@@ -23,16 +22,30 @@ export default function WelcomePage() {
     router.push('/');
   };
 
-  const handleEmailAuth = (e: React.FormEvent) => {
+  const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password.trim()) return;
-    
-    if (isSignUp) {
-      initiateEmailSignUp(auth, email, password);
-    } else {
-      initiateEmailSignIn(auth, email, password);
+    if (!email.trim() || !password.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Missing fields",
+        description: "Please enter both email and password.",
+      });
+      return;
     }
-    // The root layout/page will handle redirection based on auth state
+    initiateEmailSignIn(auth, email, password);
+  };
+
+  const handleSignUp = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!email.trim() || !password.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Missing fields",
+        description: "Please enter both email and password to create an account.",
+      });
+      return;
+    }
+    initiateEmailSignUp(auth, email, password);
   };
 
   return (
@@ -74,63 +87,63 @@ export default function WelcomePage() {
               </Button>
             </div>
           ) : (
-            <form 
-              onSubmit={handleEmailAuth} 
-              className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500"
-            >
-              <div className="space-y-3">
-                <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-accent transition-colors" />
-                  <Input 
-                    type="email" 
-                    placeholder="Email address" 
-                    className="pl-12 h-14 bg-white/5 border-white/10 rounded-2xl text-white placeholder:text-muted-foreground/50 focus-visible:ring-accent/50 focus-visible:border-accent/50"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <form onSubmit={handleSignIn} className="space-y-4 text-left">
+                <div className="space-y-3">
+                  <div className="relative group">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-accent transition-colors" />
+                    <Input 
+                      type="email" 
+                      placeholder="Email address" 
+                      className="pl-12 h-14 bg-white/5 border-white/10 rounded-2xl text-white placeholder:text-muted-foreground/50 focus-visible:ring-accent/50 focus-visible:border-accent/50"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="relative group">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-accent transition-colors" />
+                    <Input 
+                      type="password" 
+                      placeholder="Password" 
+                      className="pl-12 h-14 bg-white/5 border-white/10 rounded-2xl text-white placeholder:text-muted-foreground/50 focus-visible:ring-accent/50 focus-visible:border-accent/50"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                  </div>
                 </div>
-                <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-accent transition-colors" />
-                  <Input 
-                    type="password" 
-                    placeholder="Password" 
-                    className="pl-12 h-14 bg-white/5 border-white/10 rounded-2xl text-white placeholder:text-muted-foreground/50 focus-visible:ring-accent/50 focus-visible:border-accent/50"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div className="flex flex-col space-y-3">
-                <Button 
-                  type="submit" 
-                  className="w-full h-14 bg-accent text-accent-foreground hover:bg-accent/90 font-bold rounded-2xl shadow-lg shadow-accent/20"
-                >
-                  {isSignUp ? 'Create Account' : 'Sign In'}
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-                <div className="flex justify-between items-center px-2">
-                   <Button 
-                    type="button"
-                    variant="link"
-                    onClick={() => setIsSignUp(!isSignUp)}
-                    className="text-accent text-xs h-auto p-0"
+                
+                <div className="flex flex-col space-y-3 pt-2">
+                  <Button 
+                    type="submit" 
+                    className="w-full h-14 bg-accent text-accent-foreground hover:bg-accent/90 font-bold rounded-2xl shadow-lg shadow-accent/20"
                   >
-                    {isSignUp ? 'Already have an account? Sign In' : 'Need an account? Sign Up'}
+                    Sign In
+                    <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
+
+                  <Button 
+                    type="button"
+                    variant="outline"
+                    onClick={handleSignUp}
+                    className="w-full h-14 border-white/10 bg-white/5 text-white hover:bg-white/10 font-bold rounded-2xl"
+                  >
+                    <UserPlus className="mr-2 h-5 w-5" />
+                    Create New Account
+                  </Button>
+
                   <Button 
                     type="button"
                     variant="ghost"
                     onClick={() => setIsEmailVisible(false)}
-                    className="text-muted-foreground text-xs h-auto p-0"
+                    className="text-muted-foreground text-xs h-auto p-0 mx-auto"
                   >
-                    Back
+                    Back to options
                   </Button>
                 </div>
-              </div>
-            </form>
+              </form>
+            </div>
           )}
         </div>
       </div>
