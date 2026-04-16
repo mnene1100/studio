@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo, useEffect, useState } from 'react';
@@ -205,7 +206,7 @@ export default function UserProfilePage() {
 
         <div className="flex items-start justify-between mb-3">
           <div>
-            <h1 className="text-xl font-black text-gray-900 tracking-tight leading-none mb-1.5">
+            <h1 className="text-lg font-black text-gray-900 tracking-tight leading-none mb-1.5">
               {profile.displayName || "Guest_User"}
             </h1>
             <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">

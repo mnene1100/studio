@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from 'react';
@@ -16,7 +17,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 export default function ChatDetailPage() {
-  const { targetUserId } = useParams();
+  const { id: targetUserId } = useParams();
   const id = targetUserId as string;
   const router = useRouter();
   const db = useFirestore();
@@ -154,7 +155,7 @@ export default function ChatDetailPage() {
   const isInputEmpty = !input.trim();
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-white overflow-hidden">
+    <div className="fixed inset-0 h-[100dvh] flex flex-col bg-white overflow-hidden">
       {/* Seamless Fixed Header */}
       <header className="bg-primary safe-top flex-shrink-0 z-20">
         <div className="h-16 px-4 flex items-center justify-between">
@@ -228,7 +229,7 @@ export default function ChatDetailPage() {
       </div>
 
       {/* Fixed Bottom Input Area */}
-      <div className="bg-white border-t border-gray-100 flex-shrink-0 z-10 pb-safe">
+      <div className="bg-white border-t border-gray-100 flex-shrink-0 z-10 pb-10">
         <div className="px-6 py-4 flex flex-col space-y-3">
           {suggestions.length > 0 && (
             <div className="flex space-x-2 overflow-x-auto pb-2 -mx-2 px-2 no-scrollbar">
