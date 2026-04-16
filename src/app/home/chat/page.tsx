@@ -29,7 +29,7 @@ function ChatListItem({ chat }: { chat: any }) {
   return (
     <Link 
       href={`/home/chat/${otherParticipantId}`}
-      className="flex items-center px-4 py-4 rounded-none active:bg-accent/50 transition-all group border border-transparent"
+      className="flex items-center px-4 py-4 rounded-[2.5rem] active:bg-accent/50 transition-all group border border-transparent mb-2 mx-2"
     >
       <div className="relative">
         <Avatar className="w-14 h-14 rounded-full border-none shadow-sm overflow-hidden">
@@ -84,7 +84,7 @@ export default function ChatListPage() {
           Chats
         </h1>
         <button className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 active:scale-90 transition-all mt-2 overflow-hidden">
-          <MessageSquare className="w-4 h-4 text-white fill-white" />
+          <MessageCircle className="w-4 h-4 text-white fill-white" />
         </button>
       </header>
 

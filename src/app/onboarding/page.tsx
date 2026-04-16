@@ -54,12 +54,9 @@ export default function OnboardingPage() {
     return `${year}-${month}-${day}`;
   }, []);
 
-  // Protect the onboarding screen from existing users
   useEffect(() => {
-    if (isUserLoading || !db) return;
-
-    if (!user) {
-      router.replace('/login');
+    if (isUserLoading || !db || !user) {
+      if (!isUserLoading && !user) router.replace('/login');
       return;
     }
 
@@ -68,15 +65,12 @@ export default function OnboardingPage() {
         const userRef = doc(db, 'users', user.uid);
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
-          // If profile exists, go home immediately without showing this screen
           router.replace('/home');
         } else {
-          // Profile doesn't exist, allow onboarding UI to render
           setIsCheckingProfile(false);
         }
       } catch (e) {
         console.error("Profile check error:", e);
-        // Fallback to home on error to be safe
         router.replace('/home');
       }
     };
@@ -125,7 +119,6 @@ export default function OnboardingPage() {
       router.replace('/home');
     } catch (error: any) {
       toast({ variant: "destructive", title: "Setup Failed", description: error.message });
-    } finally {
       setIsLoading(false);
     }
   };
@@ -133,7 +126,10 @@ export default function OnboardingPage() {
   if (isUserLoading || isCheckingProfile) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+        <div className="flex flex-col items-center space-y-4">
+          <Loader2 className="w-8 h-8 text-primary animate-spin" />
+          <p className="text-[10px] text-primary font-black uppercase tracking-[0.4em] animate-pulse">Checking Profile...</p>
+        </div>
       </div>
     );
   }
