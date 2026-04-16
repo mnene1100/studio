@@ -45,7 +45,19 @@
         },
         "statusMessage": {
           "type": "string",
-          "description": "A custom status message."
+          "description": "A custom status message or bio."
+        },
+        "education": {
+          "type": "string",
+          "description": "User's educational background."
+        },
+        "horoscope": {
+          "type": "string",
+          "description": "User's zodiac sign."
+        },
+        "lookingFor": {
+          "type": "string",
+          "description": "What the user is looking for (e.g., Relationship, Friends)."
         },
         "balance": {
           "type": "number",

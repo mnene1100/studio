@@ -3,7 +3,6 @@
 
 import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { 
   ShieldCheck, Headset, ChevronRight, Copy, 
   Eye, Pencil, Coins, Diamond, Settings
@@ -77,7 +76,10 @@ export default function MePage() {
               </div>
             )}
           </div>
-          <button className="absolute bottom-1 right-1 p-2 bg-black/80 rounded-full border border-white/20 active:scale-90 shadow-xl z-20">
+          <button 
+            onClick={() => router.push('/home/me/edit')}
+            className="absolute bottom-1 right-1 p-2 bg-black/80 rounded-full border border-white/20 active:scale-90 shadow-xl z-20"
+          >
             <Pencil className="w-3.5 h-3.5 text-white" />
           </button>
         </div>
@@ -154,11 +156,14 @@ export default function MePage() {
           <div className="h-[1px] w-full bg-border" />
         </div>
 
-        <button className="w-full flex items-center p-5 bg-primary rounded-[1.75rem] shadow-xl shadow-primary/20 active:scale-[0.98] transition-all group">
+        <button 
+           onClick={() => router.push('/home/me/edit')}
+           className="w-full flex items-center p-5 bg-primary rounded-[1.75rem] shadow-xl shadow-primary/20 active:scale-[0.98] transition-all group"
+        >
           <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mr-4">
-            <ShieldCheck className="w-6 h-6 text-white" />
+            <Pencil className="w-6 h-6 text-white" />
           </div>
-          <span className="flex-1 text-left font-black text-white text-base tracking-tight">Verify profile</span>
+          <span className="flex-1 text-left font-black text-white text-base tracking-tight">Edit Profile</span>
           <ChevronRight className="w-5 h-5 text-white/50" />
         </button>
 
