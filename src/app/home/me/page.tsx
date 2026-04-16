@@ -10,7 +10,6 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
-import { cn } from '@/lib/utils';
 
 export default function MePage() {
   const router = useRouter();
@@ -47,8 +46,8 @@ export default function MePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F8F9FA] pb-32">
-      {/* Top Teal Section */}
-      <div className="bg-primary pt-12 pb-16 px-6 relative rounded-b-[2.5rem]">
+      {/* Top Teal Section - Straight & Shorter */}
+      <div className="bg-primary pt-10 pb-12 px-6 relative rounded-none shadow-lg">
         {/* ID Pill at the very top */}
         <div className="absolute top-4 left-1/2 -translate-x-1/2">
            <div 
@@ -69,93 +68,93 @@ export default function MePage() {
         </button>
 
         {/* Profile Info */}
-        <div className="flex flex-col items-center mt-10">
+        <div className="flex flex-col items-center mt-8">
           <div className="relative mb-4">
-            <Avatar className="w-32 h-32 border-4 border-white/20 ring-4 ring-black/5 shadow-2xl">
+            <Avatar className="w-28 h-28 border-4 border-white/20 ring-4 ring-black/5 shadow-2xl">
               <AvatarImage src={profile.profilePictureUrl} />
               <AvatarFallback className="bg-white/10 text-white text-3xl font-black">{initials}</AvatarFallback>
             </Avatar>
             <button className="absolute bottom-1 right-1 p-2 bg-[#1A1A1A] rounded-full border-2 border-primary shadow-xl active:scale-90 transition-transform">
-              <Pencil className="w-4 h-4 text-white" />
+              <Pencil className="w-3.5 h-3.5 text-white" />
             </button>
           </div>
           
-          <h2 className="text-3xl font-black text-white mb-0.5 tracking-tight">{displayName}</h2>
-          <p className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em]">Verified Official Profile</p>
+          <h2 className="text-2xl font-black text-white mb-0.5 tracking-tight">{displayName}</h2>
+          <p className="text-[9px] font-black text-white/60 uppercase tracking-[0.2em]">Verified Official Profile</p>
         </div>
       </div>
 
       {/* Floating Cards Section */}
-      <div className="px-6 -mt-8 grid grid-cols-2 gap-4">
+      <div className="px-6 -mt-6 grid grid-cols-2 gap-4">
         {/* Balance Card */}
-        <div className="bg-white rounded-[2.5rem] p-6 shadow-[0_15px_35px_rgba(0,0,0,0.05)] flex flex-col items-center text-center">
-          <div className="p-3 bg-primary/5 rounded-2xl mb-4">
-            <Coins className="w-6 h-6 text-primary" />
+        <div className="bg-white rounded-[2rem] p-5 shadow-[0_15px_35px_rgba(0,0,0,0.05)] flex flex-col items-center text-center">
+          <div className="p-2.5 bg-primary/5 rounded-xl mb-3">
+            <Coins className="w-5 h-5 text-primary" />
           </div>
-          <p className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-widest mb-1">Balance</p>
-          <h3 className="text-3xl font-black text-foreground mb-4">500</h3>
-          <button className="w-full py-3.5 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-primary/20 active:scale-95 transition-all">
+          <p className="text-[9px] font-black text-muted-foreground/50 uppercase tracking-widest mb-1">Balance</p>
+          <h3 className="text-2xl font-black text-foreground mb-3">500</h3>
+          <button className="w-full py-3 bg-primary text-white text-[9px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-primary/20 active:scale-95 transition-all">
             Recharge
           </button>
         </div>
 
         {/* Earnings Card */}
-        <div className="bg-white rounded-[2.5rem] p-6 shadow-[0_15px_35px_rgba(0,0,0,0.05)] flex flex-col items-center text-center">
-          <div className="p-3 bg-blue-500/5 rounded-2xl mb-4">
-            <Diamond className="w-6 h-6 text-blue-500" />
+        <div className="bg-white rounded-[2rem] p-5 shadow-[0_15px_35px_rgba(0,0,0,0.05)] flex flex-col items-center text-center">
+          <div className="p-2.5 bg-blue-500/5 rounded-xl mb-3">
+            <Diamond className="w-5 h-5 text-blue-500" />
           </div>
-          <p className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-widest mb-1">Earnings</p>
-          <h3 className="text-3xl font-black text-foreground mb-4">0</h3>
-          <button className="w-full py-3.5 bg-[#1A1A1A] text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg active:scale-95 transition-all">
+          <p className="text-[9px] font-black text-muted-foreground/50 uppercase tracking-widest mb-1">Earnings</p>
+          <h3 className="text-2xl font-black text-foreground mb-3">0</h3>
+          <button className="w-full py-3 bg-[#1A1A1A] text-white text-[9px] font-black uppercase tracking-widest rounded-full shadow-lg active:scale-95 transition-all">
             Income
           </button>
         </div>
       </div>
 
       {/* Account & Safety Section */}
-      <div className="px-6 mt-10 space-y-6">
+      <div className="px-6 mt-8 space-y-5">
         <div className="flex items-center space-x-4">
-          <h3 className="text-[13px] font-black text-muted-foreground/40 uppercase tracking-[0.1em] whitespace-nowrap">Account & Safety</h3>
+          <h3 className="text-[11px] font-black text-muted-foreground/40 uppercase tracking-[0.1em] whitespace-nowrap">Account & Safety</h3>
           <div className="h-[1px] w-full bg-muted-foreground/10" />
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* Verify Profile */}
-          <button className="w-full flex items-center p-5 bg-[#3B82F6] rounded-[2.2rem] shadow-xl shadow-blue-500/20 active:scale-[0.98] transition-all group">
-            <div className="p-3 bg-white/20 rounded-2xl mr-4">
-              <ShieldCheck className="w-6 h-6 text-white" />
+          <button className="w-full flex items-center p-4 bg-[#3B82F6] rounded-[1.75rem] shadow-xl shadow-blue-500/20 active:scale-[0.98] transition-all group">
+            <div className="p-2.5 bg-white/20 rounded-xl mr-4">
+              <ShieldCheck className="w-5 h-5 text-white" />
             </div>
-            <span className="flex-1 text-left font-black text-white text-lg">Verify profile</span>
+            <span className="flex-1 text-left font-black text-white text-base">Verify profile</span>
             <ChevronRight className="w-5 h-5 text-white/60 group-active:translate-x-1 transition-transform" />
           </button>
 
           {/* Customer Support */}
-          <button className="w-full flex items-center p-5 bg-white rounded-[2.2rem] shadow-[0_8px_30px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-all group">
-            <div className="p-3 bg-primary/10 rounded-2xl mr-4">
-              <Headset className="w-6 h-6 text-primary" />
+          <button className="w-full flex items-center p-4 bg-white rounded-[1.75rem] shadow-[0_8px_30px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-all group">
+            <div className="p-2.5 bg-primary/10 rounded-xl mr-4">
+              <Headset className="w-5 h-5 text-primary" />
             </div>
-            <span className="flex-1 text-left font-black text-foreground text-lg">Customer support</span>
+            <span className="flex-1 text-left font-black text-foreground text-base">Customer support</span>
             <ChevronRight className="w-5 h-5 text-muted-foreground/20 group-active:translate-x-1 transition-transform" />
           </button>
 
           {/* Games Center */}
-          <button className="w-full flex items-center p-5 bg-white rounded-[2.2rem] shadow-[0_8px_30px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-all group">
-            <div className="p-3 bg-orange-500/10 rounded-2xl mr-4">
-              <Gamepad2 className="w-6 h-6 text-orange-500" />
+          <button className="w-full flex items-center p-4 bg-white rounded-[1.75rem] shadow-[0_8px_30px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-all group">
+            <div className="p-2.5 bg-orange-500/10 rounded-xl mr-4">
+              <Gamepad2 className="w-5 h-5 text-orange-500" />
             </div>
-            <span className="flex-1 text-left font-black text-foreground text-lg">Games center</span>
+            <span className="flex-1 text-left font-black text-foreground text-base">Games center</span>
             <ChevronRight className="w-5 h-5 text-muted-foreground/20 group-active:translate-x-1 transition-transform" />
           </button>
 
           {/* Settings */}
           <button 
             onClick={() => router.push('/home/me/settings')}
-            className="w-full flex items-center p-5 bg-white rounded-[2.2rem] shadow-[0_8px_30px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-all group"
+            className="w-full flex items-center p-4 bg-white rounded-[1.75rem] shadow-[0_8px_30px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-all group"
           >
-            <div className="p-3 bg-muted rounded-2xl mr-4">
-              <Settings className="w-6 h-6 text-muted-foreground" />
+            <div className="p-2.5 bg-muted rounded-xl mr-4">
+              <Settings className="w-5 h-5 text-muted-foreground" />
             </div>
-            <span className="flex-1 text-left font-black text-foreground text-lg">Settings</span>
+            <span className="flex-1 text-left font-black text-foreground text-base">Settings</span>
             <ChevronRight className="w-5 h-5 text-muted-foreground/20 group-active:translate-x-1 transition-transform" />
           </button>
         </div>

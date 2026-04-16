@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
@@ -21,20 +22,20 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen pb-32 bg-background">
-      {/* Top Teal Section */}
-      <div className="teal-gradient pt-16 pb-12 px-6 rounded-b-[3rem] shadow-2xl">
+      {/* Top Teal Section - Straight & Shorter */}
+      <div className="teal-gradient pt-12 pb-8 px-6 rounded-none shadow-xl">
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white/20 backdrop-blur-md rounded-[2.5rem] aspect-square flex flex-col items-center justify-center p-6 border border-white/20 active:scale-95 transition-all cursor-pointer">
-            <div className="w-16 h-16 bg-white/30 rounded-3xl flex items-center justify-center mb-4 shadow-inner">
-              <HelpCircle className="w-10 h-10 text-white" />
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center p-4 border border-white/20 active:scale-95 transition-all cursor-pointer h-24 shadow-sm">
+            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-2">
+              <HelpCircle className="w-6 h-6 text-white" />
             </div>
-            <span className="text-white font-black text-[10px] tracking-[0.2em] uppercase text-center">Mystery Note</span>
+            <span className="text-white font-bold text-[10px] tracking-wider uppercase text-center">Mystery Note</span>
           </div>
-          <div className="bg-white/20 backdrop-blur-md rounded-[2.5rem] aspect-square flex flex-col items-center justify-center p-6 border border-white/20 active:scale-95 transition-all cursor-pointer">
-            <div className="w-16 h-16 bg-white/30 rounded-3xl flex items-center justify-center mb-4 shadow-inner">
-              <ClipboardCheck className="w-10 h-10 text-white" />
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center p-4 border border-white/20 active:scale-95 transition-all cursor-pointer h-24 shadow-sm">
+            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-2">
+              <ClipboardCheck className="w-6 h-6 text-white" />
             </div>
-            <span className="text-white font-black text-[10px] tracking-[0.2em] uppercase text-center">Task Center</span>
+            <span className="text-white font-bold text-[10px] tracking-wider uppercase text-center">Task Center</span>
           </div>
         </div>
       </div>
@@ -62,7 +63,7 @@ export default function HomePage() {
                 <Link 
                   key={u.id} 
                   href={`/home/chat/${u.id}`}
-                  className="group relative aspect-[3/4] overflow-hidden rounded-[2.5rem] shadow-xl active:scale-[0.98] transition-all"
+                  className="group relative aspect-[3/4] overflow-hidden rounded-[2rem] shadow-xl active:scale-[0.98] transition-all"
                 >
                   {/* Card Background Image */}
                   <img 
@@ -99,7 +100,7 @@ export default function HomePage() {
                 </Link>
               ))
             ) : (
-              <div className="col-span-2 p-12 text-center bg-muted/50 rounded-[2.5rem] border border-dashed border-border">
+              <div className="col-span-2 p-12 text-center bg-muted/50 rounded-[2rem] border border-dashed border-border">
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">No users found nearby</p>
               </div>
             )}
