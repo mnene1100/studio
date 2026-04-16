@@ -7,7 +7,7 @@ import {
   ChevronLeft, LogOut, Trash2, ChevronRight 
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { useUser, useFirestore } from '@/firebase';
+import { useUser, useFirestore, useAuth } from '@/firebase';
 import { doc, deleteDoc } from 'firebase/firestore';
 import { signOut, deleteUser } from 'firebase/auth';
 import {
@@ -24,7 +24,8 @@ import {
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { user, auth } = useUser();
+  const { user } = useUser();
+  const auth = useAuth();
   const db = useFirestore();
 
   const handleLogout = async () => {

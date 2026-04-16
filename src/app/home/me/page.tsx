@@ -106,17 +106,6 @@ export default function MePage() {
           <div className="h-[1px] w-full bg-gray-100" />
         </div>
 
-        <button 
-          onClick={() => router.push('/home/me/settings')}
-          className="w-full flex items-center p-5 bg-black rounded-[1.75rem] shadow-xl active:scale-[0.98] transition-all group"
-        >
-          <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mr-4">
-            <Settings className="w-6 h-6 text-white" />
-          </div>
-          <span className="flex-1 text-left font-black text-white text-base tracking-tight">Settings</span>
-          <ChevronRight className="w-5 h-5 text-white/50" />
-        </button>
-
         <button className="w-full flex items-center p-5 bg-blue-600 rounded-[1.75rem] shadow-xl shadow-blue-500/20 active:scale-[0.98] transition-all group">
           <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mr-4">
             <ShieldCheck className="w-6 h-6 text-white" />
@@ -131,6 +120,17 @@ export default function MePage() {
           </div>
           <span className="flex-1 text-left font-black text-gray-900 text-base tracking-tight">Customer support</span>
           <ChevronRight className="w-5 h-5 text-gray-300" />
+        </button>
+
+        <button 
+          onClick={() => router.push('/home/me/settings')}
+          className="w-full flex items-center p-5 bg-black rounded-[1.75rem] shadow-xl active:scale-[0.98] transition-all group"
+        >
+          <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mr-4">
+            <Settings className="w-6 h-6 text-white" />
+          </div>
+          <span className="flex-1 text-left font-black text-white text-base tracking-tight">Settings</span>
+          <ChevronRight className="w-5 h-5 text-white/50" />
         </button>
       </div>
 
