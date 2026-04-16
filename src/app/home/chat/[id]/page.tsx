@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from 'react';
@@ -126,6 +127,10 @@ export default function ChatDetailPage() {
     }
   };
 
+  const startCall = (type: 'video' | 'audio') => {
+    router.push(`/home/call/${targetUserId}?type=${type}`);
+  };
+
   const isOnline = useMemo(() => {
     if (!profile?.lastOnlineAt) return false;
     const lastOnline = new Date(profile.lastOnlineAt).getTime();
@@ -181,10 +186,20 @@ export default function ChatDetailPage() {
           </div>
 
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon" className="w-9 h-9 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => startCall('audio')}
+              className="w-9 h-9 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10"
+            >
               <Phone className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="w-9 h-9 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => startCall('video')}
+              className="w-9 h-9 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10"
+            >
               <Video className="w-4 h-4" />
             </Button>
           </div>
