@@ -4,12 +4,13 @@
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { 
-  Shield, Bell, HelpCircle, 
-  ChevronRight, Copy, QrCode, Settings
+  ShieldCheck, Headset, ChevronRight, Copy, 
+  Eye, Pencil, Coins, Diamond, Settings
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
+import { cn } from '@/lib/utils';
 
 export default function MePage() {
   const router = useRouter();
@@ -41,80 +42,112 @@ export default function MePage() {
 
   if (!profile) return null;
 
-  const displayName = profile.displayName || "";
+  const displayName = profile.displayName || "Guest_user";
   const initials = displayName.length > 0 ? displayName[0].toUpperCase() : '?';
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-background">
-      <header className="glass-header px-6 pt-14 pb-6 flex items-center justify-between">
-        <h1 className="text-4xl font-black tracking-tighter text-white">Profile</h1>
-      </header>
-
-      <div className="flex-1 overflow-y-auto pb-32">
-        <div className="px-6 flex flex-col items-center py-10">
-          <div className="relative mb-6">
-            <div className="p-1 rounded-full bg-gradient-to-tr from-primary to-accent">
-              <Avatar className="w-32 h-32 border-4 border-background">
-                <AvatarImage src={profile.profilePictureUrl} />
-                <AvatarFallback className="bg-secondary text-3xl font-black">{initials}</AvatarFallback>
-              </Avatar>
-            </div>
-            <div className="absolute bottom-1 right-1 p-2.5 bg-primary rounded-[1.25rem] shadow-2xl shadow-primary/40 active:scale-90 transition-transform cursor-pointer">
-              <QrCode className="w-5 h-5 text-white" />
-            </div>
+    <div className="flex flex-col min-h-screen bg-[#F8F9FA] pb-32">
+      {/* Top Teal Section */}
+      <div className="bg-primary pt-12 pb-16 px-6 relative rounded-b-[2.5rem]">
+        {/* Visitors Button */}
+        <button className="absolute top-10 right-6 flex flex-col items-center space-y-1 group active:scale-95 transition-all">
+          <div className="p-2.5 bg-white/20 backdrop-blur-md rounded-full border border-white/30">
+            <Eye className="w-5 h-5 text-white" />
           </div>
-          <h2 className="text-3xl font-black text-white mb-2 tracking-tight">{displayName}</h2>
+          <span className="text-[10px] font-black text-white/70 uppercase tracking-widest">Visitors</span>
+        </button>
+
+        {/* Profile Info */}
+        <div className="flex flex-col items-center mt-6">
+          <div className="relative mb-6">
+            <Avatar className="w-32 h-32 border-4 border-white/20 ring-4 ring-black/5">
+              <AvatarImage src={profile.profilePictureUrl} />
+              <AvatarFallback className="bg-white/10 text-white text-3xl font-black">{initials}</AvatarFallback>
+            </Avatar>
+            <button className="absolute bottom-1 right-1 p-2 bg-[#1A1A1A] rounded-full border-2 border-primary shadow-xl active:scale-90 transition-transform">
+              <Pencil className="w-4 h-4 text-white" />
+            </button>
+          </div>
+          
+          <h2 className="text-3xl font-black text-white mb-1 tracking-tight">{displayName}</h2>
+          <p className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em] mb-6">Verified Official Profile</p>
           
           <button 
             onClick={copyId}
-            className="flex items-center space-x-3 bg-card/60 px-5 py-3 rounded-[1.5rem] border border-white/5 active:scale-95 transition-all shadow-xl"
+            className="flex items-center space-x-3 bg-white/20 backdrop-blur-md px-6 py-2.5 rounded-full border border-white/10 active:scale-95 transition-all"
           >
-            <span className="text-[10px] uppercase font-black tracking-[0.2em] text-accent">ID</span>
-            <span className="text-xl font-mono font-bold text-white tracking-widest">
-              {profile.numericId}
-            </span>
-            <Copy className="w-4 h-4 text-muted-foreground" />
+            <span className="text-xs font-black text-white">ID: {profile.numericId}</span>
+            <Copy className="w-3.5 h-3.5 text-white/70" />
+          </button>
+        </div>
+      </div>
+
+      {/* Floating Cards Section */}
+      <div className="px-6 -mt-8 grid grid-cols-2 gap-4">
+        {/* Balance Card */}
+        <div className="bg-white rounded-[2.5rem] p-6 shadow-[0_15px_35px_rgba(0,0,0,0.05)] flex flex-col items-center text-center">
+          <div className="p-3 bg-primary/5 rounded-2xl mb-4">
+            <Coins className="w-6 h-6 text-primary" />
+          </div>
+          <p className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-widest mb-1">Balance</p>
+          <h3 className="text-2xl font-black text-foreground mb-4">500</h3>
+          <button className="w-full py-3 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-primary/20 active:scale-95 transition-all">
+            Recharge
           </button>
         </div>
 
-        <div className="px-4 space-y-6">
-          <div className="bg-card/40 rounded-[2.5rem] p-3 border border-white/5">
-            {[
-              { label: 'Security & Privacy', icon: Shield, color: 'text-blue-400', bg: 'bg-blue-400/10' },
-              { label: 'Notifications', icon: Bell, color: 'text-orange-400', bg: 'bg-orange-400/10' },
-              { label: 'Help & Feedback', icon: HelpCircle, color: 'text-green-400', bg: 'bg-green-400/10' },
-            ].map((item, i) => (
-              <button 
-                key={i} 
-                className="w-full flex items-center p-4 rounded-[1.75rem] active:bg-white/5 transition-all group mb-1 last:mb-0"
-              >
-                <div className={`p-3 rounded-2xl ${item.bg} mr-4`}>
-                  <item.icon className={`w-5 h-5 ${item.color}`} />
-                </div>
-                <span className="flex-1 text-left text-base font-bold text-white">{item.label}</span>
-                <ChevronRight className="w-5 h-5 text-muted-foreground/40 group-active:translate-x-1 transition-all" />
-              </button>
-            ))}
+        {/* Earnings Card */}
+        <div className="bg-white rounded-[2.5rem] p-6 shadow-[0_15px_35px_rgba(0,0,0,0.05)] flex flex-col items-center text-center">
+          <div className="p-3 bg-blue-500/5 rounded-2xl mb-4">
+            <Diamond className="w-6 h-6 text-blue-500" />
           </div>
+          <p className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-widest mb-1">Earnings</p>
+          <h3 className="text-2xl font-black text-foreground mb-4">0</h3>
+          <button className="w-full py-3 bg-[#1A1A1A] text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg active:scale-95 transition-all">
+            Income
+          </button>
+        </div>
+      </div>
 
-          <div className="bg-card/40 rounded-[2.5rem] p-3 border border-white/5">
-            <button 
-              onClick={() => router.push('/home/me/settings')}
-              className="w-full flex items-center p-4 rounded-[1.75rem] active:bg-white/5 transition-all group"
-            >
-              <div className="p-3 rounded-2xl bg-white/5 mr-4">
-                <Settings className="w-5 h-5 text-muted-foreground" />
-              </div>
-              <span className="flex-1 text-left text-base font-bold text-white">Settings</span>
-              <ChevronRight className="w-5 h-5 text-muted-foreground/40 group-active:translate-x-1 transition-all" />
-            </button>
-          </div>
+      {/* Account & Safety Section */}
+      <div className="px-6 mt-10 space-y-6">
+        <div className="flex items-center space-x-4">
+          <h3 className="text-[13px] font-black text-muted-foreground/40 uppercase tracking-[0.1em] whitespace-nowrap">Account & Safety</h3>
+          <div className="h-[1px] w-full bg-muted-foreground/10" />
         </div>
 
-        <div className="mt-12 mb-10 text-center px-6">
-          <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.4em]">Nexo Premium v1.0.4</p>
-          <p className="text-[9px] text-muted-foreground/30 mt-2 font-bold">Securely Hosted in East Africa</p>
+        <div className="space-y-4">
+          <button className="w-full flex items-center p-5 bg-[#3B82F6] rounded-[2rem] shadow-xl shadow-blue-500/20 active:scale-[0.98] transition-all group">
+            <div className="p-3 bg-white/20 rounded-2xl mr-4">
+              <ShieldCheck className="w-6 h-6 text-white" />
+            </div>
+            <span className="flex-1 text-left font-black text-white text-lg">Verify profile</span>
+            <ChevronRight className="w-5 h-5 text-white/60 group-active:translate-x-1 transition-transform" />
+          </button>
+
+          <button className="w-full flex items-center p-5 bg-white rounded-[2rem] shadow-[0_8px_30px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-all group">
+            <div className="p-3 bg-primary/10 rounded-2xl mr-4">
+              <Headset className="w-6 h-6 text-primary" />
+            </div>
+            <span className="flex-1 text-left font-black text-foreground text-lg">Customer support</span>
+            <ChevronRight className="w-5 h-5 text-muted-foreground/20 group-active:translate-x-1 transition-transform" />
+          </button>
+
+          <button 
+            onClick={() => router.push('/home/me/settings')}
+            className="w-full flex items-center p-5 bg-white rounded-[2rem] shadow-[0_8px_30px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-all group"
+          >
+            <div className="p-3 bg-muted rounded-2xl mr-4">
+              <Settings className="w-6 h-6 text-muted-foreground" />
+            </div>
+            <span className="flex-1 text-left font-black text-foreground text-lg">Settings</span>
+            <ChevronRight className="w-5 h-5 text-muted-foreground/20 group-active:translate-x-1 transition-transform" />
+          </button>
         </div>
+      </div>
+
+      <div className="mt-12 text-center opacity-30">
+        <p className="text-[9px] font-black uppercase tracking-[0.4em]">Nexo Premium v1.0.4</p>
       </div>
     </div>
   );
