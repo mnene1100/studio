@@ -25,8 +25,6 @@ export default function CallPage() {
   const { user: currentUser } = useUser();
 
   const [joined, setJoined] = useState(false);
-  const [localVideoTrack, setLocalVideoTrack] = useState<any>(null);
-  const [localAudioTrack, setLocalAudioTrack] = useState<any>(null);
   const [remoteUsers, setRemoteUsers] = useState<any[]>([]);
   const [micOn, setMicOn] = useState(true);
   const [cameraOn, setCameraOn] = useState(callType === 'video');
@@ -38,6 +36,10 @@ export default function CallPage() {
   const localVideoRef = useRef<HTMLDivElement>(null);
   const remoteVideoRef = useRef<HTMLDivElement>(null);
   const agoraClientRef = useRef<any>(null);
+  
+  // Track refs for immediate and reliable cleanup
+  const localAudioTrackRef = useRef<any>(null);
+  const localVideoTrackRef = useRef<any>(null);
 
   const targetUserRef = useMemoFirebase(() => {
     if (!db || !targetUserId) return null;
@@ -76,41 +78,41 @@ export default function CallPage() {
         const channelName = [currentUser?.uid, targetUserId].sort().join('_');
         
         setStatusMessage('Requesting Permissions...');
-        let audioTrack;
-        let videoTrack;
-
+        
         try {
-          audioTrack = await AgoraRTC.createMicrophoneAudioTrack({
+          // Always create audio track
+          const audioTrack = await AgoraRTC.createMicrophoneAudioTrack({
             AEC: true,
             ANS: true,
             AGC: true,
           });
-          setLocalAudioTrack(audioTrack);
+          localAudioTrackRef.current = audioTrack;
 
+          // Conditionally create video track
           if (callType === 'video') {
-            videoTrack = await AgoraRTC.createCameraVideoTrack();
-            setLocalVideoTrack(videoTrack);
+            const videoTrack = await AgoraRTC.createCameraVideoTrack();
+            localVideoTrackRef.current = videoTrack;
           }
           setHasPermission(true);
         } catch (permError) {
+          console.error("Permissions failed:", permError);
           setHasPermission(false);
           return;
         }
 
         setStatusMessage('Authenticating Session...');
-        // SECURE TOKEN FETCH
         const token = await getAgoraToken(channelName, currentUser?.uid as string);
 
         setStatusMessage('Joining Channel...');
         await agoraClientRef.current.join(appId, channelName, token, currentUser?.uid);
 
-        if (callType === 'video' && videoTrack) {
-          await agoraClientRef.current.publish([audioTrack, videoTrack]);
+        if (callType === 'video' && localVideoTrackRef.current) {
+          await agoraClientRef.current.publish([localAudioTrackRef.current, localVideoTrackRef.current]);
           if (localVideoRef.current) {
-            videoTrack.play(localVideoRef.current);
+            localVideoTrackRef.current.play(localVideoRef.current);
           }
         } else {
-          await agoraClientRef.current.publish([audioTrack]);
+          await agoraClientRef.current.publish([localAudioTrackRef.current]);
         }
 
         setJoined(true);
@@ -130,14 +132,23 @@ export default function CallPage() {
       initAgora();
     }
 
+    // CRITICAL: Cleanup function disconnects all hardware
     return () => {
-      localVideoTrack?.stop();
-      localVideoTrack?.close();
-      localAudioTrack?.stop();
-      localAudioTrack?.close();
-      agoraClientRef.current?.leave();
+      if (localVideoTrackRef.current) {
+        localVideoTrackRef.current.stop();
+        localVideoTrackRef.current.close();
+        localVideoTrackRef.current = null;
+      }
+      if (localAudioTrackRef.current) {
+        localAudioTrackRef.current.stop();
+        localAudioTrackRef.current.close();
+        localAudioTrackRef.current = null;
+      }
+      if (agoraClientRef.current) {
+        agoraClientRef.current.leave();
+      }
     };
-  }, [currentUser, targetUserId, callType]);
+  }, [currentUser, targetUserId, callType, router]);
 
   useEffect(() => {
     if (remoteUsers.length > 0 && remoteVideoRef.current) {
@@ -146,19 +157,20 @@ export default function CallPage() {
   }, [remoteUsers]);
 
   const handleEndCall = () => {
+    // Navigating back triggers the useEffect cleanup
     router.back();
   };
 
   const toggleMic = async () => {
-    if (localAudioTrack) {
-      await localAudioTrack.setEnabled(!micOn);
+    if (localAudioTrackRef.current) {
+      await localAudioTrackRef.current.setEnabled(!micOn);
       setMicOn(!micOn);
     }
   };
 
   const toggleCamera = async () => {
-    if (localVideoTrack) {
-      await localVideoTrack.setEnabled(!cameraOn);
+    if (localVideoTrackRef.current) {
+      await localVideoTrackRef.current.setEnabled(!cameraOn);
       setCameraOn(!cameraOn);
     }
   };
