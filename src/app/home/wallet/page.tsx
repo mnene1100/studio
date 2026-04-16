@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -40,6 +39,10 @@ export default function WalletPage() {
 
     setIsLoading(true);
     try {
+      // Construction of callback URL using window.location.origin.
+      // This automatically handles local dev and production (vercel).
+      const callbackUrl = `${window.location.origin}/home/wallet/callback`;
+      
       const result = await createPesapalOrder({
         amount: selectedPackage.price,
         email: profile.email || "guest@nexo.com",
@@ -47,7 +50,7 @@ export default function WalletPage() {
         firstName: profile.displayName || "Nexo",
         lastName: "User",
         description: `Recharge ${selectedPackage.coins} Nexo Coins`,
-        callbackUrl: `${window.location.origin}/home/wallet/callback`,
+        callbackUrl: callbackUrl,
       });
 
       if (result.redirectUrl) {
@@ -68,7 +71,7 @@ export default function WalletPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white pb-32">
-      {/* Header - Seamless with status bar, NO shadows or borders */}
+      {/* Seamless Header */}
       <header className="bg-primary safe-top sticky top-0 z-50">
         <div className="px-4 h-20 flex items-center justify-between">
           <Button 
@@ -190,7 +193,7 @@ export default function WalletPage() {
           </div>
         </div>
 
-        {/* Official Sellers Banner */}
+        {/* Official Sellers Section */}
         <div className="bg-gray-50 rounded-[2rem] p-6 flex items-center justify-between border border-gray-100 shadow-inner group">
           <div className="flex items-center space-x-4">
             <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center transition-transform group-hover:rotate-12">
