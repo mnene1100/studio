@@ -40,7 +40,8 @@ export default function HomePage() {
   // Determine if we have reached the end of the collection
   const hasMore = useMemo(() => {
     if (!allUsers) return false;
-    return allUsers.length === pageSize;
+    // If the number of results is exactly the pageSize, there might be more
+    return allUsers.length >= pageSize;
   }, [allUsers, pageSize]);
 
   const handleLoadMore = () => {
@@ -50,6 +51,10 @@ export default function HomePage() {
   const handleRefresh = () => {
     setPageSize(6);
   };
+
+  // Determine what to show in the main content area
+  const showLoading = isUsersLoading && (!allUsers || allUsers.length === 0);
+  const showEmpty = !isUsersLoading && allUsers !== null && discoveryUsers.length === 0;
 
   return (
     <div className="flex flex-col min-h-screen pb-32 bg-background">
@@ -98,7 +103,12 @@ export default function HomePage() {
       </div>
 
       <div className="px-3 pt-4">
-        {discoveryUsers.length > 0 ? (
+        {showLoading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 text-primary animate-spin" />
+            <p className="mt-4 text-[9px] font-black text-primary/40 uppercase tracking-[0.3em]">Finding matches...</p>
+          </div>
+        ) : discoveryUsers.length > 0 ? (
           <div className="grid grid-cols-2 gap-3 pb-6">
             {discoveryUsers.map((u, i) => {
               const age = u.dob ? differenceInYears(new Date(), new Date(u.dob)) : 20;
@@ -150,19 +160,17 @@ export default function HomePage() {
               );
             })}
           </div>
-        ) : !isUsersLoading && (
+        ) : showEmpty ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-20 px-10">
+            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+               <RefreshCw className="w-8 h-8 text-gray-200" />
+            </div>
             <h2 className="text-sm font-black text-muted-foreground tracking-tighter mb-2 uppercase italic">No users found</h2>
+            <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Try refreshing the page</p>
           </div>
-        )}
+        ) : null}
 
-        {isUsersLoading && (
-          <div className="flex justify-center py-10">
-            <Loader2 className="w-8 h-8 text-primary animate-spin" />
-          </div>
-        )}
-
-        {discoveryUsers.length > 0 && !isUsersLoading && (
+        {!showLoading && discoveryUsers.length > 0 && (
           <div className="flex flex-col items-center justify-center pb-16 pt-4">
             {hasMore ? (
               <Button 
@@ -170,6 +178,7 @@ export default function HomePage() {
                 onClick={handleLoadMore}
                 className="text-[10px] font-black text-primary uppercase tracking-[0.3em] hover:bg-primary/5 rounded-full px-8 py-6 h-auto transition-all active:scale-95"
               >
+                {isUsersLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                 Load More
               </Button>
             ) : (
