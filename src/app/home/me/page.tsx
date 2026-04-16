@@ -47,7 +47,7 @@ export default function MePage() {
 
         {/* Profile Avatar */}
         <div className="relative mb-4 mt-6">
-          <div className="w-28 h-28 relative rounded-full overflow-hidden border-4 border-white/20 shadow-2xl bg-white/10">
+          <div className="w-28 h-28 relative rounded-full overflow-hidden shadow-2xl bg-white/10">
             {profile.profilePictureUrl ? (
               <Image 
                 src={profile.profilePictureUrl} 
