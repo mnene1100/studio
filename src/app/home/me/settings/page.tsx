@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRouter } from 'next/navigation';
@@ -38,10 +39,10 @@ export default function SettingsPage() {
       localStorage.removeItem('nexo_session_active');
       localStorage.removeItem('nexo_profile_completed');
       
-      // Sign out all users regardless of anonymous status to clear Firebase Auth persistence
+      // Perform sign out
       await signOut(auth);
       
-      // Use replace to overwrite history and prevent back-button access
+      // Use replace to overwrite history
       router.replace('/login');
     } catch (error: any) {
       toast({
@@ -76,7 +77,6 @@ export default function SettingsPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      {/* Header - Seamless with status bar */}
       <header className="bg-primary safe-top relative shrink-0">
         <div className="px-4 h-20 flex items-center justify-center">
           <Button 
@@ -92,7 +92,6 @@ export default function SettingsPage() {
       </header>
 
       <div className="flex-1 px-6 py-10 space-y-4 pb-32">
-        {/* Dark Mode Toggle */}
         <div className="bg-card rounded-[2.5rem] p-5 flex items-center shadow-sm border border-border/50">
           <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mr-4">
             {theme === 'dark' ? <Moon className="w-6 h-6 text-primary" /> : <Sun className="w-6 h-6 text-primary" />}
@@ -109,7 +108,6 @@ export default function SettingsPage() {
           />
         </div>
 
-        {/* Bind Account Card */}
         <div className="bg-card rounded-[2.5rem] p-5 flex items-center shadow-sm border border-border/50 active:scale-[0.98] transition-all cursor-pointer">
           <div className="w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center mr-4">
             <ShieldCheck className="w-6 h-6 text-green-500" />
@@ -125,7 +123,6 @@ export default function SettingsPage() {
           <ChevronRight className="w-5 h-5 text-muted-foreground" />
         </div>
 
-        {/* Charge Settings Card */}
         <div className="bg-card rounded-[2.5rem] p-5 flex items-center shadow-sm border border-border/50 active:scale-[0.98] transition-all cursor-pointer">
           <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center mr-4">
             <CreditCard className="w-6 h-6 text-blue-500" />
@@ -134,7 +131,6 @@ export default function SettingsPage() {
           <ChevronRight className="w-5 h-5 text-muted-foreground" />
         </div>
 
-        {/* Blocked List Card */}
         <div className="bg-card rounded-[2.5rem] p-5 flex items-center shadow-sm border border-border/50 active:scale-[0.98] transition-all cursor-pointer">
           <div className="w-12 h-12 bg-red-500/10 rounded-2xl flex items-center justify-center mr-4">
             <Ban className="w-6 h-6 text-red-500" />
@@ -143,7 +139,6 @@ export default function SettingsPage() {
           <ChevronRight className="w-5 h-5 text-muted-foreground" />
         </div>
 
-        {/* About Card */}
         <div className="bg-card rounded-[2.5rem] p-5 flex items-center shadow-sm border border-border/50 active:scale-[0.98] transition-all cursor-pointer">
           <div className="w-12 h-12 bg-muted rounded-2xl flex items-center justify-center mr-4">
             <span className="text-xl font-black italic text-primary">NX</span>
@@ -152,7 +147,6 @@ export default function SettingsPage() {
           <ChevronRight className="w-5 h-5 text-muted-foreground" />
         </div>
 
-        {/* Custom Sign Out Button */}
         <div className="pt-6">
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -175,14 +169,11 @@ export default function SettingsPage() {
           </AlertDialog>
         </div>
 
-        {/* Footer with Logo */}
         <footer className="pt-12 flex flex-col items-center">
           <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
             <div className="text-primary text-2xl font-black italic">NX</div>
           </div>
-          
           <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em] mb-4">Version 1.0.5</p>
-          
           <div className="flex items-center space-x-6">
             <button className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Privacy</button>
             <div className="w-1 h-1 bg-border rounded-full" />

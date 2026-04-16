@@ -40,6 +40,7 @@ export default function CallPage() {
   const remoteVideoRef = useRef<HTMLDivElement>(null);
   const agoraClientRef = useRef<any>(null);
   const callIdRef = useRef<string | null>(null);
+  const initializationStartedRef = useRef(false);
   
   const localAudioTrackRef = useRef<any>(null);
   const localVideoTrackRef = useRef<any>(null);
@@ -54,14 +55,13 @@ export default function CallPage() {
     router.back();
   };
 
-  // Billing logic: Caller only
+  // Billing logic: Caller only - Isolated from the profile update trigger
   useEffect(() => {
-    if (!joined || !currentUser || !db || !currentUserProfile) return;
+    if (!joined || !currentUser || !db) return;
 
     const costPerMin = callType === 'video' ? 160 : 80;
     
     const deductCoins = async () => {
-      // Refresh balance from DB to ensure accuracy
       const userRef = doc(db, 'users', currentUser.uid);
       const userSnap = await getDoc(userRef);
       const latestBalance = userSnap.data()?.balance ?? 0;
@@ -70,42 +70,36 @@ export default function CallPage() {
         toast({
           variant: "destructive",
           title: "Insufficient Balance",
-          description: "Your call has ended due to low coin balance. Please recharge.",
+          description: "Call ended due to low balance.",
         });
         handleEndCall();
         return false;
       }
 
-      // Perform deduction
       try {
-        await updateDoc(userRef, {
-          balance: increment(-costPerMin)
-        });
+        await updateDoc(userRef, { balance: increment(-costPerMin) });
         return true;
       } catch (e) {
-        console.error("Billing error:", e);
         handleEndCall();
         return false;
       }
     };
 
-    // Initial deduction for minute 1
     deductCoins();
-
-    // Deduct every minute
-    const billingInterval = setInterval(() => {
-      deductCoins();
-    }, 60000);
+    const billingInterval = setInterval(deductCoins, 60000);
 
     return () => clearInterval(billingInterval);
-  }, [joined, currentUser, db, currentUserProfile, callType]);
+  }, [joined, currentUser?.uid, db, callType]);
 
   useEffect(() => {
+    // Only initialize ONCE to prevent UID_CONFLICT on balance updates
+    if (initializationStartedRef.current || !currentUser || !targetUserId || !db || !currentUserProfile) return;
+    initializationStartedRef.current = true;
+
     const initAgora = async () => {
       if (typeof window === 'undefined') return;
 
       try {
-        // Pre-initialization check: Ensure user can cover the FIRST minute
         const costPerMin = callType === 'video' ? 160 : 80;
         const currentBalance = currentUserProfile?.balance ?? 0;
 
@@ -120,7 +114,6 @@ export default function CallPage() {
         }
 
         const appId = process.env.NEXT_PUBLIC_AGORA_APP_ID;
-        
         if (!appId) {
           setErrorMessage('AGORA_CONFIGURATION_MISSING');
           return;
@@ -131,99 +124,70 @@ export default function CallPage() {
 
         agoraClientRef.current.on("user-published", async (user: any, mediaType: string) => {
           await agoraClientRef.current.subscribe(user, mediaType);
-          if (mediaType === "video") {
-            setRemoteUsers((prev) => [...prev, user]);
-          }
-          if (mediaType === "audio") {
-            user.audioTrack.play();
-          }
+          if (mediaType === "video") setRemoteUsers((prev) => [...prev, user]);
+          if (mediaType === "audio") user.audioTrack.play();
         });
 
         agoraClientRef.current.on("user-unpublished", (user: any) => {
           setRemoteUsers((prev) => prev.filter((u) => u.uid !== user.uid));
         });
 
-        const channelName = [currentUser?.uid, targetUserId].sort().join('_');
-        
+        const channelName = [currentUser.uid, targetUserId].sort().join('_');
         setStatusMessage('Requesting Hardware...');
         
         try {
-          const audioTrack = await AgoraRTC.createMicrophoneAudioTrack({
-            AEC: true,
-            ANS: true,
-            AGC: true,
-          });
+          const audioTrack = await AgoraRTC.createMicrophoneAudioTrack({ AEC: true, ANS: true, AGC: true });
           localAudioTrackRef.current = audioTrack;
-
           if (callType === 'video') {
-            const videoTrack = await AgoraRTC.createCameraVideoTrack();
-            localVideoTrackRef.current = videoTrack;
+            localVideoTrackRef.current = await AgoraRTC.createCameraVideoTrack();
           }
           setHasPermission(true);
         } catch (permError) {
-          console.error("Permissions denied:", permError);
           setHasPermission(false);
           return;
         }
 
         setStatusMessage('Authenticating...');
-        const result = await getAgoraToken(channelName, currentUser?.uid as string);
-        
-        if (result.error) {
-          console.error("Token result error:", result);
-          setErrorMessage(result.error);
-          return;
-        }
-
-        if (!result.token) {
-          setErrorMessage('TOKEN_NOT_RECEIVED');
+        const result = await getAgoraToken(channelName, currentUser.uid);
+        if (result.error || !result.token) {
+          setErrorMessage(result.error || 'TOKEN_NOT_RECEIVED');
           return;
         }
 
         setStatusMessage('Joining...');
-        await agoraClientRef.current.join(appId, channelName, result.token, currentUser?.uid);
+        await agoraClientRef.current.join(appId, channelName, result.token, currentUser.uid);
 
-        const callId = `${currentUser?.uid}_${targetUserId}_${Date.now()}`;
+        const callId = `${currentUser.uid}_${targetUserId}_${Date.now()}`;
         callIdRef.current = callId;
-        const callRef = doc(db!, 'calls', callId);
-        setDocumentNonBlocking(callRef, {
+        setDocumentNonBlocking(doc(db, 'calls', callId), {
           id: callId,
-          callerId: currentUser?.uid,
-          participantIds: [currentUser?.uid, targetUserId],
+          callerId: currentUser.uid,
+          participantIds: [currentUser.uid, targetUserId],
           type: callType,
           startTime: new Date().toISOString(),
           status: 'ongoing'
         }, { merge: true });
 
-        const tracksToPublish = [];
-        if (localAudioTrackRef.current) tracksToPublish.push(localAudioTrackRef.current);
+        const tracks = [];
+        if (localAudioTrackRef.current) tracks.push(localAudioTrackRef.current);
         if (callType === 'video' && localVideoTrackRef.current) {
-          tracksToPublish.push(localVideoTrackRef.current);
-          if (localVideoRef.current) {
-            localVideoTrackRef.current.play(localVideoRef.current);
-          }
+          tracks.push(localVideoTrackRef.current);
+          if (localVideoRef.current) localVideoTrackRef.current.play(localVideoRef.current);
         }
 
-        if (tracksToPublish.length > 0) {
-          await agoraClientRef.current.publish(tracksToPublish);
-        }
-
+        if (tracks.length > 0) await agoraClientRef.current.publish(tracks);
         setJoined(true);
         setStatusMessage('Connected');
       } catch (error: any) {
-        console.error("Call initialization failed:", error);
         setErrorMessage(error.message || 'CONNECTION_FAILED');
       }
     };
 
-    if (currentUser && targetUserId && db && currentUserProfile) {
-      initAgora();
-    }
+    initAgora();
 
     return () => {
       if (callIdRef.current && db) {
-        const callRef = doc(db, 'calls', callIdRef.current);
-        updateDocumentNonBlocking(callRef, {
+        updateDocumentNonBlocking(doc(db, 'calls', callIdRef.current), {
           status: 'ended',
           endTime: new Date().toISOString()
         });
@@ -231,18 +195,16 @@ export default function CallPage() {
       if (localVideoTrackRef.current) {
         localVideoTrackRef.current.stop();
         localVideoTrackRef.current.close();
-        localVideoTrackRef.current = null;
       }
       if (localAudioTrackRef.current) {
         localAudioTrackRef.current.stop();
         localAudioTrackRef.current.close();
-        localAudioTrackRef.current = null;
       }
       if (agoraClientRef.current) {
         agoraClientRef.current.leave();
       }
     };
-  }, [currentUser, targetUserId, callType, db, currentUserProfile]);
+  }, [currentUser?.uid, targetUserId, callType, db]);
 
   const toggleMic = async () => {
     if (localAudioTrackRef.current) {
@@ -269,9 +231,7 @@ export default function CallPage() {
           <AlertTitle className="text-xl font-black uppercase tracking-tight text-white">Call Error</AlertTitle>
           <AlertDescription className="text-[10px] font-medium text-white/50 leading-relaxed mt-2 uppercase tracking-widest">
             {errorMessage === 'AGORA_CONFIGURATION_MISSING' 
-              ? 'Agora credentials (App ID or Certificate) are missing. Please set AGORA_APP_ID and AGORA_APP_CERTIFICATE in your secrets.' 
-              : errorMessage === 'TOKEN_GENERATION_FAILED'
-              ? 'Secure token generation failed. Please verify your Agora App Certificate in the Agora Console.'
+              ? 'Agora credentials missing. Set AGORA_APP_ID and AGORA_APP_CERTIFICATE in secrets.' 
               : `An error occurred: ${errorMessage}.`}
           </AlertDescription>
           <Button onClick={() => router.back()} className="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] h-14 rounded-full">
@@ -289,7 +249,7 @@ export default function CallPage() {
           <AlertCircle className="h-6 w-6 mb-4 text-red-500 mx-auto" />
           <AlertTitle className="text-xl font-black uppercase tracking-tight text-white">Access Denied</AlertTitle>
           <AlertDescription className="text-[10px] font-medium text-white/50 leading-relaxed mt-2 uppercase tracking-widest">
-            NEXO requires {callType === 'video' ? 'Camera & Mic' : 'Microphone'} access. Please check your browser settings.
+            NEXO requires {callType === 'video' ? 'Camera & Mic' : 'Microphone'} access.
           </AlertDescription>
           <Button onClick={() => router.back()} className="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] h-14 rounded-full">
             Exit Session
@@ -339,9 +299,7 @@ export default function CallPage() {
         <div 
           className={cn(
             "absolute z-40 transition-all duration-500 rounded-full overflow-hidden border-2 border-white/20 shadow-2xl bg-black ring-4 ring-black/50",
-            isMinimized 
-              ? "bottom-40 right-6 w-24 h-24" 
-              : "top-20 right-6 w-32 h-32"
+            isMinimized ? "bottom-40 right-6 w-24 h-24" : "top-20 right-6 w-32 h-32"
           )}
           ref={localVideoRef}
           onClick={() => setIsMinimized(!isMinimized)}
