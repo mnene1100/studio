@@ -78,16 +78,36 @@ export default function SettingsPage() {
         <div className="bg-gray-50 rounded-[2rem] p-3 border border-gray-100">
           <h3 className="px-4 py-2 text-[8px] uppercase font-black tracking-[0.3em] text-gray-400">Account Management</h3>
           
-          <button 
-            onClick={handleLogout}
-            className="w-full flex items-center p-4 rounded-[1.5rem] active:bg-gray-100 transition-all group mb-1"
-          >
-            <div className="p-2.5 rounded-xl bg-white mr-4 shadow-sm">
-              <LogOut className="w-4 h-4 text-gray-600" />
-            </div>
-            <span className="flex-1 text-left text-sm font-black text-gray-900 uppercase tracking-tight">Sign Out</span>
-            <ChevronRight className="w-4 h-4 text-gray-300" />
-          </button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button 
+                className="w-full flex items-center p-4 rounded-[1.5rem] active:bg-gray-100 transition-all group mb-1"
+              >
+                <div className="p-2.5 rounded-xl bg-white mr-4 shadow-sm">
+                  <LogOut className="w-4 h-4 text-gray-600" />
+                </div>
+                <span className="flex-1 text-left text-sm font-black text-gray-900 uppercase tracking-tight">Sign Out</span>
+                <ChevronRight className="w-4 h-4 text-gray-300" />
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="bg-white border-gray-100 text-gray-900 rounded-[2rem] max-w-[300px]">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-lg font-black uppercase tracking-tight">Sign Out?</AlertDialogTitle>
+                <AlertDialogDescription className="text-xs font-medium text-gray-400 leading-relaxed">
+                  Are you sure you want to log out of your NEXO account?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="mt-4 gap-2">
+                <AlertDialogCancel className="bg-gray-100 border-none text-gray-600 hover:bg-gray-200 rounded-xl text-xs font-black uppercase">Cancel</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={handleLogout}
+                  className="bg-primary text-white hover:bg-primary/90 rounded-xl text-xs font-black uppercase"
+                >
+                  Sign Out
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
           <AlertDialog>
             <AlertDialogTrigger asChild>

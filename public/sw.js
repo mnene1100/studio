@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'nexo-v1';
+const CACHE_NAME = 'nexo-cache-v1';
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',
@@ -19,8 +19,9 @@ self.addEventListener('fetch', (event) => {
     caches.match(event.request).then((response) => {
       return response || fetch(event.request);
     }).catch(() => {
-      // Fallback for offline if fetching fails
-      return caches.match('/');
+      if (event.request.mode === 'navigate') {
+        return caches.match('/');
+      }
     })
   );
 });
