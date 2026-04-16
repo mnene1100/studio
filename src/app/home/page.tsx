@@ -1,9 +1,9 @@
-
 "use client";
 
 import { useHomeData } from './layout';
 import { HelpCircle, ClipboardCheck, RefreshCw, MessageSquare } from "lucide-react";
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function HomePage() {
   const { discoveryUsers, isUsersLoading } = useHomeData();
@@ -47,17 +47,19 @@ export default function HomePage() {
           </div>
         ) : discoveryUsers.length > 0 ? (
           <div className="grid grid-cols-2 gap-3 pb-6">
-            {discoveryUsers.map((u) => (
+            {discoveryUsers.map((u, i) => (
               <div 
                 key={u.id} 
                 onClick={() => router.push(`/home/profile/${u.id}`)}
                 className="group relative aspect-[3/4] overflow-hidden rounded-[2.5rem] shadow-2xl transition-all cursor-pointer"
               >
-                <img 
+                <Image 
                   src={u.profilePictureUrl || `https://picsum.photos/seed/${u.id}/600/900`} 
-                  alt={u.displayName}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  data-ai-hint="portrait"
+                  alt={u.displayName || 'User'}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 50vw, 33vw"
+                  priority={i < 4}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
                 

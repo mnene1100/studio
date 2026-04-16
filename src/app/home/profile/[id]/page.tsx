@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useMemo } from 'react';
@@ -78,7 +77,7 @@ export default function UserProfilePage() {
   const hasInformation = profile.createdAt || profile.country || profile.gender;
 
   return (
-    <div className="flex flex-col min-h-screen bg-white relative pb-40">
+    <div className="flex flex-col min-h-screen bg-white relative pb-40 overflow-x-hidden">
       {/* Hero Image Section */}
       <div className="relative w-full aspect-[4/5] overflow-hidden bg-muted">
         <Image 
@@ -146,7 +145,7 @@ export default function UserProfilePage() {
       </div>
 
       {/* Profile Details Content */}
-      <div className="px-8 -mt-8 bg-white rounded-t-[3.5rem] relative z-10 pt-10">
+      <div className="px-8 -mt-8 bg-white rounded-t-[3.5rem] relative z-10 pt-10 flex-1">
         <div className="flex items-start justify-between mb-4">
           <div>
             <h1 className="text-4xl font-black text-gray-900 tracking-tight leading-none mb-2">
@@ -184,7 +183,7 @@ export default function UserProfilePage() {
 
         {/* User Information Section - Conditional */}
         {hasInformation && (
-          <div className="space-y-6">
+          <div className="space-y-6 pb-20">
             <h3 className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em]">Information</h3>
             
             <div className="grid grid-cols-1 gap-4">
@@ -207,8 +206,8 @@ export default function UserProfilePage() {
       </div>
 
       {/* FIXED BOTTOM ACTION BAR */}
-      <div className="fixed bottom-8 left-0 right-0 px-8 z-30">
-        <div className="max-w-md mx-auto">
+      <div className="fixed bottom-8 left-0 right-0 px-8 z-30 pointer-events-none">
+        <div className="max-w-md mx-auto pointer-events-auto">
           <Button 
             onClick={() => router.push(`/home/chat/${profile.id}`)}
             className="w-full h-16 bg-primary text-white hover:bg-primary/90 font-black rounded-full text-base shadow-2xl shadow-primary/40 transition-all active:scale-95 uppercase tracking-[0.2em] flex items-center justify-center space-x-3"
