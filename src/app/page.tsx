@@ -19,22 +19,28 @@ export default function EntryPage() {
     if (!user || !isSessionActive) {
       router.replace('/login');
     } else {
-      const checkProfile = async () => {
-        const localFlag = localStorage.getItem('nexo_profile_completed');
+      const checkProfileStatus = async () => {
+        const localFlag = localStorage.getItem('nexo_profile_completed') === 'true';
         if (localFlag) {
           router.replace('/home');
           return;
         }
 
-        const userDoc = await getDoc(doc(db, 'userProfiles', user.uid));
-        if (userDoc.exists()) {
-          localStorage.setItem('nexo_profile_completed', 'true');
-          router.replace('/home');
-        } else {
+        try {
+          const userDoc = await getDoc(doc(db, 'userProfiles', user.uid));
+          if (userDoc.exists()) {
+            localStorage.setItem('nexo_profile_completed', 'true');
+            router.replace('/home');
+          } else {
+            router.replace('/onboarding');
+          }
+        } catch (e) {
+          console.error("Error checking profile status:", e);
+          // Fallback to onboarding if we can't confirm profile existence
           router.replace('/onboarding');
         }
       };
-      checkProfile();
+      checkProfileStatus();
     }
   }, [user, isUserLoading, router, db]);
 

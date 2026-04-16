@@ -17,29 +17,32 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const auth = useAuth();
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
 
   useEffect(() => {
     // Only auto-redirect if a session is explicitly marked as active
     const isSessionActive = localStorage.getItem('nexo_session_active') === 'true';
-    if (user && isSessionActive) {
+    if (!isUserLoading && user && isSessionActive) {
       router.replace('/home');
     }
-  }, [user, router]);
+  }, [user, isUserLoading, router]);
 
   const handleFastLogin = async () => {
+    if (!auth) return;
     setIsLoading(true);
     try {
-      // If we already have an anonymous user session in the background, just activate it
+      // If we already have a persistent anonymous user session, just activate it
       if (auth.currentUser && auth.currentUser.isAnonymous) {
         localStorage.setItem('nexo_session_active', 'true');
         router.replace('/home');
         return;
       }
       
-      await signInAnonymously(auth);
-      localStorage.setItem('nexo_session_active', 'true');
-      router.replace('/home');
+      const userCredential = await signInAnonymously(auth);
+      if (userCredential.user) {
+        localStorage.setItem('nexo_session_active', 'true');
+        router.replace('/home');
+      }
     } catch (error: any) {
       toast({
         variant: "destructive",

@@ -42,13 +42,21 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     return () => clearInterval(interval);
   }, [db, user?.uid]);
 
-  // Essential Global Listener: User Profile only
+  // Essential Global Listener: User Profile
   const profileRef = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
     return doc(db, 'userProfiles', user.uid);
   }, [db, user?.uid]);
   const { data: profile, isLoading: isProfileLoading } = useDoc(profileRef);
 
+  // Profile status maintenance
+  useEffect(() => {
+    if (!isProfileLoading && profile) {
+      localStorage.setItem('nexo_profile_completed', 'true');
+    }
+  }, [profile, isProfileLoading]);
+
+  // Auth and Session Guard
   useEffect(() => {
     if (isAuthLoading) return;
 
@@ -59,15 +67,16 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
       return;
     }
 
-    if (!isProfileLoading) {
-      const localProfileCompleted = localStorage.getItem('nexo_profile_completed');
-      if (!profile && !localProfileCompleted) {
+    // Only redirect to onboarding if we are sure the profile doesn't exist
+    if (!isProfileLoading && !profile) {
+      const localProfileCompleted = localStorage.getItem('nexo_profile_completed') === 'true';
+      if (!localProfileCompleted) {
         router.replace('/onboarding');
       }
     }
   }, [user, isAuthLoading, profile, isProfileLoading, router]);
 
-  if (isAuthLoading || (isProfileLoading && !profile && !localStorage.getItem('nexo_profile_completed'))) {
+  if (isAuthLoading || (isProfileLoading && !profile && localStorage.getItem('nexo_profile_completed') !== 'true')) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
