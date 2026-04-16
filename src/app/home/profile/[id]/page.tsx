@@ -1,8 +1,9 @@
+
 "use client";
 
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { useFirestore, useDoc, useMemoFirebase, useUser, setDocumentNonBlocking } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { Button } from "@/components/ui/button";
 import { 
@@ -23,6 +24,7 @@ export default function UserProfilePage() {
   const { id } = useParams();
   const router = useRouter();
   const db = useFirestore();
+  const { user: currentUser } = useUser();
 
   const userRef = useMemoFirebase(() => {
     if (!db || !id) return null;
@@ -30,6 +32,20 @@ export default function UserProfilePage() {
   }, [db, id]);
 
   const { data: profile, isLoading } = useDoc(userRef);
+
+  // Record Visitor Logic
+  useEffect(() => {
+    if (!db || !currentUser || !id || currentUser.uid === id) return;
+    
+    // Use the visitorId as part of the path for idempotency (or timestamp for history)
+    // Here we record every unique visit window by current user
+    const visitorRef = doc(db, 'userProfiles', id as string, 'visitors', currentUser.uid);
+    setDocumentNonBlocking(visitorRef, {
+      id: currentUser.uid,
+      visitorId: currentUser.uid,
+      visitedAt: new Date().toISOString()
+    }, { merge: true });
+  }, [db, currentUser, id]);
 
   const age = useMemo(() => {
     if (!profile?.dob) return null;

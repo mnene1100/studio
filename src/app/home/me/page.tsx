@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { 
@@ -13,7 +14,13 @@ import Image from 'next/image';
 
 export default function MePage() {
   const router = useRouter();
-  const { profile } = useHomeData();
+  const { profile, visitors } = useHomeData();
+
+  const hasNewVisitors = useMemo(() => {
+    if (!profile || !visitors?.length) return false;
+    const lastChecked = profile.lastCheckedVisitorsAt ? new Date(profile.lastCheckedVisitorsAt).getTime() : 0;
+    return visitors.some(v => new Date(v.visitedAt).getTime() > lastChecked);
+  }, [profile, visitors]);
 
   const copyId = () => {
     if (profile?.numericId) {
@@ -39,9 +46,15 @@ export default function MePage() {
       {/* Top Teal Header Section with Safe Top */}
       <div className="bg-primary safe-top pb-32 px-6 relative flex flex-col items-center shrink-0">
         {/* Visitors Button - Top Right */}
-        <button className="absolute top-6 right-6 flex flex-col items-center active:scale-95 transition-all z-10 safe-top">
-          <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 mb-1 shadow-lg">
+        <button 
+          onClick={() => router.push('/home/me/visitors')}
+          className="absolute top-6 right-6 flex flex-col items-center active:scale-95 transition-all z-10 safe-top"
+        >
+          <div className="relative w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 mb-1 shadow-lg">
             <Eye className="w-5 h-5 text-white" />
+            {hasNewVisitors && (
+              <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-primary animate-pulse" />
+            )}
           </div>
           <span className="text-[9px] font-black text-white uppercase tracking-widest">Visitors</span>
         </button>

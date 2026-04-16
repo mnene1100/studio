@@ -64,6 +64,11 @@
           "description": "Timestamp indicating the last time the user was online.",
           "format": "date-time"
         },
+        "lastCheckedVisitorsAt": {
+          "type": "string",
+          "description": "Timestamp when the user last checked their visitors list.",
+          "format": "date-time"
+        },
         "createdAt": {
           "type": "string",
           "description": "Timestamp indicating when the user profile was created.",
@@ -80,6 +85,18 @@
         "country",
         "createdAt"
       ]
+    },
+    "ProfileVisitor": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ProfileVisitor",
+      "type": "object",
+      "description": "Represents a user who visited another user's profile.",
+      "properties": {
+        "id": { "type": "string" },
+        "visitorId": { "type": "string" },
+        "visitedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "visitorId", "visitedAt"]
     },
     "ChatConversation": {
       "$schema": "http://json-schema.org/draft-07/schema#",
@@ -153,6 +170,16 @@
             "$ref": "#/backend/entities/UserProfile"
           },
           "description": "Stores individual user profile information."
+        }
+      },
+      {
+        "path": "/userProfiles/{userId}/visitors/{visitorId}",
+        "definition": {
+          "entityName": "ProfileVisitor",
+          "schema": {
+            "$ref": "#/backend/entities/ProfileVisitor"
+          },
+          "description": "Stores profile visitor information."
         }
       },
       {

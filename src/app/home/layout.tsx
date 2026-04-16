@@ -1,18 +1,21 @@
+
 "use client";
 
 import { useEffect, createContext, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { Navigation } from "@/components/navigation";
 import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase, updateDocumentNonBlocking } from '@/firebase';
-import { doc, collection, query, where, limit } from 'firebase/firestore';
+import { doc, collection, query, where, limit, orderBy } from 'firebase/firestore';
 
 interface HomeDataContextType {
   profile: any;
   chats: any[];
   discoveryUsers: any[];
+  visitors: any[];
   isProfileLoading: boolean;
   isChatsLoading: boolean;
   isUsersLoading: boolean;
+  isVisitorsLoading: boolean;
 }
 
 const HomeDataContext = createContext<HomeDataContextType | undefined>(undefined);
@@ -70,6 +73,17 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
 
   const discoveryUsers = allUsers?.filter(u => u.id !== user?.uid) || [];
 
+  // Visitors Listener for notification dot
+  const visitorsQuery = useMemoFirebase(() => {
+    if (!db || !user?.uid) return null;
+    return query(
+      collection(db, 'userProfiles', user.uid, 'visitors'),
+      orderBy('visitedAt', 'desc'),
+      limit(20)
+    );
+  }, [db, user?.uid]);
+  const { data: visitors, isLoading: isVisitorsLoading } = useCollection(visitorsQuery);
+
   useEffect(() => {
     if (isAuthLoading) return;
 
@@ -99,9 +113,11 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
       profile, 
       chats: chats || [], 
       discoveryUsers, 
+      visitors: visitors || [],
       isProfileLoading,
       isChatsLoading,
-      isUsersLoading
+      isUsersLoading,
+      isVisitorsLoading
     }}>
       <div className="min-h-screen bg-background relative">
         <main className="max-w-md mx-auto min-h-screen">
