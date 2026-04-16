@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useMemo, useEffect } from 'react';
@@ -8,7 +7,7 @@ import { doc } from 'firebase/firestore';
 import { Button } from "@/components/ui/button";
 import { 
   ChevronLeft, MoreHorizontal, Copy, 
-  Globe, Calendar, Ban, Flag, MessageCircle 
+  Calendar, Ban, Flag, MessageCircle 
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { differenceInYears, formatDistanceToNow } from 'date-fns';
@@ -18,7 +17,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 
 export default function UserProfilePage() {
   const { id } = useParams();
@@ -109,7 +108,7 @@ export default function UserProfilePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white relative pb-40 overflow-x-hidden">
-      {/* Hero Image Section - Slightly shorter for compact feel */}
+      {/* Hero Image Section */}
       <div className="relative w-full aspect-[1/1.15] overflow-hidden bg-muted">
         <Image 
           src={profile.profilePictureUrl || `https://picsum.photos/seed/${profile.id}/800/1000`}
@@ -124,7 +123,7 @@ export default function UserProfilePage() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent h-1/4" />
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-white via-white/10 to-transparent h-24" />
 
-        {/* Top Navigation - Smaller icons */}
+        {/* Top Navigation */}
         <div className="absolute top-10 left-4 right-4 flex items-center justify-between z-20">
           <Button 
             variant="ghost" 
@@ -165,7 +164,7 @@ export default function UserProfilePage() {
         </div>
       </div>
 
-      {/* Profile Details Area - Tighter spacing */}
+      {/* Profile Details Area */}
       <div className="px-6 -mt-12 bg-white rounded-t-[3rem] relative z-10 pt-8 flex-1">
         {/* Status Indicator */}
         <div className="mb-3">
@@ -179,15 +178,12 @@ export default function UserProfilePage() {
 
         <div className="flex items-start justify-between mb-3">
           <div>
-            <h1 className="text-2xl font-black text-gray-900 tracking-tight leading-none mb-1.5">
+            <h1 className="text-lg font-black text-gray-900 tracking-tight leading-none mb-1.5">
               {profile.displayName || "Guest_User"}
             </h1>
             <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">
               {profile.gender} {age ? `• ${age} Years Old` : ''}
             </p>
-          </div>
-          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shadow-sm">
-            <Globe className="w-5 h-5 text-primary" />
           </div>
         </div>
 
@@ -233,7 +229,7 @@ export default function UserProfilePage() {
         )}
       </div>
 
-      {/* Floating Action Button - Slightly more compact */}
+      {/* Floating Action Button */}
       <div className="fixed bottom-6 left-0 right-0 px-6 z-30 pointer-events-none">
         <div className="max-w-md mx-auto pointer-events-auto">
           <Button 
