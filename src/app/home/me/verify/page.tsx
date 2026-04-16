@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -44,7 +45,7 @@ export default function VerifyProfilePage() {
   if (!profile) return null;
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-background">
       <header className="bg-primary safe-top sticky top-0 z-50 shrink-0">
         <div className="px-4 h-16 flex items-center justify-between">
           <button 
@@ -63,7 +64,7 @@ export default function VerifyProfilePage() {
           <div className="w-32 h-32 bg-primary/10 rounded-[3rem] flex items-center justify-center border-4 border-primary/20 relative">
             <UserCheck className="w-16 h-16 text-primary" />
             {profile.isVerified && (
-              <div className="absolute -top-4 -right-4 bg-green-500 p-2 rounded-full border-4 border-white shadow-xl">
+              <div className="absolute -top-4 -right-4 bg-green-500 p-2 rounded-full border-4 border-card shadow-xl">
                 <Check className="w-6 h-6 text-white" />
               </div>
             )}
@@ -72,32 +73,32 @@ export default function VerifyProfilePage() {
         </div>
 
         <div className="space-y-4 max-w-xs">
-          <h2 className="text-2xl font-black text-gray-900 tracking-tight uppercase italic">
+          <h2 className="text-2xl font-black text-foreground tracking-tight uppercase italic">
             {profile.isVerified ? "Already Verified" : "Get Your Badge"}
           </h2>
-          <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest leading-relaxed">
+          <p className="text-[11px] font-black text-muted-foreground uppercase tracking-widest leading-relaxed">
             Verified users get more visibility, unlock premium features, and build trust within the Nexo community.
           </p>
         </div>
 
         <div className="w-full space-y-3 pt-6">
-          <div className="flex items-center space-x-4 p-5 bg-gray-50 rounded-[1.75rem] border border-gray-100">
-            <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center shrink-0">
+          <div className="flex items-center space-x-4 p-5 bg-card rounded-[1.75rem] border border-border">
+            <div className="w-10 h-10 bg-background rounded-xl shadow-sm flex items-center justify-center shrink-0">
               <BadgeCheck className="w-6 h-6 text-primary fill-primary/10" />
             </div>
             <div className="text-left">
-              <p className="text-[11px] font-black text-gray-900 uppercase">Trust Badge</p>
-              <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Show you are real</p>
+              <p className="text-[11px] font-black text-foreground uppercase">Trust Badge</p>
+              <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Show you are real</p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-4 p-5 bg-gray-50 rounded-[1.75rem] border border-gray-100">
-            <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center shrink-0">
+          <div className="flex items-center space-x-4 p-5 bg-card rounded-[1.75rem] border border-border">
+            <div className="w-10 h-10 bg-background rounded-xl shadow-sm flex items-center justify-center shrink-0">
               <ShieldCheck className="w-6 h-6 text-primary fill-primary/10" />
             </div>
             <div className="text-left">
-              <p className="text-[11px] font-black text-gray-900 uppercase">Secure Profile</p>
-              <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Enhanced protection</p>
+              <p className="text-[11px] font-black text-foreground uppercase">Secure Profile</p>
+              <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Enhanced protection</p>
             </div>
           </div>
         </div>

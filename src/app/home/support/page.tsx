@@ -11,7 +11,7 @@ export default function SupportPage() {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col h-screen bg-white">
+    <div className="flex flex-col h-screen bg-background">
       {/* Header - Seamless with status bar */}
       <header className="bg-primary safe-top px-4 h-24 flex items-center justify-between relative z-20">
         <div className="flex items-center space-x-3">
@@ -38,14 +38,14 @@ export default function SupportPage() {
       </header>
 
       {/* Messages Area */}
-      <div className="flex-1 bg-white" />
+      <div className="flex-1 bg-background" />
 
       {/* Input Area */}
-      <div className="px-6 py-6 bg-white flex items-center space-x-3 pb-10">
+      <div className="px-6 py-6 bg-background flex items-center space-x-3 pb-10">
         <div className="flex-1 relative">
           <Input 
             placeholder="Message..." 
-            className="w-full bg-gray-50 border-none rounded-full h-14 px-6 text-sm font-medium placeholder:text-gray-400 focus-visible:ring-primary/20 shadow-sm"
+            className="w-full bg-muted border-none rounded-full h-14 px-6 text-sm font-medium placeholder:text-muted-foreground focus-visible:ring-primary/20 shadow-sm"
           />
           <Button 
             size="icon" 

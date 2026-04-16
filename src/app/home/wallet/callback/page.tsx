@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
@@ -80,7 +81,7 @@ export default function PaymentCallbackPage() {
   }, [trackingId, user?.uid, db, coinsToCredit, merchantRef, router]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-background">
       <header className="bg-primary safe-top h-16 flex items-center justify-center relative shrink-0">
         <h1 className="text-[10px] font-black text-white tracking-[0.2em] uppercase italic">Transaction Status</h1>
       </header>
@@ -91,8 +92,8 @@ export default function PaymentCallbackPage() {
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
               <Loader2 className="w-8 h-8 text-primary animate-spin" />
             </div>
-            <h2 className="text-lg font-black text-gray-900 uppercase italic">Confirming...</h2>
-            <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Securing your coins</p>
+            <h2 className="text-lg font-black text-foreground uppercase italic">Confirming...</h2>
+            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Securing your coins</p>
           </div>
         ) : status === 'success' ? (
           <div className="space-y-8 animate-in zoom-in duration-500 max-w-xs w-full">
@@ -100,19 +101,19 @@ export default function PaymentCallbackPage() {
               <CheckCircle2 className="w-10 h-10 text-white" />
             </div>
             <div className="space-y-2">
-              <h2 className="text-2xl font-black text-gray-900 uppercase italic tracking-tight">Success!</h2>
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+              <h2 className="text-2xl font-black text-foreground uppercase italic tracking-tight">Success!</h2>
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
                 Coins added. Redirecting...
               </p>
             </div>
             
-            <div className="bg-gray-50 p-6 rounded-[2rem] w-full border border-gray-100 text-left space-y-3">
+            <div className="bg-card p-6 rounded-[2rem] w-full border border-border text-left space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-[8px] font-black text-gray-300 uppercase">Coins</span>
-                <span className="text-[9px] font-black text-gray-900">{coinsToCredit}</span>
+                <span className="text-[8px] font-black text-muted-foreground uppercase">Coins</span>
+                <span className="text-[9px] font-black text-foreground">{coinsToCredit}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-[8px] font-black text-gray-300 uppercase">Status</span>
+                <span className="text-[8px] font-black text-muted-foreground uppercase">Status</span>
                 <span className="text-[9px] font-black text-primary uppercase">Credited</span>
               </div>
             </div>
@@ -130,12 +131,12 @@ export default function PaymentCallbackPage() {
               <XCircle className="w-10 h-10 text-white" />
             </div>
             <div className="space-y-2">
-              <h2 className="text-2xl font-black text-gray-900 uppercase italic tracking-tight">Payment Failed</h2>
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Verification unsuccessful</p>
+              <h2 className="text-2xl font-black text-foreground uppercase italic tracking-tight">Payment Failed</h2>
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Verification unsuccessful</p>
             </div>
             <Button 
               onClick={() => router.replace('/home/wallet')}
-              className="w-full h-14 bg-gray-900 text-white rounded-full font-black uppercase tracking-[0.2em] text-[10px] active:scale-95 transition-all shadow-xl"
+              className="w-full h-14 bg-foreground text-background rounded-full font-black uppercase tracking-[0.2em] text-[10px] active:scale-95 transition-all shadow-xl"
             >
               Try Again
             </Button>

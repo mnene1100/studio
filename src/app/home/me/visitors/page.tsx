@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect } from 'react';
@@ -22,10 +23,10 @@ function VisitorItem({ visitor }: { visitor: any }) {
 
   if (!profile) return (
     <div className="flex items-center px-4 py-4 rounded-3xl animate-pulse">
-      <div className="w-14 h-14 bg-gray-100 rounded-full" />
+      <div className="w-14 h-14 bg-muted rounded-full" />
       <div className="ml-4 flex-1 space-y-2">
-        <div className="h-4 w-1/3 bg-gray-50 rounded-full" />
-        <div className="h-3 w-1/2 bg-gray-50 rounded-full" />
+        <div className="h-4 w-1/3 bg-muted rounded-full" />
+        <div className="h-3 w-1/2 bg-muted rounded-full" />
       </div>
     </div>
   );
@@ -33,9 +34,9 @@ function VisitorItem({ visitor }: { visitor: any }) {
   return (
     <div 
       onClick={() => router.push(`/home/profile/${profile.id}`)}
-      className="flex items-center px-4 py-4 rounded-[2rem] active:bg-gray-50 transition-all group border border-transparent"
+      className="flex items-center px-4 py-4 rounded-[2rem] active:bg-muted/50 transition-all group border border-transparent"
     >
-      <Avatar className="w-14 h-14 rounded-full ring-2 ring-gray-50 shadow-sm">
+      <Avatar className="w-14 h-14 rounded-full ring-2 ring-muted shadow-sm">
         <AvatarImage src={profile.profilePictureUrl} />
         <AvatarFallback className="bg-primary/10 text-primary font-black">
           {profile.displayName?.substring(0, 2).toUpperCase()}
@@ -44,15 +45,15 @@ function VisitorItem({ visitor }: { visitor: any }) {
       
       <div className="ml-4 flex-1">
         <div className="flex items-center justify-between mb-0.5">
-          <h3 className="font-black text-gray-900 text-sm tracking-tight">{profile.displayName}</h3>
-          <div className="flex items-center space-x-1 text-gray-300">
+          <h3 className="font-black text-foreground text-sm tracking-tight">{profile.displayName}</h3>
+          <div className="flex items-center space-x-1 text-muted-foreground">
             <Clock className="w-2.5 h-2.5" />
             <span className="text-[9px] font-black uppercase tracking-widest">
               {formatDistanceToNow(new Date(visitor.visitedAt), { addSuffix: true })}
             </span>
           </div>
         </div>
-        <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">
+        <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
           Viewed your profile
         </p>
       </div>
@@ -98,7 +99,7 @@ export default function VisitorsPage() {
   }, [db, user?.uid]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-white pb-32">
+    <div className="flex flex-col min-h-screen bg-background pb-32">
       <header className="bg-primary safe-top px-4 h-24 flex items-center justify-between relative z-20">
         <div className="flex items-center space-x-3">
           <Button 
@@ -132,11 +133,11 @@ export default function VisitorsPage() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-[60vh] text-center px-10">
-            <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6 border border-gray-100 shadow-sm">
-              <Eye className="w-10 h-10 text-gray-200" />
+            <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-6 border border-border shadow-sm">
+              <Eye className="w-10 h-10 text-muted-foreground" />
             </div>
-            <h2 className="text-sm font-black text-gray-900 tracking-tight mb-2 uppercase italic">No visitors yet</h2>
-            <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest leading-relaxed">
+            <h2 className="text-sm font-black text-foreground tracking-tight mb-2 uppercase italic">No visitors yet</h2>
+            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest leading-relaxed">
               When users view your profile, they will appear here.
             </p>
           </div>

@@ -199,7 +199,7 @@ export default function ChatDetailPage() {
   const isInputEmpty = !input.trim();
 
   return (
-    <div className="fixed inset-0 h-[100dvh] flex flex-col bg-white overflow-hidden">
+    <div className="fixed inset-0 h-[100dvh] flex flex-col bg-background overflow-hidden">
       <header className="bg-primary safe-top flex-shrink-0 z-20">
         <div className="h-16 px-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
@@ -251,7 +251,7 @@ export default function ChatDetailPage() {
       </header>
 
       <div 
-        className="flex-1 overflow-y-auto px-6 py-6 flex flex-col space-y-4 bg-white overscroll-contain" 
+        className="flex-1 overflow-y-auto px-6 py-6 flex flex-col space-y-4 bg-background overscroll-contain" 
         ref={scrollRef}
         style={{ WebkitOverflowScrolling: 'touch' }}
       >
@@ -262,7 +262,7 @@ export default function ChatDetailPage() {
               <div className={isMe ? 'chat-bubble-user' : 'chat-bubble-contact'}>
                 <p className="text-[14px] font-medium">{msg.content}</p>
               </div>
-              <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest mt-1 mx-2">
+              <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mt-1 mx-2">
                 {msg.sentAt ? new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
               </span>
             </div>
@@ -270,7 +270,7 @@ export default function ChatDetailPage() {
         })}
       </div>
 
-      <div className="bg-white border-t border-gray-100 flex-shrink-0 z-10 pb-4">
+      <div className="bg-background border-t border-border flex-shrink-0 z-10 pb-4">
         <div className="px-6 py-4 flex flex-col space-y-3">
           {suggestions.length > 0 && (
             <div className="flex space-x-2 overflow-x-auto pb-2 -mx-2 px-2 no-scrollbar">
@@ -290,7 +290,7 @@ export default function ChatDetailPage() {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="w-12 h-12 bg-gray-50 rounded-full text-red-500 shadow-sm flex-shrink-0 overflow-hidden"
+              className="w-12 h-12 bg-muted rounded-full text-red-500 shadow-sm flex-shrink-0 overflow-hidden"
               onClick={handleGetSuggestions}
             >
               <Gift className="w-5 h-5 fill-red-500" />
@@ -299,7 +299,7 @@ export default function ChatDetailPage() {
             <div className="flex-1 relative">
               <Input 
                 placeholder="Message..." 
-                className="w-full bg-gray-50 border-none rounded-full h-12 px-6 text-sm font-medium placeholder:text-gray-400 focus-visible:ring-primary/20"
+                className="w-full bg-muted border-none rounded-full h-12 px-6 text-sm font-medium placeholder:text-muted-foreground focus-visible:ring-primary/20"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}

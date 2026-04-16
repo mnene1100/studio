@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
@@ -200,7 +201,7 @@ export default function EditProfilePage() {
   if (!profile) return null;
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-background">
       <header className="bg-primary safe-top sticky top-0 z-50 shrink-0">
         <div className="px-4 h-16 flex items-center justify-between">
           <Button 
@@ -226,7 +227,7 @@ export default function EditProfilePage() {
       <div className="flex-1 overflow-y-auto px-6 py-8 pb-32 space-y-8">
         <div className="flex flex-col items-center">
           <div className="relative group">
-            <Avatar className="w-32 h-32 border-4 border-gray-50 shadow-2xl">
+            <Avatar className="w-32 h-32 border-4 border-card shadow-2xl">
               <AvatarImage src={formData.profilePictureUrl} className="object-cover" />
               <AvatarFallback className="bg-primary/10 text-primary font-black text-2xl">
                 {formData.displayName?.substring(0, 2).toUpperCase()}
@@ -234,7 +235,7 @@ export default function EditProfilePage() {
             </Avatar>
             <button 
               onClick={() => fileInputRef.current?.click()}
-              className="absolute bottom-0 right-0 p-3 bg-primary text-white rounded-full border-4 border-white shadow-xl active:scale-90 transition-all"
+              className="absolute bottom-0 right-0 p-3 bg-primary text-white rounded-full border-4 border-background shadow-xl active:scale-90 transition-all"
             >
               <Camera className="w-5 h-5" />
             </button>
@@ -246,53 +247,53 @@ export default function EditProfilePage() {
               onChange={handleFileChange} 
             />
           </div>
-          <p className="mt-4 text-[9px] font-black text-gray-300 uppercase tracking-widest italic">Tap camera to change avatar</p>
+          <p className="mt-4 text-[9px] font-black text-muted-foreground uppercase tracking-widest italic">Tap camera to change avatar</p>
         </div>
 
         <div className="space-y-6">
           <div className="flex items-center space-x-4">
             <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] whitespace-nowrap">Basic Info</h3>
-            <div className="h-[1px] w-full bg-gray-50" />
+            <div className="h-[1px] w-full bg-border" />
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Display Name</Label>
+            <Label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Display Name</Label>
             <Input 
               value={formData.displayName}
               onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
               placeholder="Your name"
-              className="h-12 bg-gray-50 border-none rounded-2xl px-4 text-sm font-bold"
+              className="h-12 bg-muted border-none rounded-2xl px-4 text-sm font-bold"
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Bio / About Me</Label>
+            <Label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Bio / About Me</Label>
             <Textarea 
               value={formData.statusMessage}
               onChange={(e) => setFormData(prev => ({ ...prev, statusMessage: e.target.value }))}
               placeholder="Tell us about yourself..."
-              className="min-h-[100px] bg-gray-50 border-none rounded-2xl p-4 text-sm font-medium resize-none"
+              className="min-h-[100px] bg-muted border-none rounded-2xl p-4 text-sm font-medium resize-none"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Birthday</Label>
+              <Label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Birthday</Label>
               <div className="relative">
                 <Input 
                   type="date"
                   max={maxDate}
                   value={formData.dob}
                   onChange={(e) => setFormData(prev => ({ ...prev, dob: e.target.value }))}
-                  className="h-12 bg-gray-50 border-none rounded-2xl px-4 text-xs font-bold pl-10"
+                  className="h-12 bg-muted border-none rounded-2xl px-4 text-xs font-bold pl-10"
                 />
                 <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-40" />
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Region</Label>
+              <Label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Region</Label>
               <Select value={formData.country} onValueChange={(val) => setFormData(prev => ({ ...prev, country: val }))}>
-                <SelectTrigger className="h-12 bg-gray-50 border-none rounded-2xl px-4 text-xs font-bold">
+                <SelectTrigger className="h-12 bg-muted border-none rounded-2xl px-4 text-xs font-bold">
                   <div className="flex items-center">
                     <MapPin className="w-3 h-3 text-primary mr-2" />
                     <SelectValue placeholder="Country" />
@@ -309,14 +310,14 @@ export default function EditProfilePage() {
         <div className="space-y-6">
           <div className="flex items-center space-x-4">
             <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] whitespace-nowrap">Lifestyle & Education</h3>
-            <div className="h-[1px] w-full bg-gray-50" />
+            <div className="h-[1px] w-full bg-border" />
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Education</Label>
+            <Label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Education</Label>
             <div className="relative">
               <Select value={formData.education} onValueChange={(val) => setFormData(prev => ({ ...prev, education: val }))}>
-                <SelectTrigger className="h-12 bg-gray-50 border-none rounded-2xl px-10 text-xs font-bold w-full">
+                <SelectTrigger className="h-12 bg-muted border-none rounded-2xl px-10 text-xs font-bold w-full">
                   <SelectValue placeholder="Select Education Level" />
                 </SelectTrigger>
                 <SelectContent className="rounded-2xl border-none shadow-2xl">
@@ -329,9 +330,9 @@ export default function EditProfilePage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Horoscope</Label>
+              <Label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Horoscope</Label>
               <Select value={formData.horoscope} onValueChange={(val) => setFormData(prev => ({ ...prev, horoscope: val }))}>
-                <SelectTrigger className="h-12 bg-gray-50 border-none rounded-2xl px-4 text-xs font-bold">
+                <SelectTrigger className="h-12 bg-muted border-none rounded-2xl px-4 text-xs font-bold">
                   <div className="flex items-center">
                     <Star className="w-3 h-3 text-primary mr-2" />
                     <SelectValue placeholder="Sign" />
@@ -343,9 +344,9 @@ export default function EditProfilePage() {
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Looking For</Label>
+              <Label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Looking For</Label>
               <Select value={formData.lookingFor} onValueChange={(val) => setFormData(prev => ({ ...prev, lookingFor: val }))}>
-                <SelectTrigger className="h-12 bg-gray-50 border-none rounded-2xl px-4 text-xs font-bold">
+                <SelectTrigger className="h-12 bg-muted border-none rounded-2xl px-4 text-xs font-bold">
                   <div className="flex items-center">
                     <Heart className="w-3 h-3 text-primary mr-2" />
                     <SelectValue placeholder="Purpose" />

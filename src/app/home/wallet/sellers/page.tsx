@@ -16,7 +16,7 @@ export default function SellersPage() {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-background">
       {/* Header - Seamless with status bar */}
       <header className="bg-primary safe-top px-4 h-24 flex items-center justify-between relative z-20">
         <div className="flex items-center space-x-3">
@@ -44,7 +44,7 @@ export default function SellersPage() {
             <BadgeCheck className="w-5 h-5 fill-primary text-white" />
             <span className="text-xs font-black uppercase tracking-widest">Safe & Secure</span>
           </div>
-          <p className="text-[10px] font-medium text-gray-500 leading-relaxed">
+          <p className="text-[10px] font-medium text-muted-foreground leading-relaxed">
             These sellers are authorized by NEXO. For your safety, always communicate through official chat and never share your password.
           </p>
         </div>
@@ -52,9 +52,9 @@ export default function SellersPage() {
         {MOCK_SELLERS.map((seller) => (
           <div 
             key={seller.id}
-            className="flex items-center p-5 bg-gray-50 rounded-[2.5rem] border border-gray-100 shadow-sm active:scale-[0.98] transition-all group"
+            className="flex items-center p-5 bg-card rounded-[2.5rem] border border-border shadow-sm active:scale-[0.98] transition-all group"
           >
-            <Avatar className="w-14 h-14 rounded-full border-2 border-white shadow-sm">
+            <Avatar className="w-14 h-14 rounded-full border-2 border-background shadow-sm">
               <AvatarImage src={seller.avatar} />
               <AvatarFallback className="bg-primary/10 text-primary font-black">
                 {seller.name.substring(0, 2).toUpperCase()}
@@ -63,10 +63,10 @@ export default function SellersPage() {
             
             <div className="ml-4 flex-1">
               <div className="flex items-center space-x-1 mb-0.5">
-                <h3 className="font-black text-gray-900 text-sm tracking-tight">{seller.name}</h3>
+                <h3 className="font-black text-foreground text-sm tracking-tight">{seller.name}</h3>
                 <ShieldCheck className="w-3 h-3 text-primary fill-primary/10" />
               </div>
-              <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest">
+              <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest">
                 {seller.location}
               </p>
             </div>
@@ -83,7 +83,7 @@ export default function SellersPage() {
       </div>
 
       <footer className="p-8 text-center opacity-30">
-        <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em]">Authorized Nexo Network</p>
+        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em]">Authorized Nexo Network</p>
       </footer>
     </div>
   );

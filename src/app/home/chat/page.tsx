@@ -29,29 +29,29 @@ function ChatListItem({ chat }: { chat: any }) {
   return (
     <Link 
       href={`/home/chat/${otherParticipantId}`}
-      className="flex items-center px-4 py-4 rounded-none active:bg-gray-50 transition-all group border border-transparent"
+      className="flex items-center px-4 py-4 rounded-none active:bg-accent/50 transition-all group border border-transparent"
     >
       <div className="relative">
         <Avatar className="w-14 h-14 rounded-full border-none shadow-sm overflow-hidden">
           <AvatarImage src={profile?.profilePictureUrl} className="object-cover rounded-full" />
-          <AvatarFallback className="bg-gray-100 text-lg font-bold rounded-full">
+          <AvatarFallback className="bg-muted text-lg font-bold rounded-full">
             <MessageCircle className="w-6 h-6 text-primary" />
           </AvatarFallback>
         </Avatar>
         {isOnline && (
-          <div className="absolute top-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white" />
+          <div className="absolute top-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-background" />
         )}
       </div>
       
       <div className="ml-4 flex-1">
         <div className="flex items-center justify-between mb-0.5">
-          <h3 className="font-bold text-gray-900 text-sm tracking-tight">{profile?.displayName || 'Loading...'}</h3>
-          <span className="text-[10px] font-bold text-gray-300">
+          <h3 className="font-bold text-foreground text-sm tracking-tight">{profile?.displayName || 'Loading...'}</h3>
+          <span className="text-[10px] font-bold text-muted-foreground">
             {lastMessageTime ? new Date(lastMessageTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
           </span>
         </div>
         <div className="flex items-center justify-between">
-          <p className="text-[11px] text-gray-400 line-clamp-1 font-medium italic">
+          <p className="text-[11px] text-muted-foreground line-clamp-1 font-medium italic">
             {lastMessagePreview}
           </p>
         </div>
@@ -78,7 +78,7 @@ export default function ChatListPage() {
     .sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime());
 
   return (
-    <div className="flex flex-col min-h-screen bg-white pb-32">
+    <div className="flex flex-col min-h-screen bg-background pb-32">
       <header className="bg-primary safe-top px-6 pb-4 flex items-center justify-between sticky top-0 z-40">
         <h1 className="text-3xl text-white font-black italic tracking-tight uppercase pt-2">
           Chats
@@ -88,7 +88,7 @@ export default function ChatListPage() {
         </button>
       </header>
 
-      <div className="flex-1 px-2 pt-4 bg-white">
+      <div className="flex-1 px-2 pt-4 bg-background">
         {isChatsLoading ? (
           <div className="flex flex-col items-center justify-center pt-20">
              <Loader2 className="w-8 h-8 text-primary animate-spin" />
@@ -101,10 +101,10 @@ export default function ChatListPage() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-[60vh] text-center">
-            <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6 border border-gray-100 shadow-sm">
-              <MessageSquare className="w-10 h-10 text-gray-200" />
+            <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-6 border border-border shadow-sm">
+              <MessageSquare className="w-10 h-10 text-muted-foreground" />
             </div>
-            <h2 className="text-[10px] font-black text-gray-300 tracking-[0.3em] uppercase italic">
+            <h2 className="text-[10px] font-black text-muted-foreground tracking-[0.3em] uppercase italic">
               No active conversations
             </h2>
           </div>

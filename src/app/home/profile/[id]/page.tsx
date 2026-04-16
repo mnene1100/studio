@@ -72,7 +72,7 @@ export default function UserProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="animate-spin text-primary" />
       </div>
     );
@@ -81,7 +81,7 @@ export default function UserProfilePage() {
   if (!profile) return null;
 
   return (
-    <div className="flex flex-col min-h-screen bg-white relative pb-40">
+    <div className="flex flex-col min-h-screen bg-background relative pb-40">
       {isFullScreen && (
         <div 
           className="fixed inset-0 z-[100] bg-black flex items-center justify-center animate-in fade-in duration-300" 
@@ -128,7 +128,7 @@ export default function UserProfilePage() {
                 <MoreVertical className="w-5 h-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 rounded-[1.5rem] border-none shadow-2xl p-2 bg-white/95 backdrop-blur-xl">
+            <DropdownMenuContent align="end" className="w-48 rounded-[1.5rem] border-none shadow-2xl p-2 bg-popover/95 backdrop-blur-xl">
               <DropdownMenuItem onClick={handleBlock} className="flex items-center px-4 py-3 rounded-xl text-red-500 font-bold focus:bg-red-50">
                 <Ban className="w-4 h-4 mr-3" />
                 <span className="text-xs uppercase tracking-widest">Block User</span>
@@ -142,34 +142,34 @@ export default function UserProfilePage() {
         </div>
       </div>
 
-      <div className="px-6 bg-white pt-10 -mt-12 flex-1 rounded-t-[3rem] relative z-10">
+      <div className="px-6 bg-background pt-10 -mt-12 flex-1 rounded-t-[3rem] relative z-10">
         <div className="mb-4">
-          <div className={`inline-flex items-center px-4 py-1.5 rounded-full border ${isOnline ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
-            <div className={`w-2 h-2 ${isOnline ? 'bg-primary shadow-[0_0_8px_rgba(40,180,164,0.5)]' : 'bg-gray-300'} rounded-full mr-2`} />
+          <div className={`inline-flex items-center px-4 py-1.5 rounded-full border ${isOnline ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-muted border-border text-muted-foreground'}`}>
+            <div className={`w-2 h-2 ${isOnline ? 'bg-primary shadow-[0_0_8px_rgba(40,180,164,0.5)]' : 'bg-muted-foreground/30'} rounded-full mr-2`} />
             <span className="text-[9px] font-black uppercase tracking-widest">{isOnline ? "Online" : "Offline"}</span>
           </div>
         </div>
 
-        <h1 className="text-2xl font-black text-gray-900 tracking-tight mb-1">{profile.displayName}</h1>
-        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-8">
+        <h1 className="text-2xl font-black text-foreground tracking-tight mb-1">{profile.displayName}</h1>
+        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-8">
           {profile.gender} {age ? `• ${age} Years` : ''} • {profile.country || "KENYA"}
         </p>
 
         <div className="mb-8">
-           <h3 className="text-[9px] font-black text-gray-300 uppercase tracking-widest mb-2.5">About</h3>
-           <p className="text-gray-600 font-medium text-[14px] leading-relaxed">
+           <h3 className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-2.5">About</h3>
+           <p className="text-foreground/70 font-medium text-[14px] leading-relaxed">
              {profile.statusMessage || "Hey! I'm using NEXO."}
            </p>
         </div>
 
         <div className="grid grid-cols-2 gap-4 pb-12">
-          <div className="bg-gray-50 p-5 border border-gray-100 rounded-[2rem]">
-            <h4 className="text-[8px] font-black text-gray-300 uppercase tracking-widest mb-1.5">Education</h4>
-            <p className="text-[11px] font-bold text-gray-900 truncate">{profile.education || "Not specified"}</p>
+          <div className="bg-card p-5 border border-border rounded-[2rem]">
+            <h4 className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1.5">Education</h4>
+            <p className="text-[11px] font-bold text-foreground truncate">{profile.education || "Not specified"}</p>
           </div>
-          <div className="bg-gray-50 p-5 border border-gray-100 rounded-[2rem]">
-            <h4 className="text-[8px] font-black text-gray-300 uppercase tracking-widest mb-1.5">Looking for</h4>
-            <p className="text-[11px] font-bold text-gray-900 truncate">{profile.lookingFor || "Making Friends"}</p>
+          <div className="bg-card p-5 border border-border rounded-[2rem]">
+            <h4 className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1.5">Looking for</h4>
+            <p className="text-[11px] font-bold text-foreground truncate">{profile.lookingFor || "Making Friends"}</p>
           </div>
         </div>
       </div>

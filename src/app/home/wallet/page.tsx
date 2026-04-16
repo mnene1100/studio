@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -69,7 +70,7 @@ export default function WalletPage() {
   const isFormValid = !!selectedPackage;
 
   return (
-    <div className="flex flex-col min-h-screen bg-white pb-24">
+    <div className="flex flex-col min-h-screen bg-background pb-24">
       <header className="bg-primary safe-top sticky top-0 z-50">
         <div className="px-4 h-16 flex items-center justify-between">
           <Button 
@@ -116,13 +117,13 @@ export default function WalletPage() {
         <div className="max-w-[40%]">
           <label className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1.5 block px-1">Region</label>
           <Select defaultValue="kenya">
-            <SelectTrigger className="w-full h-10 bg-gray-50 border-none rounded-xl px-3 text-[10px] font-black text-gray-900 focus:ring-0 shadow-none">
+            <SelectTrigger className="w-full h-10 bg-muted border-none rounded-xl px-3 text-[10px] font-black text-foreground focus:ring-0 shadow-none">
               <div className="flex items-center space-x-2">
                 <Globe className="w-3 h-3 text-primary" />
                 <SelectValue />
               </div>
             </SelectTrigger>
-            <SelectContent className="bg-white rounded-2xl border-none shadow-2xl p-1">
+            <SelectContent className="bg-popover rounded-2xl border-none shadow-2xl p-1">
               <SelectItem value="kenya" className="py-3 font-black text-[9px] uppercase tracking-widest rounded-xl">Kenya (KES)</SelectItem>
               <SelectItem value="uganda" className="py-3 font-black text-[9px] uppercase tracking-widest rounded-xl">Uganda (UGX)</SelectItem>
               <SelectItem value="tanzania" className="py-3 font-black text-[9px] uppercase tracking-widest rounded-xl">Tanzania (TZS)</SelectItem>
@@ -145,10 +146,10 @@ export default function WalletPage() {
                 key={pkg.id} 
                 onClick={() => setSelectedPackage(pkg)}
                 className={cn(
-                  "relative bg-white rounded-[2rem] p-4 flex flex-col items-center border transition-all duration-300 cursor-pointer",
+                  "relative bg-card rounded-[2rem] p-4 flex flex-col items-center border transition-all duration-300 cursor-pointer",
                   selectedPackage?.id === pkg.id 
                     ? "border-primary bg-primary/[0.02] shadow-xl scale-[1.02]" 
-                    : "border-gray-50 hover:bg-gray-50/50"
+                    : "border-border hover:bg-muted/50"
                 )}
               >
                 {pkg.badge && (
@@ -158,15 +159,15 @@ export default function WalletPage() {
                 )}
                 <div className={cn(
                   "w-9 h-9 rounded-2xl flex items-center justify-center mb-2 transition-all shadow-sm",
-                  selectedPackage?.id === pkg.id ? "bg-primary text-white" : "bg-gray-50 text-gray-300"
+                  selectedPackage?.id === pkg.id ? "bg-primary text-white" : "bg-muted text-muted-foreground"
                 )}>
                   <Coins className="w-4 h-4" />
                 </div>
-                <span className="text-lg font-black text-gray-900 tracking-tight">{pkg.coins}</span>
+                <span className="text-lg font-black text-foreground tracking-tight">{pkg.coins}</span>
                 <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-2">{pkg.label}</span>
                 <div className={cn(
                   "w-5 h-5 rounded-full flex items-center justify-center border-2 transition-all",
-                  selectedPackage?.id === pkg.id ? "bg-primary border-primary text-white shadow-lg" : "border-gray-100 bg-white"
+                  selectedPackage?.id === pkg.id ? "bg-primary border-primary text-white shadow-lg" : "border-border bg-background"
                 )}>
                   {selectedPackage?.id === pkg.id && <ArrowRight className="w-2.5 h-2.5" />}
                 </div>
@@ -175,13 +176,13 @@ export default function WalletPage() {
           </div>
         </div>
 
-        <div className="bg-gray-50 rounded-[2rem] p-4 flex items-center justify-between border-none">
+        <div className="bg-muted rounded-[2rem] p-4 flex items-center justify-between border-none">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center">
+            <div className="w-10 h-10 bg-background rounded-xl shadow-sm flex items-center justify-center">
               <Users className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="text-[11px] font-black text-gray-900 tracking-tight">Official Sellers</p>
+              <p className="text-[11px] font-black text-foreground tracking-tight">Official Sellers</p>
               <p className="text-[7px] font-black text-muted-foreground uppercase tracking-widest">Authorized Network</p>
             </div>
           </div>
@@ -189,7 +190,7 @@ export default function WalletPage() {
             variant="ghost" 
             size="icon" 
             onClick={() => router.push('/home/wallet/sellers')}
-            className="w-10 h-10 rounded-xl bg-white shadow-sm hover:bg-gray-50"
+            className="w-10 h-10 rounded-xl bg-background shadow-sm hover:bg-muted"
           >
             <UserPlus className="w-4 h-4 text-primary" />
           </Button>
@@ -202,7 +203,7 @@ export default function WalletPage() {
           disabled={!isFormValid || isLoading}
           className={cn(
             "w-full h-16 rounded-[2rem] text-[11px] font-black transition-all uppercase tracking-[0.3em] shadow-2xl active:scale-95",
-            isFormValid ? "bg-primary text-white shadow-primary/30" : "bg-gray-100 text-gray-400"
+            isFormValid ? "bg-primary text-white shadow-primary/30" : "bg-muted text-muted-foreground"
           )}
         >
           {isLoading ? (
