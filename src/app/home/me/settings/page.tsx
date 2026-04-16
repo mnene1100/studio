@@ -4,7 +4,8 @@
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { 
-  ChevronLeft, LogOut, Trash2, ChevronRight 
+  ChevronLeft, ShieldCheck, CreditCard, 
+  Ban, Info, ChevronRight, LogOut 
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useUser, useFirestore, useAuth } from '@/firebase';
@@ -21,6 +22,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import Image from 'next/image';
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -66,80 +68,119 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-white">
-      <header className="px-4 h-16 flex items-center space-x-2 border-b border-gray-100">
-        <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-full text-gray-900">
+    <div className="flex flex-col h-screen overflow-hidden bg-[#F9FAFB]">
+      {/* Teal Header exactly as in screenshot */}
+      <header className="bg-primary px-4 h-20 flex items-center justify-center relative shadow-md">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => router.back()} 
+          className="absolute left-4 w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10"
+        >
           <ChevronLeft className="w-6 h-6" />
         </Button>
-        <h1 className="text-lg font-black text-gray-900 tracking-tighter uppercase italic">Settings</h1>
+        <h1 className="text-xl font-black text-white tracking-[0.2em] uppercase">Settings</h1>
       </header>
 
-      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
-        <div className="bg-gray-50 rounded-[2rem] p-3 border border-gray-100">
-          <h3 className="px-4 py-2 text-[8px] uppercase font-black tracking-[0.3em] text-gray-400">Account Management</h3>
-          
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <button 
-                className="w-full flex items-center p-4 rounded-[1.5rem] active:bg-gray-100 transition-all group mb-1"
-              >
-                <div className="p-2.5 rounded-xl bg-white mr-4 shadow-sm">
-                  <LogOut className="w-4 h-4 text-gray-600" />
-                </div>
-                <span className="flex-1 text-left text-sm font-black text-gray-900 uppercase tracking-tight">Sign Out</span>
-                <ChevronRight className="w-4 h-4 text-gray-300" />
-              </button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="bg-white border-gray-100 text-gray-900 rounded-[2rem] max-w-[300px]">
-              <AlertDialogHeader>
-                <AlertDialogTitle className="text-lg font-black uppercase tracking-tight">Sign Out?</AlertDialogTitle>
-                <AlertDialogDescription className="text-xs font-medium text-gray-400 leading-relaxed">
-                  Are you sure you want to log out of your NEXO account?
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter className="mt-4 gap-2">
-                <AlertDialogCancel className="bg-gray-100 border-none text-gray-600 hover:bg-gray-200 rounded-xl text-xs font-black uppercase">Cancel</AlertDialogCancel>
-                <AlertDialogAction 
-                  onClick={handleLogout}
-                  className="bg-primary text-white hover:bg-primary/90 rounded-xl text-xs font-black uppercase"
-                >
-                  Sign Out
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+      <div className="flex-1 overflow-y-auto px-6 py-10 space-y-4 pb-20">
+        {/* Bind Account Card */}
+        <div className="bg-white rounded-[2.5rem] p-5 flex items-center shadow-sm border border-gray-50 active:scale-[0.98] transition-all cursor-pointer">
+          <div className="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center mr-4">
+            <ShieldCheck className="w-6 h-6 text-green-500" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-base font-black text-gray-900 tracking-tight">Bind account</h3>
+            {user?.isAnonymous && (
+              <span className="inline-block mt-1 px-3 py-0.5 bg-orange-100 text-orange-500 text-[9px] font-black uppercase tracking-widest rounded-full">
+                Guest Mode
+              </span>
+            )}
+          </div>
+          <ChevronRight className="w-5 h-5 text-gray-300" />
+        </div>
 
+        {/* Charge Settings Card */}
+        <div className="bg-white rounded-[2.5rem] p-5 flex items-center shadow-sm border border-gray-50 active:scale-[0.98] transition-all cursor-pointer">
+          <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center mr-4">
+            <CreditCard className="w-6 h-6 text-blue-500" />
+          </div>
+          <h3 className="flex-1 text-base font-black text-gray-900 tracking-tight">Charge settings</h3>
+          <ChevronRight className="w-5 h-5 text-gray-300" />
+        </div>
+
+        {/* Blocked List Card */}
+        <div className="bg-white rounded-[2.5rem] p-5 flex items-center shadow-sm border border-gray-50 active:scale-[0.98] transition-all cursor-pointer">
+          <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center mr-4">
+            <Ban className="w-6 h-6 text-red-500" />
+          </div>
+          <h3 className="flex-1 text-base font-black text-gray-900 tracking-tight">Blocked List</h3>
+          <ChevronRight className="w-5 h-5 text-gray-300" />
+        </div>
+
+        {/* About Card */}
+        <div className="bg-white rounded-[2.5rem] p-5 flex items-center shadow-sm border border-gray-50 active:scale-[0.98] transition-all cursor-pointer">
+          <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center mr-4">
+            <Info className="w-6 h-6 text-gray-400" />
+          </div>
+          <h3 className="flex-1 text-base font-black text-gray-900 tracking-tight">About NEXO</h3>
+          <ChevronRight className="w-5 h-5 text-gray-300" />
+        </div>
+
+        {/* Custom Sign Out Button */}
+        <div className="pt-6">
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <button 
-                className="w-full flex items-center p-4 rounded-[1.5rem] active:bg-destructive/10 transition-all group"
-              >
-                <div className="p-2.5 rounded-xl bg-destructive/10 mr-4">
-                  <Trash2 className="w-4 h-4 text-destructive" />
-                </div>
-                <span className="flex-1 text-left text-sm font-black text-destructive uppercase tracking-tight">Delete Account</span>
-                <ChevronRight className="w-4 h-4 text-destructive/20" />
+              <button className="w-full h-16 bg-white rounded-full flex items-center justify-center text-red-500 font-black uppercase tracking-[0.2em] shadow-sm border border-gray-100 active:scale-95 transition-all">
+                Sign Out
               </button>
             </AlertDialogTrigger>
-            <AlertDialogContent className="bg-white border-gray-100 text-gray-900 rounded-[2rem] max-w-[300px]">
+            <AlertDialogContent className="bg-white border-none rounded-[2rem] max-w-xs shadow-2xl">
               <AlertDialogHeader>
-                <AlertDialogTitle className="text-lg font-black uppercase tracking-tight">Confirm Deletion</AlertDialogTitle>
-                <AlertDialogDescription className="text-xs font-medium text-gray-400 leading-relaxed">
-                  This action is permanent. All chat history and profile data will be erased from our secure servers.
+                <AlertDialogTitle className="font-black text-gray-900 uppercase tracking-tight">Sign Out?</AlertDialogTitle>
+                <AlertDialogDescription className="text-xs font-medium text-gray-400">
+                  Are you sure you want to exit your NEXO session?
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter className="mt-4 gap-2">
-                <AlertDialogCancel className="bg-gray-100 border-none text-gray-600 hover:bg-gray-200 rounded-xl text-xs font-black uppercase">Cancel</AlertDialogCancel>
-                <AlertDialogAction 
-                  onClick={handleDeleteAccount}
-                  className="bg-destructive text-white hover:bg-destructive/90 rounded-xl text-xs font-black uppercase"
-                >
-                  Delete
-                </AlertDialogAction>
+                <AlertDialogCancel className="bg-gray-100 border-none text-gray-600 rounded-xl text-xs font-black uppercase tracking-widest">Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleLogout} className="bg-red-500 text-white hover:bg-red-600 rounded-xl text-xs font-black uppercase tracking-widest">Confirm</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
         </div>
+
+        {/* Footer with Logo */}
+        <footer className="pt-12 flex flex-col items-center">
+          <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
+            <div className="text-primary text-2xl font-black italic">NX</div>
+          </div>
+          
+          <p className="text-[10px] font-black text-gray-300 uppercase tracking-[0.4em] mb-4">Version 1.0.5</p>
+          
+          <div className="flex items-center space-x-6">
+            <button className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Privacy</button>
+            <div className="w-1 h-1 bg-gray-200 rounded-full" />
+            <button className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Terms</button>
+            <div className="w-1 h-1 bg-gray-200 rounded-full" />
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button className="text-[9px] font-black text-red-300 uppercase tracking-widest">Delete Account</button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="bg-white border-none rounded-[2rem] max-w-xs shadow-2xl">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="font-black text-red-500 uppercase tracking-tight">Delete Account</AlertDialogTitle>
+                  <AlertDialogDescription className="text-xs font-medium text-gray-400">
+                    This will permanently erase your data.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter className="mt-4">
+                  <AlertDialogCancel className="bg-gray-100 border-none text-gray-600 rounded-xl text-xs font-black uppercase tracking-widest">Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDeleteAccount} className="bg-red-500 text-white hover:bg-red-600 rounded-xl text-xs font-black uppercase tracking-widest">Delete</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </footer>
       </div>
     </div>
   );
