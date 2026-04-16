@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -43,15 +42,14 @@ export default function WalletPage() {
       const coinAmount = selectedPackage.coins.replace(',', '');
       const callbackUrl = `${window.location.origin}/home/wallet/callback?coins=${coinAmount}`;
       
-      // Pass a placeholder number as PesaPal API requires one, but the user will enter their real one on the hosted page
       const result = await createPesapalOrder({
         amount: selectedPackage.price,
         email: profile.email || "guest@nexo.com",
-        phoneNumber: "0700000000", 
         firstName: profile.displayName || "Nexo",
         lastName: "User",
         description: `Recharge ${selectedPackage.coins} Nexo Coins`,
         callbackUrl: callbackUrl,
+        // phoneNumber omitted so user enters it on PesaPal hosted page
       });
 
       if (result.redirectUrl) {
@@ -74,6 +72,7 @@ export default function WalletPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white pb-24">
+      {/* Seamless Header */}
       <header className="bg-primary safe-top sticky top-0 z-50">
         <div className="px-4 h-16 flex items-center justify-between">
           <Button 
@@ -98,108 +97,108 @@ export default function WalletPage() {
         </div>
       </header>
 
-      <div className="p-4 space-y-6">
-        {/* Wallet Balance Card */}
-        <div className="bg-gradient-to-br from-gray-900 to-black rounded-[2rem] p-6 text-white shadow-xl relative overflow-hidden group">
-          <div className="absolute -right-6 -top-6 w-32 h-32 bg-primary/20 rounded-full blur-[50px]" />
+      <div className="p-4 space-y-5">
+        {/* Compact Wallet Balance Card */}
+        <div className="bg-gradient-to-br from-gray-900 to-black rounded-[1.75rem] p-5 text-white shadow-xl relative overflow-hidden group">
+          <div className="absolute -right-6 -top-6 w-24 h-24 bg-primary/20 rounded-full blur-[40px]" />
           <div className="relative z-10">
-            <div className="flex items-center space-x-2 mb-2">
-              <div className="w-8 h-8 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/10">
-                <Coins className="w-4 h-4 text-primary" />
+            <div className="flex items-center space-x-2 mb-1">
+              <div className="w-6 h-6 bg-white/10 backdrop-blur-md rounded-lg flex items-center justify-center border border-white/10">
+                <Coins className="w-3.5 h-3.5 text-primary" />
               </div>
-              <span className="text-[9px] font-black uppercase tracking-widest text-white/50">Balance</span>
+              <span className="text-[8px] font-black uppercase tracking-widest text-white/50">Balance</span>
             </div>
-            <div className="flex items-baseline space-x-2">
-              <h2 className="text-4xl font-black tracking-tighter">
+            <div className="flex items-baseline space-x-1.5">
+              <h2 className="text-3xl font-black tracking-tighter">
                 {profile?.balance?.toLocaleString() || "0"}
               </h2>
-              <span className="text-[10px] font-black text-primary uppercase tracking-widest italic">Coins</span>
+              <span className="text-[9px] font-black text-primary uppercase tracking-widest italic">Coins</span>
             </div>
           </div>
         </div>
 
-        {/* Region Selector */}
-        <div className="max-w-[50%]">
-          <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-2 block px-1">Region</label>
+        {/* Region Selector - Compact */}
+        <div className="max-w-[45%]">
+          <label className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1.5 block px-1">Region</label>
           <Select defaultValue="kenya">
-            <SelectTrigger className="w-full h-12 bg-gray-50 border-gray-100 rounded-2xl px-4 text-xs font-black text-gray-900 focus:ring-primary/10">
+            <SelectTrigger className="w-full h-10 bg-gray-50 border-gray-100 rounded-xl px-3 text-[10px] font-black text-gray-900 focus:ring-primary/10">
               <div className="flex items-center space-x-2">
-                <Globe className="w-3.5 h-3.5 text-primary" />
+                <Globe className="w-3 h-3 text-primary" />
                 <SelectValue />
               </div>
             </SelectTrigger>
-            <SelectContent className="bg-white rounded-2xl border border-gray-100 shadow-xl p-1">
-              <SelectItem value="kenya" className="py-3 font-black text-[10px] uppercase tracking-widest rounded-xl">Kenya (KES)</SelectItem>
-              <SelectItem value="uganda" className="py-3 font-black text-[10px] uppercase tracking-widest rounded-xl">Uganda (UGX)</SelectItem>
-              <SelectItem value="tanzania" className="py-3 font-black text-[10px] uppercase tracking-widest rounded-xl">Tanzania (TZS)</SelectItem>
+            <SelectContent className="bg-white rounded-xl border border-gray-100 shadow-xl p-1">
+              <SelectItem value="kenya" className="py-2.5 font-black text-[9px] uppercase tracking-widest rounded-lg">Kenya (KES)</SelectItem>
+              <SelectItem value="uganda" className="py-2.5 font-black text-[9px] uppercase tracking-widest rounded-lg">Uganda (UGX)</SelectItem>
+              <SelectItem value="tanzania" className="py-2.5 font-black text-[9px] uppercase tracking-widest rounded-lg">Tanzania (TZS)</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        {/* Packages Grid */}
-        <div className="space-y-3">
+        {/* Packages Grid - More Compact */}
+        <div className="space-y-2.5">
           <div className="flex items-center justify-between px-1">
-            <h3 className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Packages</h3>
+            <h3 className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Select Package</h3>
             <div className="flex items-center space-x-1">
-               <Zap className="w-2.5 h-2.5 text-primary fill-primary" />
-               <span className="text-[8px] font-black text-primary uppercase tracking-widest">Instant</span>
+               <Zap className="w-2 h-2 text-primary fill-primary" />
+               <span className="text-[7px] font-black text-primary uppercase tracking-widest">Instant</span>
             </div>
           </div>
           
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2.5">
             {PACKAGES.map((pkg) => (
               <div 
                 key={pkg.id} 
                 onClick={() => setSelectedPackage(pkg)}
                 className={cn(
-                  "relative bg-white rounded-[1.5rem] p-4 flex flex-col items-center border-2 transition-all duration-200 cursor-pointer group",
+                  "relative bg-white rounded-[1.25rem] p-3.5 flex flex-col items-center border-2 transition-all duration-200 cursor-pointer group",
                   selectedPackage?.id === pkg.id 
-                    ? "border-primary bg-primary/[0.01] scale-[1.02]" 
+                    ? "border-primary bg-primary/[0.02] scale-[1.01]" 
                     : "border-gray-50 hover:border-gray-100"
                 )}
               >
                 {pkg.badge && (
-                  <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 bg-primary text-white text-[6px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full z-10">
+                  <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 bg-primary text-white text-[5px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full z-10">
                     {pkg.badge}
                   </div>
                 )}
                 <div className={cn(
-                  "w-10 h-10 rounded-xl flex items-center justify-center mb-2 transition-all",
+                  "w-8 h-8 rounded-lg flex items-center justify-center mb-1.5 transition-all",
                   selectedPackage?.id === pkg.id ? "bg-primary text-white" : "bg-gray-50 text-gray-300"
                 )}>
-                  <Coins className="w-5 h-5" />
+                  <Coins className="w-4 h-4" />
                 </div>
-                <span className="text-xl font-black text-gray-900 tracking-tight">{pkg.coins}</span>
-                <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-3">{pkg.label}</span>
+                <span className="text-lg font-black text-gray-900 tracking-tight">{pkg.coins}</span>
+                <span className="text-[7px] font-black text-muted-foreground uppercase tracking-widest mb-2">{pkg.label}</span>
                 <div className={cn(
-                  "w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all",
+                  "w-5 h-5 rounded-full flex items-center justify-center border-2 transition-all",
                   selectedPackage?.id === pkg.id ? "bg-primary border-primary text-white" : "border-gray-50 bg-white"
                 )}>
-                  {selectedPackage?.id === pkg.id && <ArrowRight className="w-3 h-3" />}
+                  {selectedPackage?.id === pkg.id && <ArrowRight className="w-2.5 h-2.5" />}
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Vendors Link */}
-        <div className="bg-gray-50 rounded-[1.5rem] p-4 flex items-center justify-between border border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center">
-              <Users className="w-5 h-5 text-primary" />
+        {/* Vendors Link - Compact */}
+        <div className="bg-gray-50 rounded-[1.25rem] p-3 flex items-center justify-between border border-gray-100">
+          <div className="flex items-center space-x-2.5">
+            <div className="w-8 h-8 bg-white rounded-lg shadow-sm flex items-center justify-center">
+              <Users className="w-4 h-4 text-primary" />
             </div>
             <div>
-              <p className="text-xs font-black text-gray-900 tracking-tight">Official Sellers</p>
-              <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Connect with vendors</p>
+              <p className="text-[10px] font-black text-gray-900 tracking-tight">Official Sellers</p>
+              <p className="text-[7px] font-black text-muted-foreground uppercase tracking-widest">Alternative purchase</p>
             </div>
           </div>
           <Button 
             variant="ghost" 
             size="icon" 
             onClick={() => router.push('/home/wallet/sellers')}
-            className="w-10 h-10 rounded-xl bg-white shadow-sm hover:bg-primary hover:text-white"
+            className="w-8 h-8 rounded-lg bg-white shadow-sm"
           >
-            <UserPlus className="w-4 h-4" />
+            <UserPlus className="w-3.5 h-3.5 text-primary" />
           </Button>
         </div>
       </div>

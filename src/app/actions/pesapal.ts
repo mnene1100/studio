@@ -1,4 +1,3 @@
-
 'use server';
 
 /**
@@ -9,7 +8,7 @@
 interface PesapalOrderInput {
   amount: number;
   email: string;
-  phoneNumber: string;
+  phoneNumber?: string; // Made optional
   firstName: string;
   lastName: string;
   description: string;
@@ -83,7 +82,7 @@ export async function createPesapalOrder(input: PesapalOrderInput) {
         notification_id: ipnId,
         billing_address: {
           email_address: input.email,
-          phone_number: input.phoneNumber || "0700000000",
+          phone_number: input.phoneNumber || "", // Leave blank if not provided to let user enter on PesaPal page
           country_code: 'KE',
           first_name: input.firstName,
           last_name: input.lastName,
