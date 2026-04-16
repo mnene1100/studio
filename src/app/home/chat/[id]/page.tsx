@@ -228,8 +228,8 @@ export default function ChatDetailPage() {
         })}
       </div>
 
-      {/* Fixed Bottom Input Area */}
-      <div className="bg-white border-t border-gray-100 flex-shrink-0 z-10 pb-10">
+      {/* Fixed Bottom Input Area - Reduced bottom padding */}
+      <div className="bg-white border-t border-gray-100 flex-shrink-0 z-10 pb-4">
         <div className="px-6 py-4 flex flex-col space-y-3">
           {suggestions.length > 0 && (
             <div className="flex space-x-2 overflow-x-auto pb-2 -mx-2 px-2 no-scrollbar">
