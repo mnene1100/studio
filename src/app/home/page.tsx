@@ -50,7 +50,7 @@ export default function HomePage() {
             ))}
           </div>
         ) : discoveryUsers.length > 0 ? (
-          <div className="grid grid-cols-2 gap-2.5 pb-6">
+          <div className="grid grid-cols-2 gap-3 pb-6">
             {discoveryUsers.map((u, i) => {
               const age = u.dob ? differenceInYears(new Date(), new Date(u.dob)) : 20;
               
@@ -58,7 +58,7 @@ export default function HomePage() {
                 <div 
                   key={u.id} 
                   onClick={() => router.push(`/home/profile/${u.id}`)}
-                  className="group relative aspect-[1/1.2] overflow-hidden rounded-[2rem] shadow-xl transition-all cursor-pointer bg-card active:scale-[0.98]"
+                  className="group relative aspect-[1/1.25] overflow-hidden rounded-[2.25rem] shadow-xl transition-all cursor-pointer bg-card active:scale-[0.98] border border-white/5"
                 >
                   <Image 
                     src={u.profilePictureUrl || `https://picsum.photos/seed/${u.id}/600/750`} 
@@ -69,41 +69,44 @@ export default function HomePage() {
                     priority={i < 4}
                     data-ai-hint="person portrait"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                   
-                  {/* Top Right Chat Button */}
+                  {/* Gradient Overlay for bottom text legibility */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+                  
+                  {/* Flush Corner Chat Button */}
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
                       router.push(`/home/chat/${u.id}`);
                     }}
-                    className="absolute top-4 right-4 z-20"
+                    className="absolute top-0 right-0 z-20"
                   >
-                    <div className="bg-primary px-4 py-2 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform">
-                      <MessageSquare className="w-3 h-3 text-white fill-white mr-1" />
-                      <span className="text-[9px] font-black text-white uppercase italic">Chat</span>
+                    <div className="bg-primary px-5 py-2.5 rounded-bl-[1.5rem] flex items-center justify-center shadow-lg active:scale-95 transition-all">
+                      <MessageSquare className="w-3.5 h-3.5 text-white fill-white mr-1.5" />
+                      <span className="text-[10px] font-black text-white uppercase italic tracking-wider">Chat</span>
                     </div>
                   </button>
 
+                  {/* Profile Details at Bottom */}
                   <div className="absolute bottom-4 left-4 right-4">
-                    <div className="flex items-center space-x-1 mb-2">
-                      <h4 className="text-[14px] font-black text-white truncate drop-shadow-md tracking-tight">
+                    <div className="flex items-center space-x-1.5 mb-2.5">
+                      <h4 className="text-[13px] font-black text-white truncate drop-shadow-md tracking-tight">
                         {u.displayName?.toLowerCase() || 'guest_user'}
                       </h4>
-                      {u.isVerified && <UserCheck className="w-4 h-4 text-primary fill-primary" />}
+                      {u.isVerified && <UserCheck className="w-3.5 h-3.5 text-primary fill-primary" />}
                     </div>
                     
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex items-center space-x-2">
                       {/* Gender/Age Badge */}
-                      <div className="px-2 py-0 bg-primary/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-primary/30">
-                        <span className="text-[8px] font-black text-white uppercase tracking-tighter">
+                      <div className="h-5 px-2 bg-primary/30 backdrop-blur-md rounded-full flex items-center justify-center border border-primary/40">
+                        <span className="text-[9px] font-black text-white uppercase tracking-tighter">
                           {u.gender === 'Female' ? '♀' : '♂'} {age}
                         </span>
                       </div>
                       
                       {/* Country Badge */}
-                      <div className="px-2 py-0 bg-primary/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-primary/30 min-w-[3rem]">
-                        <span className="text-[8px] font-black text-white uppercase tracking-widest text-center w-full">
+                      <div className="h-5 px-3 bg-primary/30 backdrop-blur-md rounded-full flex items-center justify-center border border-primary/40 min-w-[3.5rem]">
+                        <span className="text-[9px] font-black text-white uppercase tracking-widest text-center w-full">
                           {u.country?.substring(0, 5) || 'Kenya'}
                         </span>
                       </div>
