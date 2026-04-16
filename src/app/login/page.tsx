@@ -136,7 +136,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-black relative overflow-hidden">
       <div className="absolute inset-0 bg-black/60 z-[1]" />
 
-      <div className="w-full max-w-sm space-y-16 text-center z-10">
+      <div className="w-full max-sm space-y-16 text-center z-10">
         <div className="space-y-6 animate-in fade-in zoom-in duration-700">
           <div className="mx-auto w-24 h-24 bg-primary rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-primary/30 rotate-12 transition-transform hover:rotate-0 duration-500">
             <Zap className="text-white w-12 h-12" />
