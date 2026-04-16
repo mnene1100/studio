@@ -11,8 +11,6 @@ import { signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPa
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { toast } from "@/hooks/use-toast";
 
-const RANDOM_NAMES = ["SilverFox", "DesertStar", "NeoWave", "SkyWalker", "NexoUser", "SwiftWind", "DeepBlue", "SolarFlare"];
-
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -37,53 +35,19 @@ export default function LoginPage() {
     }
   }, [user, isUserLoading, router, db]);
 
-  const detectCountry = async (): Promise<string> => {
-    try {
-      const response = await fetch('https://ipapi.co/json/');
-      const data = await response.json();
-      return data.country_name || 'Kenya';
-    } catch (e) {
-      return 'Kenya';
-    }
-  };
-
-  const ensureUserProfile = async (firebaseUser: FirebaseUser) => {
-    if (!db) return;
-    const userRef = doc(db, 'users', firebaseUser.uid);
-    const userDoc = await getDoc(userRef);
-
-    if (!userDoc.exists()) {
-      const detectedCountry = await detectCountry();
-      const randomName = RANDOM_NAMES[Math.floor(Math.random() * RANDOM_NAMES.length)] + "_" + Math.floor(Math.random() * 1000);
-      
-      const defaultProfile = {
-        id: firebaseUser.uid,
-        numericId: (Math.floor(Math.random() * 900000000) + 100000000).toString(),
-        email: firebaseUser.email || 'guest@nexo.com',
-        displayName: randomName,
-        gender: 'Female', // Default to female for guests
-        dob: '2000-01-01',
-        country: detectedCountry,
-        education: 'N/A',
-        profilePictureUrl: `https://picsum.photos/seed/${firebaseUser.uid}/200/200`,
-        createdAt: new Date().toISOString(),
-        lastOnlineAt: new Date().toISOString(),
-        statusMessage: "Hey there! I'm using NEXO.",
-        balance: 500,
-        earnings: 0,
-        isVerified: false,
-      };
-      await setDoc(userRef, defaultProfile, { merge: true });
-    }
-  };
-
   const handleFastLogin = async () => {
-    if (!auth) return;
+    if (!auth || !db) return;
     setIsLoading(true);
     try {
       const userCredential = await signInAnonymously(auth);
-      await ensureUserProfile(userCredential.user);
-      router.replace('/home');
+      const userRef = doc(db, 'users', userCredential.user.uid);
+      const userDoc = await getDoc(userRef);
+      
+      if (!userDoc.exists()) {
+        router.replace('/onboarding');
+      } else {
+        router.replace('/home');
+      }
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -100,8 +64,7 @@ export default function LoginPage() {
     if (!email.trim() || !password.trim() || !auth) return;
     setIsLoading(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      await ensureUserProfile(userCredential.user);
+      await signInWithEmailAndPassword(auth, email, password);
       router.replace('/home');
     } catch (error: any) {
       toast({ variant: "destructive", title: "Sign in failed", description: "Check credentials and connection." });
@@ -115,9 +78,8 @@ export default function LoginPage() {
     if (!email.trim() || !password.trim() || !auth) return;
     setIsLoading(true);
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      await ensureUserProfile(userCredential.user);
-      router.replace('/home');
+      await createUserWithEmailAndPassword(auth, email, password);
+      router.replace('/onboarding');
     } catch (error: any) {
       toast({ variant: "destructive", title: "Sign up failed", description: error.message });
     } finally {
@@ -151,8 +113,8 @@ export default function LoginPage() {
           ) : (
             <form onSubmit={handleSignIn} className="space-y-4 text-left animate-in slide-in-from-bottom-4">
               <div className="space-y-3">
-                <Input type="email" placeholder="Email address" className="h-14 bg-white/10 border-white/10 text-white rounded-2xl" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                <Input type="password" placeholder="Password" className="h-14 bg-white/10 border-white/10 text-white rounded-2xl" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                <Input type="email" placeholder="Email address" className="h-14 bg-white/10 border-white/10 text-white rounded-2xl placeholder:text-white/40" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <Input type="password" placeholder="Password" className="h-14 bg-white/10 border-white/10 text-white rounded-2xl placeholder:text-white/40" value={password} onChange={(e) => setPassword(e.target.value)} required />
               </div>
               <div className="flex flex-col space-y-3 pt-2">
                 <Button type="submit" disabled={isLoading} className="w-full h-14 bg-primary text-white font-black rounded-2xl shadow-lg shadow-primary/20 uppercase tracking-widest">
