@@ -1,14 +1,14 @@
-
 "use client";
 
 import { useRouter } from 'next/navigation';
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { 
   ShieldCheck, Headset, ChevronRight, Copy, 
   Eye, Pencil, Coins, Diamond, Settings
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useHomeData } from '../layout';
+import Image from 'next/image';
 
 export default function MePage() {
   const router = useRouter();
@@ -47,24 +47,36 @@ export default function MePage() {
 
         {/* Profile Avatar */}
         <div className="relative mb-6 mt-4">
-          <Avatar className="w-32 h-32 ring-0 shadow-2xl rounded-full overflow-hidden bg-white/10">
-            <AvatarImage src={profile.profilePictureUrl} className="object-cover" />
-            <AvatarFallback className="bg-white/10 text-white text-3xl font-black">{initials}</AvatarFallback>
-          </Avatar>
-          <button className="absolute bottom-1 right-1 p-2 bg-black/80 rounded-full border border-white/20 active:scale-90 shadow-xl">
+          <div className="w-32 h-32 relative rounded-full overflow-hidden border-4 border-white/20 shadow-2xl bg-white/10">
+            {profile.profilePictureUrl ? (
+              <Image 
+                src={profile.profilePictureUrl} 
+                alt={displayName}
+                fill
+                className="object-cover"
+                sizes="128px"
+                priority
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-white text-3xl font-black">
+                {initials}
+              </div>
+            )}
+          </div>
+          <button className="absolute bottom-1 right-1 p-2 bg-black/80 rounded-full border border-white/20 active:scale-90 shadow-xl z-20">
             <Pencil className="w-4 h-4 text-white" />
           </button>
         </div>
         
         <h2 className="text-3xl font-black text-white mb-1 tracking-tight drop-shadow-sm">{displayName}</h2>
-        <p className="text-[10px] font-black text-white/70 uppercase tracking-[0.2em] mb-6">
+        <p className="text-[10px] font-black text-white/70 uppercase tracking-[0.2em] mb-4">
           {profile.gender} • Verified Official Profile
         </p>
 
         {/* ID Pill */}
         <div 
           onClick={copyId}
-          className="flex items-center space-x-2 bg-white/20 backdrop-blur-md px-6 py-3 rounded-full border border-white/10 cursor-pointer active:scale-95 transition-all group z-30 shadow-lg mb-2"
+          className="flex items-center space-x-2 bg-white/20 backdrop-blur-md px-6 py-3 rounded-full border border-white/10 cursor-pointer active:scale-95 transition-all group z-30 shadow-lg mb-4"
         >
           <span className="text-xs font-black text-white tracking-widest uppercase">ID: {profile.numericId}</span>
           <Copy className="w-3.5 h-3.5 text-white/60 group-hover:text-white transition-colors" />
@@ -72,27 +84,27 @@ export default function MePage() {
 
         {/* Floating White Balance Cards */}
         <div className="absolute bottom-[-80px] left-0 right-0 px-6 grid grid-cols-2 gap-4 z-20">
-          <div className="bg-white rounded-[2.5rem] p-6 flex flex-col items-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-gray-50 group">
-            <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
-              <Coins className="w-6 h-6 text-primary" />
+          <div className="bg-white rounded-[2.5rem] p-5 flex flex-col items-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-gray-50 group">
+            <div className="w-10 h-10 bg-primary/10 rounded-2xl flex items-center justify-center mb-3">
+              <Coins className="w-5 h-5 text-primary" />
             </div>
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Balance</p>
-            <h3 className="text-3xl font-black text-gray-900 mb-6 tracking-tight">{profile.balance ?? 0}</h3>
+            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Balance</p>
+            <h3 className="text-2xl font-black text-gray-900 mb-4 tracking-tight">{profile.balance ?? 0}</h3>
             <button 
               onClick={() => router.push('/home/wallet')}
-              className="w-full py-2 bg-primary text-white rounded-full text-xs font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-primary/20"
+              className="w-full h-9 bg-primary text-white rounded-full text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-primary/20"
             >
               Recharge
             </button>
           </div>
 
-          <div className="bg-white rounded-[2.5rem] p-6 flex flex-col items-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-gray-50 group">
-            <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-4">
-              <Diamond className="w-6 h-6 text-blue-500" />
+          <div className="bg-white rounded-[2.5rem] p-5 flex flex-col items-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-gray-50 group">
+            <div className="w-10 h-10 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-3">
+              <Diamond className="w-5 h-5 text-blue-500" />
             </div>
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Earnings</p>
-            <h3 className="text-3xl font-black text-gray-900 mb-6 tracking-tight">{profile.earnings ?? 0}</h3>
-            <button className="w-full py-2 bg-black text-white rounded-full text-xs font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg">
+            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Earnings</p>
+            <h3 className="text-2xl font-black text-gray-900 mb-4 tracking-tight">{profile.earnings ?? 0}</h3>
+            <button className="w-full h-9 bg-black text-white rounded-full text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg">
               Income
             </button>
           </div>

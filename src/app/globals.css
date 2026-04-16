@@ -55,29 +55,28 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* Disable selection globally for native feel */
-  html, body {
-    user-select: none;
-    -webkit-user-select: none;
-    overflow-x: hidden;
-    height: 100%;
-  }
-
-  /* Re-enable selection for inputs and textareas */
-  input, textarea, [contenteditable="true"] {
-    user-select: text;
-    -webkit-user-select: text;
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
     @apply bg-white text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
-    overscroll-behavior-y: none; /* Disables pull-to-refresh */
-    min-height: 100%;
-    display: flex;
-    flex-direction: column;
+    overscroll-behavior-y: none;
+    min-height: 100vh;
+    overflow-x: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    /* Ensure scrolling is smooth on iOS */
+    -webkit-overflow-scrolling: touch;
   }
   
+  input, textarea, [contenteditable="true"] {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
   /* Hide scrollbars but keep functionality */
   ::-webkit-scrollbar {
     display: none;
