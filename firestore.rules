@@ -3,10 +3,11 @@ service cloud.firestore {
   match /databases/{database}/documents {
     /*
      * NEXO PROTOTYPE SECURITY RULES - FULLY OPEN
-     * Allows all reads and writes for authenticated users to facilitate rapid prototyping.
+     * Allows all reads and writes for all users (including guests/anonymous) 
+     * to facilitate rapid prototyping and testing.
      */
     match /{document=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if true;
     }
   }
 }

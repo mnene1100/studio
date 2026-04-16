@@ -33,6 +33,7 @@ export default function HomePage() {
   }, [allUsers, user?.uid]);
 
   // Determine if we have reached the end of the collection
+  // If we fetched fewer items than our current pageSize, we've hit the end.
   const hasMore = useMemo(() => {
     if (!allUsers) return false;
     return allUsers.length === pageSize;
