@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MessageCircle, User, LayoutGrid } from 'lucide-react';
+import { MessageSquareMore, User, Compass } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function Navigation() {
@@ -11,13 +11,13 @@ export function Navigation() {
   const navItems = [
     { 
       label: 'Home', 
-      icon: LayoutGrid, 
+      icon: Compass, 
       href: '/home',
       activeColor: 'text-primary'
     },
     { 
       label: 'Chats', 
-      icon: MessageCircle, 
+      icon: MessageSquareMore, 
       href: '/home/chat',
       activeColor: 'text-primary'
     },
@@ -30,7 +30,7 @@ export function Navigation() {
   ];
 
   return (
-    <nav className="glass-nav px-6 pb-6 pt-3 h-20">
+    <nav className="glass-nav px-6 pb-8 pt-4 h-24">
       <div className="max-w-md mx-auto flex justify-around items-center h-full">
         {navItems.map((item) => {
           const isActive = item.href === '/home' 
@@ -42,27 +42,29 @@ export function Navigation() {
               key={item.href} 
               href={item.href}
               className={cn(
-                "relative flex flex-col items-center justify-center space-y-1 group transition-all duration-300",
-                isActive ? item.activeColor : "text-muted-foreground/50"
+                "relative flex flex-col items-center justify-center space-y-1.5 group transition-all duration-300 min-w-[64px]",
+                isActive ? item.activeColor : "text-muted-foreground/40"
               )}
             >
               <div className={cn(
-                "p-2 rounded-2xl transition-all duration-300 active:scale-90",
-                isActive && "bg-primary/10"
+                "p-2.5 rounded-[1.25rem] transition-all duration-500 active:scale-90",
+                isActive && "bg-primary/10 shadow-[0_0_20px_rgba(20,184,166,0.1)]"
               )}>
                 <item.icon 
-                  className={cn("w-6 h-6 transition-transform", isActive && "scale-110")} 
-                  strokeWidth={isActive ? 2.5 : 2} 
+                  className={cn(
+                    "w-7 h-7 transition-all duration-500", 
+                    isActive ? "scale-110 stroke-[2.5px]" : "stroke-[2px]"
+                  )} 
                 />
               </div>
               <span className={cn(
-                "text-[10px] font-black tracking-[0.05em] uppercase transition-opacity",
-                isActive ? "opacity-100" : "opacity-40"
+                "text-[10px] font-black tracking-[0.1em] uppercase transition-all duration-500",
+                isActive ? "opacity-100 translate-y-0" : "opacity-40 translate-y-0.5"
               )}>
                 {item.label}
               </span>
               {isActive && (
-                <div className="absolute -top-1 w-1 h-1 bg-primary rounded-full animate-in fade-in zoom-in" />
+                <div className="absolute -top-2 w-1.5 h-1.5 bg-primary rounded-full animate-in fade-in zoom-in duration-500 shadow-[0_0_10px_#14b8a6]" />
               )}
             </Link>
           );
