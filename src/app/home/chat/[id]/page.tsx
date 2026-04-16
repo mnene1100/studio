@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from 'react';
@@ -61,7 +60,6 @@ export default function ChatDetailPage() {
       });
 
       if (!found) {
-        // Create new conversation
         const newChatId = [currentUser.uid, targetUserId].sort().join('_');
         const chatRef = doc(db, 'chatConversations', newChatId);
         setDocumentNonBlocking(chatRef, {
@@ -109,7 +107,6 @@ export default function ChatDetailPage() {
     const messagesColRef = collection(db, 'chatConversations', chatId, 'messages');
     addDocumentNonBlocking(messagesColRef, messageData);
 
-    // Update conversation timestamp
     const chatRef = doc(db, 'chatConversations', chatId);
     updateDocumentNonBlocking(chatRef, {
       updatedAt: new Date().toISOString()
@@ -150,7 +147,7 @@ export default function ChatDetailPage() {
     if (!profile?.lastOnlineAt) return false;
     const lastOnline = new Date(profile.lastOnlineAt).getTime();
     const now = Date.now();
-    return now - lastOnline < 120000; // 2 minutes threshold
+    return now - lastOnline < 120000;
   }, [profile?.lastOnlineAt]);
 
   const lastSeenText = useMemo(() => {
@@ -167,8 +164,9 @@ export default function ChatDetailPage() {
   const initials = displayName.substring(0, 2).toUpperCase();
 
   return (
-    <div className="flex flex-col h-screen bg-white">
-      <header className="bg-primary safe-top px-4 shadow-md relative z-20">
+    <div className="flex flex-col h-screen bg-white overflow-hidden">
+      {/* Fixed Header */}
+      <header className="bg-primary safe-top px-4 shadow-md sticky top-0 z-50">
         <div className="h-20 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Button 
@@ -226,6 +224,7 @@ export default function ChatDetailPage() {
         </div>
       </header>
 
+      {/* Scrollable Messages Area */}
       <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col space-y-4 bg-white" ref={scrollRef}>
         {messages.map((msg: any, i: number) => {
           const isMe = msg.senderId === currentUser?.uid;
@@ -242,47 +241,50 @@ export default function ChatDetailPage() {
         })}
       </div>
 
-      <div className="px-6 py-4 bg-white border-t border-gray-100 flex items-center space-x-3">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="w-12 h-12 bg-gray-50 rounded-full text-red-500 shadow-sm flex-shrink-0"
-          onClick={handleGetSuggestions}
-        >
-          <Gift className="w-5 h-5 fill-red-500" />
-        </Button>
-
-        <div className="flex-1 relative">
-          <Input 
-            placeholder="Message..." 
-            className="w-full bg-gray-50 border-none rounded-full h-12 px-6 text-sm font-medium placeholder:text-gray-400 focus-visible:ring-primary/20"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-          />
+      {/* Fixed Bottom Input */}
+      <div className="px-6 py-4 bg-white border-t border-gray-100 flex flex-col space-y-3 z-10 pb-safe">
+        {suggestions.length > 0 && (
+          <div className="flex space-x-2 overflow-x-auto pb-2 -mx-2 px-2">
+            {suggestions.map((s, i) => (
+              <button 
+                key={i}
+                onClick={() => setInput(s)}
+                className="whitespace-nowrap px-4 py-2 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest rounded-full border border-primary/10 active:scale-95 transition-all"
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        )}
+        
+        <div className="flex items-center space-x-3">
           <Button 
+            variant="ghost" 
             size="icon" 
-            className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-[#BEE5DF] text-white hover:bg-[#A8D8D0] h-9 w-9 rounded-full shadow-sm"
-            onClick={handleSendMessage}
+            className="w-12 h-12 bg-gray-50 rounded-full text-red-500 shadow-sm flex-shrink-0"
+            onClick={handleGetSuggestions}
           >
-            <Send className="w-4 h-4" />
+            <Gift className="w-5 h-5 fill-red-500" />
           </Button>
+
+          <div className="flex-1 relative">
+            <Input 
+              placeholder="Message..." 
+              className="w-full bg-gray-50 border-none rounded-full h-12 px-6 text-sm font-medium placeholder:text-gray-400 focus-visible:ring-primary/20"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+            />
+            <Button 
+              size="icon" 
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-[#BEE5DF] text-white hover:bg-[#A8D8D0] h-9 w-9 rounded-full shadow-sm"
+              onClick={handleSendMessage}
+            >
+              <Send className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </div>
-      
-      {suggestions.length > 0 && (
-        <div className="px-6 pb-4 bg-white flex space-x-2 overflow-x-auto">
-          {suggestions.map((s, i) => (
-            <button 
-              key={i}
-              onClick={() => setInput(s)}
-              className="whitespace-nowrap px-4 py-2 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest rounded-full border border-primary/10"
-            >
-              {s}
-            </button>
-          ))}
-        </div>
-      )}
     </div>
   );
 }

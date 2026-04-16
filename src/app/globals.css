@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -60,7 +59,9 @@
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
     height: 100%;
-    background-color: #28B4A4; /* Ensure body/status bar background matches primary teal */
+    background-color: #28B4A4;
+    /* Disable pull-to-refresh at the root */
+    overscroll-behavior-y: none;
   }
 
   body {
@@ -71,7 +72,6 @@
     overflow-x: hidden;
     user-select: none;
     -webkit-user-select: none;
-    /* Ensure scrolling is smooth on iOS */
     -webkit-overflow-scrolling: touch;
     touch-action: manipulation;
   }
@@ -81,7 +81,6 @@
     -webkit-user-select: text;
   }
 
-  /* Hide scrollbars but keep functionality */
   ::-webkit-scrollbar {
     display: none;
   }
@@ -96,7 +95,7 @@
 }
 
 .glass-header {
-  @apply sticky top-0 z-30 bg-primary/95 backdrop-blur-2xl border-b border-white/5 shadow-xl;
+  @apply sticky top-0 z-50 bg-primary/95 backdrop-blur-2xl border-b border-white/5 shadow-xl;
 }
 
 .premium-gradient {
