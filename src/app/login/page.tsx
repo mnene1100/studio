@@ -20,7 +20,6 @@ export default function LoginPage() {
   const { user, isUserLoading } = useUser();
 
   useEffect(() => {
-    // Only auto-redirect if a session is explicitly marked as active
     const isSessionActive = localStorage.getItem('nexo_session_active') === 'true';
     if (!isUserLoading && user && isSessionActive) {
       router.replace('/home');
@@ -31,7 +30,6 @@ export default function LoginPage() {
     if (!auth) return;
     setIsLoading(true);
     try {
-      // If we already have a persistent anonymous user session, just activate it
       if (auth.currentUser && auth.currentUser.isAnonymous) {
         localStorage.setItem('nexo_session_active', 'true');
         router.replace('/home');
@@ -41,7 +39,7 @@ export default function LoginPage() {
       const userCredential = await signInAnonymously(auth);
       if (userCredential.user) {
         localStorage.setItem('nexo_session_active', 'true');
-        router.replace('/home');
+        router.replace('/onboarding');
       }
     } catch (error: any) {
       toast({
@@ -109,7 +107,8 @@ export default function LoginPage() {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       localStorage.setItem('nexo_session_active', 'true');
-      router.replace('/home');
+      // Direct redirect to onboarding for new accounts
+      router.replace('/onboarding');
     } catch (error: any) {
       let message = "Could not create account.";
       if (error.code === 'auth/email-already-in-use') {
@@ -128,19 +127,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-black relative overflow-hidden">
-      {/* Background Video */}
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover z-0 opacity-40"
-      >
-        <source src="/background.mp4" type="video/mp4" />
-      </video>
-
-      {/* Dark Overlay for Readability */}
-      <div className="absolute inset-0 bg-black/40 z-[1]" />
+      <div className="absolute inset-0 bg-black/60 z-[1]" />
 
       <div className="w-full max-w-sm space-y-16 text-center z-10">
         <div className="space-y-6 animate-in fade-in zoom-in duration-700">
@@ -246,12 +233,6 @@ export default function LoginPage() {
             </div>
           )}
         </div>
-      </div>
-
-      <div className="absolute bottom-10 left-0 right-0 flex flex-col items-center space-y-2 z-10 px-10 text-center">
-        <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.15em] leading-relaxed max-w-xs">
-          By signing up, you agree to our <span className="text-white/40 underline">Terms</span> and <span className="text-white/40 underline">Privacy Policy</span>.
-        </p>
       </div>
     </div>
   );

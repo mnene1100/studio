@@ -20,7 +20,6 @@ export default function HomePage() {
   const mysteryIcon = PlaceHolderImages.find(img => img.id === 'mystery-icon');
   const taskIcon = PlaceHolderImages.find(img => img.id === 'task-icon');
 
-  // Screen-specific paginated listener
   const discoveryQuery = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
     return query(
@@ -32,15 +31,13 @@ export default function HomePage() {
   
   const { data: allUsers, isLoading: isUsersLoading } = useCollection(discoveryQuery);
   
-  // Filter out the current user and memoize results
   const discoveryUsers = useMemo(() => {
-    return allUsers?.filter(u => u.id !== user?.uid) || [];
+    if (!allUsers || !user?.uid) return [];
+    return allUsers.filter(u => u.id !== user.uid);
   }, [allUsers, user?.uid]);
 
-  // Determine if we have reached the end of the collection
   const hasMore = useMemo(() => {
     if (!allUsers) return false;
-    // If the number of results is exactly the pageSize, there might be more
     return allUsers.length >= pageSize;
   }, [allUsers, pageSize]);
 
@@ -52,8 +49,8 @@ export default function HomePage() {
     setPageSize(6);
   };
 
-  // Determine what to show in the main content area
-  const showLoading = isUsersLoading && (!allUsers || allUsers.length === 0);
+  // Improved visibility logic: showEmpty ONLY if loading is definitively finished and no users exist
+  const showLoading = isUsersLoading || (allUsers === null && user?.uid);
   const showEmpty = !isUsersLoading && allUsers !== null && discoveryUsers.length === 0;
 
   return (
@@ -68,7 +65,7 @@ export default function HomePage() {
                 fill 
                 className="object-contain" 
                 priority 
-                data-ai-hint={mysteryIcon?.imageHint || "mystery note"}
+                data-ai-hint="mystery note"
                />
             </div>
             <span className="text-white font-black text-[8px] tracking-[0.15em] uppercase text-center">Mystery Note</span>
@@ -82,7 +79,7 @@ export default function HomePage() {
                 fill 
                 className="object-contain" 
                 priority 
-                data-ai-hint={taskIcon?.imageHint || "task center"}
+                data-ai-hint="task center"
               />
             </div>
             <span className="text-white font-black text-[8px] tracking-[0.15em] uppercase text-center">Task Center</span>
@@ -102,7 +99,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div className="px-3 pt-4">
+      <div className="px-3 pt-4 flex-1">
         {showLoading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 className="w-8 h-8 text-primary animate-spin" />
@@ -178,7 +175,6 @@ export default function HomePage() {
                 onClick={handleLoadMore}
                 className="text-[10px] font-black text-primary uppercase tracking-[0.3em] hover:bg-primary/5 rounded-full px-8 py-6 h-auto transition-all active:scale-95"
               >
-                {isUsersLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                 Load More
               </Button>
             ) : (

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo, useEffect, useState } from 'react';
@@ -26,7 +27,6 @@ export default function UserProfilePage() {
   const { user: currentUser } = useUser();
   const [isFullScreen, setIsFullScreen] = useState(false);
 
-  // Wait for currentUser to be available before querying
   const userRef = useMemoFirebase(() => {
     if (!db || !id || !currentUser?.uid) return null;
     return doc(db, 'users', id as string);
@@ -34,7 +34,6 @@ export default function UserProfilePage() {
 
   const { data: profile, isLoading } = useDoc(userRef);
 
-  // Record Visitor Logic
   useEffect(() => {
     if (!db || !currentUser || !id || currentUser.uid === id) return;
     
@@ -108,7 +107,6 @@ export default function UserProfilePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white relative pb-40 overflow-x-hidden">
-      {/* Full Screen Image Overlay */}
       {isFullScreen && (
         <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center animate-in fade-in duration-300">
           <Button 
@@ -132,7 +130,6 @@ export default function UserProfilePage() {
         </div>
       )}
 
-      {/* Hero Image Section */}
       <div 
         className="relative w-full aspect-[1/1.15] overflow-hidden bg-muted cursor-zoom-in"
         onClick={() => setIsFullScreen(true)}
@@ -146,11 +143,9 @@ export default function UserProfilePage() {
           sizes="(max-width: 768px) 100vw, 400px"
         />
         
-        {/* Overlays */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent h-1/4" />
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-white via-white/10 to-transparent h-24" />
 
-        {/* Top Navigation */}
         <div className="absolute top-10 left-4 right-4 flex items-center justify-between z-20">
           <Button 
             variant="ghost" 
@@ -192,9 +187,8 @@ export default function UserProfilePage() {
         </div>
       </div>
 
-      {/* Profile Details Area - Edges made straight by removing rounded class */}
-      <div className="px-6 -mt-12 bg-white relative z-10 pt-8 flex-1">
-        {/* Status Indicator */}
+      {/* Profile Details Area - Edges made fully straight by removing all rounded classes and negative margins */}
+      <div className="px-6 bg-white relative z-10 pt-8 flex-1 rounded-none border-t border-gray-100">
         <div className="mb-3">
           <div className={`inline-flex items-center px-3 py-1 rounded-full border ${isOnline ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
             <div className={`w-1.5 h-1.5 ${isOnline ? 'bg-primary' : 'bg-gray-300'} rounded-full mr-1.5`} />
@@ -235,7 +229,6 @@ export default function UserProfilePage() {
         </div>
       </div>
 
-      {/* Floating Action Button */}
       <div className="fixed bottom-6 left-0 right-0 px-6 z-30 pointer-events-none">
         <div className="max-w-md mx-auto pointer-events-auto">
           <Button 
