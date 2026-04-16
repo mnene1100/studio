@@ -37,8 +37,6 @@ export default function UserProfilePage() {
   useEffect(() => {
     if (!db || !currentUser || !id || currentUser.uid === id) return;
     
-    // Use the visitorId as part of the path for idempotency (or timestamp for history)
-    // Here we record every unique visit window by current user
     const visitorRef = doc(db, 'userProfiles', id as string, 'visitors', currentUser.uid);
     setDocumentNonBlocking(visitorRef, {
       id: currentUser.uid,
@@ -111,6 +109,7 @@ export default function UserProfilePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white relative pb-40 overflow-x-hidden">
+      {/* Hero Image Section */}
       <div className="relative w-full aspect-[4/5] overflow-hidden bg-muted">
         <Image 
           src={profile.profilePictureUrl || `https://picsum.photos/seed/${profile.id}/800/1000`}
@@ -121,9 +120,11 @@ export default function UserProfilePage() {
           sizes="(max-width: 768px) 100vw, 400px"
         />
         
+        {/* Overlays */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent h-1/3" />
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-white via-white/10 to-transparent h-24" />
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-white via-white/10 to-transparent h-32" />
 
+        {/* Top Navigation */}
         <div className="absolute top-12 left-6 right-6 flex items-center justify-between z-20">
           <Button 
             variant="ghost" 
@@ -162,18 +163,20 @@ export default function UserProfilePage() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+      </div>
 
-        <div className="absolute bottom-6 left-8 z-10">
-          <div className="bg-primary/90 backdrop-blur-md px-4 py-2 rounded-full flex items-center space-x-2 border border-white/20 shadow-lg">
-            <div className={`w-2 h-2 ${isOnline ? 'bg-green-400' : 'bg-white/50'} rounded-full`} />
-            <span className="text-[9px] font-black text-white uppercase tracking-widest">
+      {/* Profile Details Area */}
+      <div className="px-8 -mt-16 bg-white rounded-t-[3.5rem] relative z-10 pt-10 flex-1">
+        {/* Status Indicator - Positioned Well Above the Name */}
+        <div className="mb-4">
+          <div className={`inline-flex items-center px-4 py-1.5 rounded-full shadow-sm border ${isOnline ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
+            <div className={`w-2 h-2 ${isOnline ? 'bg-primary' : 'bg-gray-300'} rounded-full mr-2`} />
+            <span className="text-[10px] font-black uppercase tracking-widest">
               {statusText}
             </span>
           </div>
         </div>
-      </div>
 
-      <div className="px-8 -mt-8 bg-white rounded-t-[3.5rem] relative z-10 pt-10 flex-1">
         <div className="flex items-start justify-between mb-4">
           <div>
             <h1 className="text-4xl font-black text-gray-900 tracking-tight leading-none mb-2">
@@ -183,7 +186,7 @@ export default function UserProfilePage() {
               {profile.gender} {age ? `• ${age} Years Old` : ''}
             </p>
           </div>
-          <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
+          <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center shadow-sm">
             <Globe className="w-6 h-6 text-primary" />
           </div>
         </div>
@@ -230,6 +233,7 @@ export default function UserProfilePage() {
         )}
       </div>
 
+      {/* Floating Action Button */}
       <div className="fixed bottom-8 left-0 right-0 px-8 z-30 pointer-events-none">
         <div className="max-w-md mx-auto pointer-events-auto">
           <Button 
