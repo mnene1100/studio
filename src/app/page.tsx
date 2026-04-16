@@ -3,27 +3,40 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useUser, useFirestore } from '@/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 export default function EntryPage() {
   const router = useRouter();
+  const { user, isUserLoading } = useUser();
+  const db = useFirestore();
 
   useEffect(() => {
-    const userSession = localStorage.getItem('nexo_session');
-    if (!userSession) {
+    if (isUserLoading) return;
+
+    if (!user) {
       router.push('/login');
     } else {
-      const profile = JSON.parse(localStorage.getItem('nexo_profile') || '{}');
-      if (!profile.name) {
-        router.push('/onboarding');
-      } else {
-        router.push('/home/chat');
-      }
+      const checkProfile = async () => {
+        const userDoc = await getDoc(doc(db, 'userProfiles', user.uid));
+        if (userDoc.exists()) {
+          const profile = userDoc.data();
+          localStorage.setItem('nexo_profile', JSON.stringify(profile));
+          router.push('/home/chat');
+        } else {
+          router.push('/onboarding');
+        }
+      };
+      checkProfile();
     }
-  }, [router]);
+  }, [user, isUserLoading, router, db]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
-      <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+    <div className="flex items-center justify-center min-h-screen bg-background premium-gradient">
+      <div className="flex flex-col items-center space-y-4">
+        <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-[10px] text-accent font-bold uppercase tracking-[0.4em] animate-pulse">Initializing NEXO</p>
+      </div>
     </div>
   );
 }
