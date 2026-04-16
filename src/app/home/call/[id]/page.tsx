@@ -56,7 +56,7 @@ export default function CallPage() {
         const appId = process.env.NEXT_PUBLIC_AGORA_APP_ID;
         
         if (!appId) {
-          setErrorMessage('AGORA_APP_ID missing in public env.');
+          setErrorMessage('AGORA_APP_ID is missing. Please check your .env configuration.');
           return;
         }
 
@@ -79,7 +79,7 @@ export default function CallPage() {
 
         const channelName = [currentUser?.uid, targetUserId].sort().join('_');
         
-        setStatusMessage('Requesting Permissions...');
+        setStatusMessage('Requesting Hardware...');
         
         try {
           const audioTrack = await AgoraRTC.createMicrophoneAudioTrack({
@@ -95,15 +95,16 @@ export default function CallPage() {
           }
           setHasPermission(true);
         } catch (permError) {
-          console.error("Permissions failed:", permError);
+          console.error("Permissions denied:", permError);
           setHasPermission(false);
           return;
         }
 
-        setStatusMessage('Authenticating Session...');
+        setStatusMessage('Authenticating...');
         const result = await getAgoraToken(channelName, currentUser?.uid as string);
         
         if (result.error) {
+          console.error("Token result error:", result);
           setErrorMessage(result.error);
           return;
         }
@@ -113,7 +114,7 @@ export default function CallPage() {
           return;
         }
 
-        setStatusMessage('Joining Channel...');
+        setStatusMessage('Joining...');
         await agoraClientRef.current.join(appId, channelName, result.token, currentUser?.uid);
 
         const callId = `${currentUser?.uid}_${targetUserId}_${Date.now()}`;
@@ -205,7 +206,11 @@ export default function CallPage() {
           <AlertCircle className="h-6 w-6 mb-4 text-red-500" />
           <AlertTitle className="text-xl font-black uppercase tracking-tight text-white">Call Error</AlertTitle>
           <AlertDescription className="text-[10px] font-medium text-white/50 leading-relaxed mt-2 uppercase tracking-widest">
-            {errorMessage === 'AGORA_CONFIGURATION_MISSING' ? 'The Agora engine keys are missing on the server.' : `An error occurred: ${errorMessage}. Please check your configuration.`}
+            {errorMessage === 'AGORA_CONFIGURATION_MISSING' 
+              ? 'Agora credentials (App ID or Certificate) are missing on the server.' 
+              : errorMessage === 'TOKEN_GENERATION_FAILED'
+              ? 'Secure token generation failed. Please verify your Agora App Certificate.'
+              : `An error occurred: ${errorMessage}.`}
           </AlertDescription>
           <Button onClick={() => router.back()} className="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] h-14 rounded-full">
             Exit Session
@@ -242,7 +247,7 @@ export default function CallPage() {
             <div className="relative">
               <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping opacity-30" />
               <div className="absolute inset-0 bg-primary/10 rounded-full animate-pulse blur-3xl" />
-              <Avatar className="w-40 h-40 border-8 border-white/5 shadow-[0_0_80px_rgba(40,180,164,0.3)] relative z-10 rounded-full">
+              <Avatar className="w-40 h-40 border-8 border-white/5 shadow-[0_0_80px_rgba(40,180,164,0.3)] relative z-10 rounded-full overflow-hidden">
                 <AvatarImage src={profile?.profilePictureUrl} className="object-cover rounded-full" />
                 <AvatarFallback className="bg-primary/10 text-primary text-4xl font-black rounded-full">{initials}</AvatarFallback>
               </Avatar>
