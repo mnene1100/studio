@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { 
   ChevronLeft, ShieldCheck, CreditCard, 
-  Ban, Info, ChevronRight, LogOut, Moon, Sun
+  Ban, Info, ChevronRight, Moon, Sun
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useUser, useFirestore, useAuth } from '@/firebase';
@@ -35,14 +35,9 @@ export default function SettingsPage() {
   const handleLogout = async () => {
     if (!auth) return;
     try {
-      // Clear all state FIRST to ensure no stale data remains
       localStorage.clear();
       sessionStorage.clear();
-      
-      // Perform sign out
       await signOut(auth);
-      
-      // Force a full clean redirect to the login page
       window.location.href = '/login';
     } catch (error: any) {
       toast({
@@ -64,14 +59,14 @@ export default function SettingsPage() {
       sessionStorage.clear();
       toast({
         title: "Account Deleted",
-        description: "Your data has been removed from the NEXO network.",
+        description: "Your data has been removed.",
       });
       window.location.href = '/login';
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Re-authentication required",
-        description: "Please sign out and back in before deleting your account.",
+        title: "Error",
+        description: "Re-authentication required for deletion.",
       });
     }
   };
@@ -140,14 +135,6 @@ export default function SettingsPage() {
           <ChevronRight className="w-5 h-5 text-muted-foreground" />
         </div>
 
-        <div className="bg-card rounded-[2.5rem] p-5 flex items-center shadow-sm border border-border/50 active:scale-[0.98] transition-all cursor-pointer">
-          <div className="w-12 h-12 bg-muted rounded-2xl flex items-center justify-center mr-4">
-            <span className="text-xl font-black italic text-primary">NX</span>
-          </div>
-          <h3 className="flex-1 text-base font-black text-foreground tracking-tight">About NEXO</h3>
-          <ChevronRight className="w-5 h-5 text-muted-foreground" />
-        </div>
-
         <div className="pt-6">
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -159,7 +146,7 @@ export default function SettingsPage() {
               <AlertDialogHeader>
                 <AlertDialogTitle className="font-black text-foreground uppercase tracking-tight">Sign Out?</AlertDialogTitle>
                 <AlertDialogDescription className="text-xs font-medium text-muted-foreground">
-                  Are you sure you want to exit your NEXO session?
+                  Exit your session?
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter className="mt-4 gap-2">
@@ -176,10 +163,6 @@ export default function SettingsPage() {
           </div>
           <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.4em] mb-4">Version 1.0.5</p>
           <div className="flex items-center space-x-6">
-            <button className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Privacy</button>
-            <div className="w-1 h-1 bg-border rounded-full" />
-            <button className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Terms</button>
-            <div className="w-1 h-1 bg-border rounded-full" />
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <button className="text-[9px] font-black text-red-300 uppercase tracking-widest">Delete Account</button>

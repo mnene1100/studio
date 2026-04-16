@@ -31,14 +31,12 @@ export default function ChatDetailPage() {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [chatId, setChatId] = useState<string | null>(null);
 
-  // 1. Get Target User Profile
   const targetUserRef = useMemoFirebase(() => {
     if (!db || !id) return null;
     return doc(db, 'users', id);
   }, [db, id]);
   const { data: profile } = useDoc(targetUserRef);
 
-  // 2. Find or Create Chat Room
   useEffect(() => {
     if (!db || !currentUser || !id) return;
 
@@ -74,7 +72,6 @@ export default function ChatDetailPage() {
     findConversation();
   }, [db, currentUser, id]);
 
-  // 3. Listen to Real-time Messages
   const messagesQuery = useMemoFirebase(() => {
     if (!db || !chatId) return null;
     return query(
@@ -96,20 +93,18 @@ export default function ChatDetailPage() {
   const handleSendMessage = async () => {
     if (!input.trim() || !chatId || !currentUser || !db) return;
     
-    // Coin Deduction Logic: Male users pay 15 coins per text, Female users pay 0
     if (currentUserProfile?.gender === 'Male') {
       const currentBalance = currentUserProfile.balance ?? 0;
       if (currentBalance < 15) {
         toast({
           variant: 'destructive',
           title: 'Insufficient Balance',
-          description: 'You need 15 coins to send a message. Please recharge your wallet.',
+          description: 'You need 15 coins to send a message.',
         });
         router.push('/home/wallet');
         return;
       }
 
-      // Atomic deduction
       const userRef = doc(db, 'users', currentUser.uid);
       await updateDoc(userRef, {
         balance: increment(-15)
@@ -152,7 +147,6 @@ export default function ChatDetailPage() {
   };
 
   const startCall = (type: 'video' | 'audio') => {
-    // Pre-call balance check
     const costPerMin = type === 'video' ? 160 : 80;
     const currentBalance = currentUserProfile?.balance ?? 0;
 
@@ -160,7 +154,7 @@ export default function ChatDetailPage() {
       toast({
         variant: 'destructive',
         title: 'Insufficient Balance',
-        description: `You need at least ${costPerMin} coins to start a ${type} call.`,
+        description: `You need at least ${costPerMin} coins.`,
       });
       router.push('/home/wallet');
       return;
@@ -193,7 +187,6 @@ export default function ChatDetailPage() {
 
   return (
     <div className="fixed inset-0 h-[100dvh] flex flex-col bg-white overflow-hidden">
-      {/* Seamless Fixed Header */}
       <header className="bg-primary safe-top flex-shrink-0 z-20">
         <div className="h-16 px-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
@@ -244,7 +237,6 @@ export default function ChatDetailPage() {
         </div>
       </header>
 
-      {/* Scrollable Messages Area */}
       <div 
         className="flex-1 overflow-y-auto px-6 py-6 flex flex-col space-y-4 bg-white overscroll-contain" 
         ref={scrollRef}
@@ -265,7 +257,6 @@ export default function ChatDetailPage() {
         })}
       </div>
 
-      {/* Fixed Bottom Input Area */}
       <div className="bg-white border-t border-gray-100 flex-shrink-0 z-10 pb-4">
         <div className="px-6 py-4 flex flex-col space-y-3">
           {suggestions.length > 0 && (

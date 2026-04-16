@@ -10,7 +10,6 @@ import { useAuth, useUser, useFirestore } from '@/firebase';
 import { signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword, User as FirebaseUser } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { toast } from "@/hooks/use-toast";
-import { generateNexoId } from "@/app/lib/store";
 
 const RANDOM_NAMES = ["SilverFox", "DesertStar", "NeoWave", "SkyWalker", "NexoUser", "SwiftWind", "DeepBlue", "SolarFlare"];
 
@@ -26,7 +25,6 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!isUserLoading && user) {
-      // Check if profile exists before sending to home
       const checkProfile = async () => {
         if (!db) return;
         const userRef = doc(db, 'users', user.uid);
@@ -45,7 +43,6 @@ export default function LoginPage() {
       const data = await response.json();
       return data.country_name || 'Kenya';
     } catch (e) {
-      console.warn("Location detection failed, defaulting to Kenya");
       return 'Kenya';
     }
   };
@@ -61,7 +58,7 @@ export default function LoginPage() {
       
       const defaultProfile = {
         id: firebaseUser.uid,
-        numericId: generateNexoId(),
+        numericId: (Math.floor(Math.random() * 900000000) + 100000000).toString(),
         email: firebaseUser.email || 'guest@nexo.com',
         displayName: randomName,
         gender: 'Other',
@@ -78,7 +75,6 @@ export default function LoginPage() {
       };
       await setDoc(userRef, defaultProfile, { merge: true });
     }
-    localStorage.setItem('nexo_session_active', 'true');
   };
 
   const handleFastLogin = async () => {
