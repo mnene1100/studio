@@ -95,15 +95,15 @@ export default function HomePage() {
                     
                     <div className="flex flex-wrap gap-1.5">
                       {/* Gender/Age Badge */}
-                      <div className="px-2 py-0 bg-primary/20 backdrop-blur-sm rounded-full flex items-center space-x-1 border border-primary/30">
-                        <span className="text-[8px] font-black text-white uppercase tracking-tighter px-1.5">
+                      <div className="px-2 py-0 bg-primary/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-primary/30">
+                        <span className="text-[8px] font-black text-white uppercase tracking-tighter">
                           {u.gender === 'Female' ? '♀' : '♂'} {age}
                         </span>
                       </div>
                       
                       {/* Country Badge */}
-                      <div className="px-2 py-0 bg-primary/20 backdrop-blur-sm rounded-full border border-primary/30">
-                        <span className="text-[8px] font-black text-white uppercase tracking-widest px-1.5">
+                      <div className="px-2 py-0 bg-primary/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-primary/30">
+                        <span className="text-[8px] font-black text-white uppercase tracking-widest text-center">
                           {u.country?.substring(0, 5) || 'Kenya'}
                         </span>
                       </div>
