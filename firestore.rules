@@ -2,12 +2,17 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     /**
-     * NEXO APPLICATION SECURITY RULES (PROTOTYPING MODE)
+     * NEXO APPLICATION SECURITY RULES (OPEN PROTOTYPING MODE)
      * 
-     * Open access for development. 
+     * Allows all read/write access to all collections for development.
      */
     match /{document=**} {
       allow read, write: if true;
+    }
+    
+    // Explicitly allow transactions collection for the list method
+    match /transactions/{transactionId} {
+      allow read, write, list: if true;
     }
   }
 }

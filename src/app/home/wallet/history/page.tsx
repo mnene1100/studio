@@ -16,7 +16,6 @@ function TransactionItem({ item }: { item: any }) {
         "w-12 h-12 rounded-2xl flex items-center justify-center mr-4",
         isRecharge ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-600"
       )}>
-        {/* Recharge arrow points UP, Deduction points DOWN */}
         {isRecharge ? <ArrowUpRight className="w-6 h-6" /> : <ArrowDownLeft className="w-6 h-6" />}
       </div>
       
@@ -70,6 +69,7 @@ export default function WalletHistoryPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
+      {/* Seamless Header */}
       <header className="bg-primary safe-top sticky top-0 z-50">
         <div className="px-4 h-16 flex items-center justify-between">
           <Button 
