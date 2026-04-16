@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useRouter } from 'next/navigation';
@@ -6,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, Coins, ArrowUpRight, ArrowDownLeft, Clock } from "lucide-react";
 import { cn } from '@/lib/utils';
 import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
-import { collection, query, where, orderBy, limit } from 'firebase/firestore';
+import { collection, query, where, limit } from 'firebase/firestore';
 
 function TransactionItem({ item }: { item: any }) {
   const isRecharge = item.type === 'recharge';
@@ -15,8 +14,9 @@ function TransactionItem({ item }: { item: any }) {
     <div className="bg-gray-50 rounded-[2rem] p-5 flex items-center border border-gray-50 shadow-sm">
       <div className={cn(
         "w-12 h-12 rounded-2xl flex items-center justify-center mr-4",
-        isRecharge ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-600"
+        isRecharge ? "bg-green-500/10 text-green-600" : "bg-gray-100 text-gray-400"
       )}>
+        {/* Recharge = Arrow UP, Spent = Arrow DOWN */}
         {isRecharge ? <ArrowUpRight className="w-6 h-6" /> : <ArrowDownLeft className="w-6 h-6" />}
       </div>
       
@@ -56,9 +56,9 @@ export default function WalletHistoryPage() {
   const { user } = useUser();
   const db = useFirestore();
 
+  // Simplified query to avoid permission/index errors during prototyping
   const transactionsQuery = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
-    // Simplified query to avoid permission/index errors during prototyping
     return query(
       collection(db, 'transactions'),
       where('userId', '==', user.uid),
@@ -68,14 +68,14 @@ export default function WalletHistoryPage() {
 
   const { data: transactions, isLoading } = useCollection(transactionsQuery);
 
-  // Client-side sorting as a fallback if Firestore composite index isn't ready
+  // Client-side sorting as a fallback to ensure chronological order without index requirements
   const sortedTransactions = [...(transactions || [])].sort((a, b) => {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      {/* Seamless Header */}
+      {/* Seamless Header - No Shadow/Border */}
       <header className="bg-primary safe-top sticky top-0 z-50">
         <div className="px-4 h-16 flex items-center justify-between">
           <Button 

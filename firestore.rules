@@ -10,7 +10,7 @@ service cloud.firestore {
       allow read, write: if true;
     }
     
-    // Explicitly allow transactions collection for the list method
+    // Explicitly allow transactions collection for the list method to prevent permission errors
     match /transactions/{transactionId} {
       allow read, write, list: if true;
     }

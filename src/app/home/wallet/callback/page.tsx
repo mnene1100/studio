@@ -38,7 +38,7 @@ export default function PaymentCallbackPage() {
         if (transSnap.exists() && transSnap.data().status === 'completed') {
           console.log("Transaction already completed, skipping credit.");
           setStatus('success');
-          // Automatic redirect after success
+          // Automatic redirect after success to prevent going back
           setTimeout(() => router.replace('/home/wallet'), 2000);
           return;
         }
@@ -60,7 +60,7 @@ export default function PaymentCallbackPage() {
           createdAt: new Date().toISOString()
         }, { merge: true });
 
-        // Update user balance
+        // Update user balance using increment for safety
         await updateDoc(userRef, {
           balance: increment(amount)
         });
@@ -116,6 +116,13 @@ export default function PaymentCallbackPage() {
                 <span className="text-[9px] font-black text-primary uppercase">Credited</span>
               </div>
             </div>
+            
+            <Button 
+              onClick={() => router.replace('/home/wallet')}
+              className="w-full h-14 bg-primary text-white rounded-full font-black uppercase tracking-[0.2em] text-[10px] active:scale-95 transition-all shadow-xl"
+            >
+              Done
+            </Button>
           </div>
         ) : (
           <div className="space-y-8 animate-in zoom-in duration-500 max-w-xs w-full">

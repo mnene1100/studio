@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from 'react';
@@ -109,7 +108,7 @@ export default function ChatDetailPage() {
     updateDocumentNonBlocking(chatRef, {
       updatedAt: now,
       lastMessageSentAt: now,
-      lastMessageContent: messageContent // Store content preview
+      lastMessageContent: messageContent
     });
 
     setInput('');
@@ -151,41 +150,41 @@ export default function ChatDetailPage() {
 
   return (
     <div className="flex flex-col h-screen bg-white overflow-hidden">
-      {/* Fixed Header - Seamless with status bar */}
-      <header className="bg-primary safe-top px-4 sticky top-0 z-50 flex-shrink-0">
-        <div className="h-20 flex items-center justify-between">
+      {/* Seamless Fixed Header */}
+      <header className="bg-primary safe-top sticky top-0 z-50 flex-shrink-0">
+        <div className="h-16 px-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Button 
               variant="ghost" 
               size="icon" 
               onClick={() => router.back()} 
-              className="w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10"
+              className="w-9 h-9 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10"
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="w-5 h-5" />
             </Button>
             
             <div className="flex items-center space-x-3">
               <div className="relative">
-                <Avatar className="w-10 h-10 border border-white/20">
+                <Avatar className="w-9 h-9 border border-white/20">
                   <AvatarImage src={profile?.profilePictureUrl} />
-                  <AvatarFallback className="bg-white/10 text-white font-bold">{initials}</AvatarFallback>
+                  <AvatarFallback className="bg-white/10 text-white font-bold text-xs">{initials}</AvatarFallback>
                 </Avatar>
                 {isOnline && (
-                  <div className="absolute top-0 right-0 w-3 h-3 bg-green-400 rounded-full" />
+                  <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full border border-primary" />
                 )}
               </div>
               <div className="flex flex-col">
                 <h3 className="text-sm font-black text-white leading-tight tracking-tight">{displayName}</h3>
-                <span className="text-[9px] font-black text-white/70 uppercase tracking-widest">{lastSeenText}</span>
+                <span className="text-[8px] font-black text-white/70 uppercase tracking-widest">{lastSeenText}</span>
               </div>
             </div>
           </div>
 
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon" className="w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10">
+            <Button variant="ghost" size="icon" className="w-9 h-9 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10">
               <Phone className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10">
+            <Button variant="ghost" size="icon" className="w-9 h-9 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10">
               <Video className="w-4 h-4" />
             </Button>
           </div>
