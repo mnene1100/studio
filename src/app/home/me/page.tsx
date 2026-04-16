@@ -10,10 +10,25 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { useHomeData } from '../layout';
 import Image from 'next/image';
+import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { collection, query, orderBy, limit } from 'firebase/firestore';
 
 export default function MePage() {
   const router = useRouter();
-  const { profile, visitors } = useHomeData();
+  const { profile } = useHomeData();
+  const { user } = useUser();
+  const db = useFirestore();
+
+  // Localized listener for visitors only on this screen
+  const visitorsQuery = useMemoFirebase(() => {
+    if (!db || !user?.uid) return null;
+    return query(
+      collection(db, 'userProfiles', user.uid, 'visitors'),
+      orderBy('visitedAt', 'desc'),
+      limit(5)
+    );
+  }, [db, user?.uid]);
+  const { data: visitors } = useCollection(visitorsQuery);
 
   const hasNewVisitors = useMemo(() => {
     if (!profile || !visitors?.length) return false;
@@ -42,9 +57,7 @@ export default function MePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background pb-32">
-      {/* Top Teal Header Section with Safe Top */}
       <div className="bg-primary safe-top pb-32 px-6 relative flex flex-col items-center shrink-0">
-        {/* Visitors Button - Top Right */}
         <button 
           onClick={() => router.push('/home/me/visitors')}
           className="absolute top-6 right-6 flex flex-col items-center active:scale-95 transition-all z-10 safe-top"
@@ -58,7 +71,6 @@ export default function MePage() {
           <span className="text-[9px] font-black text-white uppercase tracking-widest">Visitors</span>
         </button>
 
-        {/* Profile Avatar */}
         <div className="relative mb-4 mt-6">
           <div className="w-28 h-28 relative rounded-full overflow-hidden shadow-2xl bg-white/10">
             {profile.profilePictureUrl ? (
@@ -89,7 +101,6 @@ export default function MePage() {
           {profile.gender} • Verified Official Profile
         </p>
 
-        {/* ID Pill */}
         <div 
           onClick={copyId}
           className="flex items-center space-x-2 bg-white/20 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/10 cursor-pointer active:scale-95 transition-all group z-30 shadow-lg mb-2"
@@ -98,7 +109,6 @@ export default function MePage() {
           <Copy className="w-3 h-3 text-white/60 group-hover:text-white transition-colors" />
         </div>
 
-        {/* Floating Balance Cards */}
         <div className="absolute bottom-[-75px] left-0 right-0 px-6 grid grid-cols-2 gap-4 z-20">
           <div className="bg-card rounded-[2rem] p-5 flex flex-col items-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-border group">
             <div className="w-8 h-8 bg-primary/10 rounded-xl flex items-center justify-center mb-2">
@@ -127,10 +137,8 @@ export default function MePage() {
         </div>
       </div>
 
-      {/* Content Spacer */}
       <div className="h-24 shrink-0" />
 
-      {/* Main Actions Area */}
       <div className="px-6 mt-8 space-y-4">
         <div className="flex items-center space-x-4 mb-2">
           <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] whitespace-nowrap">Service & Support</h3>
@@ -149,7 +157,6 @@ export default function MePage() {
         </button>
       </div>
 
-      {/* Account Controls */}
       <div className="px-6 mt-12 space-y-4">
         <div className="flex items-center space-x-4 mb-2">
           <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] whitespace-nowrap">Account Controls</h3>

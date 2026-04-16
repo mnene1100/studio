@@ -3,12 +3,11 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useHomeData } from '../../layout';
-import { useFirestore, useUser, useDoc, useMemoFirebase, updateDocumentNonBlocking } from '@/firebase';
-import { doc } from 'firebase/firestore';
+import { useFirestore, useUser, useDoc, useMemoFirebase, useCollection, updateDocumentNonBlocking } from '@/firebase';
+import { doc, collection, query, orderBy, limit } from 'firebase/firestore';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { ChevronLeft, Eye, MessageCircle, Clock } from "lucide-react";
+import { ChevronLeft, Eye, MessageCircle, Clock, Loader2 } from "lucide-react";
 import { formatDistanceToNow } from 'date-fns';
 
 function VisitorItem({ visitor }: { visitor: any }) {
@@ -78,7 +77,17 @@ export default function VisitorsPage() {
   const router = useRouter();
   const { user } = useUser();
   const db = useFirestore();
-  const { visitors, isVisitorsLoading } = useHomeData();
+
+  // Screen-specific listener
+  const visitorsQuery = useMemoFirebase(() => {
+    if (!db || !user?.uid) return null;
+    return query(
+      collection(db, 'userProfiles', user.uid, 'visitors'),
+      orderBy('visitedAt', 'desc'),
+      limit(20)
+    );
+  }, [db, user?.uid]);
+  const { data: visitors, isLoading: isVisitorsLoading } = useCollection(visitorsQuery);
 
   // Clear notification dot by updating lastCheckedVisitorsAt
   useEffect(() => {
@@ -91,7 +100,6 @@ export default function VisitorsPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white pb-32">
-      {/* Header - Seamless with status bar */}
       <header className="bg-primary safe-top px-4 h-24 flex items-center justify-between relative z-20">
         <div className="flex items-center space-x-3">
           <Button 
@@ -114,21 +122,13 @@ export default function VisitorsPage() {
 
       <div className="flex-1 px-2 pt-6">
         {isVisitorsLoading ? (
-          <div className="space-y-4 px-4">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className="flex items-center space-x-4">
-                <div className="w-14 h-14 bg-gray-50 rounded-full animate-pulse" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 w-1/3 bg-gray-50 rounded-full animate-pulse" />
-                  <div className="h-3 w-1/2 bg-gray-50 rounded-full animate-pulse" />
-                </div>
-              </div>
-            ))}
+          <div className="flex justify-center pt-20">
+            <Loader2 className="w-8 h-8 text-primary animate-spin" />
           </div>
-        ) : visitors.length > 0 ? (
+        ) : visitors && visitors.length > 0 ? (
           <div className="space-y-2">
             {visitors.map((visitor) => (
-              <VisitorItem key={visitor.visitorId} visitor={visitor} />
+              <VisitorItem key={visitor.id} visitor={visitor} />
             ))}
           </div>
         ) : (

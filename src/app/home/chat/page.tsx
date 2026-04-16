@@ -3,10 +3,9 @@
 
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageSquare, MessageCircle } from "lucide-react";
-import { useHomeData } from '../layout';
-import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
-import { doc } from 'firebase/firestore';
+import { MessageSquare, MessageCircle, Loader2 } from "lucide-react";
+import { useUser, useFirestore, useDoc, useMemoFirebase, useCollection } from '@/firebase';
+import { doc, collection, query, where, orderBy } from 'firebase/firestore';
 
 function ChatListItem({ chat }: { chat: any }) {
   const { user } = useUser();
@@ -61,21 +60,26 @@ function ChatListItem({ chat }: { chat: any }) {
 }
 
 export default function ChatListPage() {
-  const { chats, isChatsLoading } = useHomeData();
+  const { user } = useUser();
+  const db = useFirestore();
 
-  // Filter to only show chats that have at least one message sent
-  const filteredAndSortedChats = [...(chats || [])]
-    .filter(chat => !!chat.lastMessageSentAt)
-    .sort((a, b) => {
-      const dateA = a.lastMessageSentAt ? new Date(a.lastMessageSentAt).getTime() : 0;
-      const dateB = b.lastMessageSentAt ? new Date(b.lastMessageSentAt).getTime() : 0;
-      return dateB - dateA;
-    });
+  // Screen-specific listener
+  const chatsQuery = useMemoFirebase(() => {
+    if (!db || !user?.uid) return null;
+    return query(
+      collection(db, 'chatConversations'),
+      where('participantIds', 'array-contains', user.uid),
+      orderBy('updatedAt', 'desc')
+    );
+  }, [db, user?.uid]);
+  const { data: chats, isLoading: isChatsLoading } = useCollection(chatsQuery);
+
+  const filteredAndSortedChats = (chats || []).filter(chat => !!chat.lastMessageSentAt);
 
   return (
     <div className="flex flex-col min-h-screen bg-white pb-32">
       <header className="bg-primary safe-top px-6 pb-4 flex items-center justify-between sticky top-0 z-40">
-        <h1 className="text-3xl text-white font-black italic tracking-tight uppercase pt-2" style={{ fontFamily: 'Inter, sans-serif' }}>
+        <h1 className="text-3xl text-white font-black italic tracking-tight uppercase pt-2">
           Chats
         </h1>
         <button className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 active:scale-90 transition-all mt-2">
@@ -85,16 +89,8 @@ export default function ChatListPage() {
 
       <div className="flex-1 px-2 pt-4 bg-white">
         {isChatsLoading ? (
-          <div className="space-y-4 px-4">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="flex items-center space-x-4">
-                <div className="w-14 h-14 bg-gray-50 rounded-2xl animate-pulse" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 w-1/3 bg-gray-50 rounded-full animate-pulse" />
-                  <div className="h-3 w-1/2 bg-gray-50 rounded-full animate-pulse" />
-                </div>
-              </div>
-            ))}
+          <div className="flex flex-col items-center justify-center pt-20">
+             <Loader2 className="w-8 h-8 text-primary animate-spin" />
           </div>
         ) : filteredAndSortedChats.length > 0 ? (
           <div className="space-y-0">

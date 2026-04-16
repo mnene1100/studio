@@ -4,18 +4,12 @@
 import { useEffect, createContext, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { Navigation } from "@/components/navigation";
-import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase, updateDocumentNonBlocking } from '@/firebase';
-import { doc, collection, query, where, limit, orderBy } from 'firebase/firestore';
+import { useUser, useFirestore, useDoc, useMemoFirebase, updateDocumentNonBlocking } from '@/firebase';
+import { doc } from 'firebase/firestore';
 
 interface HomeDataContextType {
   profile: any;
-  chats: any[];
-  discoveryUsers: any[];
-  visitors: any[];
   isProfileLoading: boolean;
-  isChatsLoading: boolean;
-  isUsersLoading: boolean;
-  isVisitorsLoading: boolean;
 }
 
 const HomeDataContext = createContext<HomeDataContextType | undefined>(undefined);
@@ -37,7 +31,6 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
 
     const userRef = doc(db, 'userProfiles', user.uid);
     
-    // Heartbeat: update last online status every 1 minute
     const updatePresence = () => {
       updateDocumentNonBlocking(userRef, {
         lastOnlineAt: new Date().toISOString()
@@ -49,40 +42,12 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     return () => clearInterval(interval);
   }, [db, user?.uid]);
 
-  // Persistent Listeners
+  // Essential Global Listener: User Profile only
   const profileRef = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
     return doc(db, 'userProfiles', user.uid);
   }, [db, user?.uid]);
   const { data: profile, isLoading: isProfileLoading } = useDoc(profileRef);
-
-  const chatsQuery = useMemoFirebase(() => {
-    if (!db || !user?.uid) return null;
-    return query(
-      collection(db, 'chatConversations'),
-      where('participantIds', 'array-contains', user.uid)
-    );
-  }, [db, user?.uid]);
-  const { data: chats, isLoading: isChatsLoading } = useCollection(chatsQuery);
-
-  const discoveryQuery = useMemoFirebase(() => {
-    if (!db) return null;
-    return query(collection(db, 'userProfiles'), limit(20));
-  }, [db]);
-  const { data: allUsers, isLoading: isUsersLoading } = useCollection(discoveryQuery);
-
-  const discoveryUsers = allUsers?.filter(u => u.id !== user?.uid) || [];
-
-  // Visitors Listener for notification dot
-  const visitorsQuery = useMemoFirebase(() => {
-    if (!db || !user?.uid) return null;
-    return query(
-      collection(db, 'userProfiles', user.uid, 'visitors'),
-      orderBy('visitedAt', 'desc'),
-      limit(20)
-    );
-  }, [db, user?.uid]);
-  const { data: visitors, isLoading: isVisitorsLoading } = useCollection(visitorsQuery);
 
   useEffect(() => {
     if (isAuthLoading) return;
@@ -113,13 +78,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   return (
     <HomeDataContext.Provider value={{ 
       profile, 
-      chats: chats || [], 
-      discoveryUsers, 
-      visitors: visitors || [],
-      isProfileLoading,
-      isChatsLoading,
-      isUsersLoading,
-      isVisitorsLoading
+      isProfileLoading
     }}>
       <div className="min-h-screen bg-background relative">
         <main className="max-w-md mx-auto min-h-screen">
