@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
@@ -11,12 +12,13 @@ import {
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { differenceInYears } from 'date-fns';
+import Image from 'next/image';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/dropdown-menu";
 
 export default function UserProfilePage() {
   const { id } = useParams();
@@ -30,14 +32,14 @@ export default function UserProfilePage() {
 
   const { data: profile, isLoading } = useDoc(userRef);
 
-  const calculateAge = (dob: string) => {
-    if (!dob) return null;
+  const age = useMemo(() => {
+    if (!profile?.dob) return null;
     try {
-      return differenceInYears(new Date(), new Date(dob));
+      return differenceInYears(new Date(), new Date(profile.dob));
     } catch (e) {
       return null;
     }
-  };
+  }, [profile?.dob]);
 
   const copyId = () => {
     if (profile?.numericId) {
@@ -73,22 +75,24 @@ export default function UserProfilePage() {
 
   if (!profile) return null;
 
-  const age = calculateAge(profile.dob);
   const hasInformation = profile.createdAt || profile.country || profile.gender;
 
   return (
     <div className="flex flex-col min-h-screen bg-white relative pb-40">
       {/* Hero Image Section */}
-      <div className="relative w-full aspect-[4/5] overflow-hidden">
-        <img 
+      <div className="relative w-full aspect-[4/5] overflow-hidden bg-muted">
+        <Image 
           src={profile.profilePictureUrl || `https://picsum.photos/seed/${profile.id}/800/1200`}
-          alt={profile.displayName}
-          className="w-full h-full object-cover"
+          alt={profile.displayName || "User"}
+          fill
+          priority
+          className="object-cover"
+          sizes="(max-width: 768px) 100vw, 400px"
         />
         
         {/* Subtle Gradient Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent h-1/3" />
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-white via-white/20 to-transparent h-24" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent h-1/3" />
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-white via-white/10 to-transparent h-24" />
 
         {/* Header Overlay Buttons */}
         <div className="absolute top-12 left-6 right-6 flex items-center justify-between z-20">
@@ -96,7 +100,7 @@ export default function UserProfilePage() {
             variant="ghost" 
             size="icon" 
             onClick={() => router.back()}
-            className="w-12 h-12 bg-black/20 backdrop-blur-xl rounded-full text-white border border-white/10 hover:bg-black/40 active:scale-90 transition-all"
+            className="w-12 h-12 bg-black/20 backdrop-blur-md rounded-full text-white border border-white/10 hover:bg-black/40 active:scale-95 transition-all"
           >
             <ChevronLeft className="w-6 h-6" />
           </Button>
@@ -106,12 +110,12 @@ export default function UserProfilePage() {
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="w-12 h-12 bg-black/20 backdrop-blur-xl rounded-full text-white border border-white/10 hover:bg-black/40 active:scale-90 transition-all"
+                className="w-12 h-12 bg-black/20 backdrop-blur-md rounded-full text-white border border-white/10 hover:bg-black/40 active:scale-95 transition-all"
               >
                 <MoreHorizontal className="w-6 h-6" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white/95 backdrop-blur-2xl border-none rounded-[2rem] p-2 shadow-2xl min-w-[180px]">
+            <DropdownMenuContent className="bg-white/95 backdrop-blur-xl border-none rounded-[2rem] p-2 shadow-2xl min-w-[180px]">
               <DropdownMenuItem 
                 onClick={handleBlock}
                 className="flex items-center space-x-3 p-4 rounded-2xl focus:bg-red-50 text-red-500 cursor-pointer font-black uppercase tracking-widest text-[10px]"
@@ -185,7 +189,7 @@ export default function UserProfilePage() {
             
             <div className="grid grid-cols-1 gap-4">
               {profile.createdAt && (
-                <div className="bg-white border border-gray-100 rounded-[2.5rem] p-6 flex items-center shadow-sm hover:shadow-md transition-shadow">
+                <div className="bg-white border border-gray-100 rounded-[2.5rem] p-6 flex items-center shadow-sm">
                   <div className="w-14 h-14 bg-primary/5 rounded-2xl flex items-center justify-center mr-5">
                     <Calendar className="w-7 h-7 text-primary" />
                   </div>
@@ -203,9 +207,8 @@ export default function UserProfilePage() {
       </div>
 
       {/* FIXED BOTTOM ACTION BAR */}
-      <div className="fixed bottom-0 left-0 right-0 p-8 z-30 pointer-events-none">
-        <div className="max-w-md mx-auto pointer-events-auto">
-          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white via-white/80 to-transparent -z-10" />
+      <div className="fixed bottom-8 left-0 right-0 px-8 z-30">
+        <div className="max-w-md mx-auto">
           <Button 
             onClick={() => router.push(`/home/chat/${profile.id}`)}
             className="w-full h-16 bg-primary text-white hover:bg-primary/90 font-black rounded-full text-base shadow-2xl shadow-primary/40 transition-all active:scale-95 uppercase tracking-[0.2em] flex items-center justify-center space-x-3"

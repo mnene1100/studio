@@ -1,8 +1,8 @@
 
 {
-  "name": "NEXO",
+  "name": "NEXO Premium",
   "short_name": "NEXO",
-  "description": "Premium real-time communication platform.",
+  "description": "Seamless real-time communication platform.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
