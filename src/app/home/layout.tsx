@@ -37,8 +37,8 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   );
 
   return (
-    <div className="min-h-screen pb-16 bg-background">
-      <main className="max-w-md mx-auto min-h-screen">
+    <div className="min-h-screen bg-background relative">
+      <main className="max-w-md mx-auto min-h-screen pb-32">
         {children}
       </main>
       <Navigation />

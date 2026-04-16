@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MessageSquareMore, User, Compass } from 'lucide-react';
+import { Home, MessageCircle, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function Navigation() {
@@ -11,13 +11,13 @@ export function Navigation() {
   const navItems = [
     { 
       label: 'Home', 
-      icon: Compass, 
+      icon: Home, 
       href: '/home',
       activeColor: 'text-primary'
     },
     { 
       label: 'Chats', 
-      icon: MessageSquareMore, 
+      icon: MessageCircle, 
       href: '/home/chat',
       activeColor: 'text-primary'
     },
@@ -30,8 +30,8 @@ export function Navigation() {
   ];
 
   return (
-    <nav className="glass-nav px-6 pb-6 pt-3 h-20">
-      <div className="max-w-md mx-auto flex justify-around items-center h-full">
+    <nav className="glass-nav h-20 px-4">
+      <div className="flex justify-around items-center h-full">
         {navItems.map((item) => {
           const isActive = item.href === '/home' 
             ? pathname === '/home' 
@@ -42,13 +42,13 @@ export function Navigation() {
               key={item.href} 
               href={item.href}
               className={cn(
-                "relative flex flex-col items-center justify-center space-y-1 group transition-all duration-300 min-w-[64px]",
+                "relative flex flex-col items-center justify-center space-y-1 group transition-all duration-300 min-w-[70px]",
                 isActive ? item.activeColor : "text-muted-foreground/40"
               )}
             >
               <div className={cn(
-                "p-2 rounded-[1rem] transition-all duration-500 active:scale-90",
-                isActive && "bg-primary/10 shadow-[0_0_15px_rgba(20,184,166,0.1)]"
+                "p-2 rounded-[1.25rem] transition-all duration-500 active:scale-90",
+                isActive && "bg-primary/10 shadow-[0_0_20px_rgba(20,184,166,0.1)]"
               )}>
                 <item.icon 
                   className={cn(
@@ -64,7 +64,7 @@ export function Navigation() {
                 {item.label}
               </span>
               {isActive && (
-                <div className="absolute -top-1 w-1 h-1 bg-primary rounded-full animate-in fade-in zoom-in duration-500 shadow-[0_0_10px_#14b8a6]" />
+                <div className="absolute -top-1 w-1.5 h-1.5 bg-primary rounded-full animate-in fade-in zoom-in duration-500 shadow-[0_0_12px_#14b8a6]" />
               )}
             </Link>
           );
