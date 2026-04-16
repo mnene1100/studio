@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRouter } from 'next/navigation';
@@ -57,15 +58,20 @@ export default function WalletHistoryPage() {
 
   const transactionsQuery = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
+    // Simplified query to avoid permission/index errors during prototyping
     return query(
       collection(db, 'transactions'),
       where('userId', '==', user.uid),
-      orderBy('createdAt', 'desc'),
       limit(50)
     );
   }, [db, user?.uid]);
 
   const { data: transactions, isLoading } = useCollection(transactionsQuery);
+
+  // Client-side sorting as a fallback if Firestore composite index isn't ready
+  const sortedTransactions = [...(transactions || [])].sort((a, b) => {
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -92,9 +98,9 @@ export default function WalletHistoryPage() {
               <div key={i} className="h-24 bg-gray-50 rounded-[2rem] animate-pulse" />
             ))}
           </div>
-        ) : transactions && transactions.length > 0 ? (
+        ) : sortedTransactions.length > 0 ? (
           <div className="space-y-4">
-            {transactions.map((item) => (
+            {sortedTransactions.map((item) => (
               <TransactionItem key={item.id} item={item} />
             ))}
           </div>
