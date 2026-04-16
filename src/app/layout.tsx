@@ -33,7 +33,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="theme-color" content="#28B4A4" />
       </head>
-      <body className="font-body antialiased bg-background text-foreground min-h-screen overflow-x-hidden pb-safe">
+      <body className="font-body antialiased bg-background text-foreground min-h-screen overflow-x-hidden">
         <ThemeProvider>
           <FirebaseClientProvider>
             {children}

@@ -154,7 +154,7 @@ export default function ChatDetailPage() {
   const isInputEmpty = !input.trim();
 
   return (
-    <div className="flex flex-col h-screen bg-white overflow-hidden">
+    <div className="flex flex-col h-[100dvh] bg-white overflow-hidden overscroll-none">
       {/* Seamless Fixed Header */}
       <header className="bg-primary safe-top sticky top-0 z-50 flex-shrink-0">
         <div className="h-16 px-4 flex items-center justify-between">
@@ -207,7 +207,7 @@ export default function ChatDetailPage() {
       </header>
 
       {/* Scrollable Messages Area */}
-      <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col space-y-4 bg-white" ref={scrollRef}>
+      <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col space-y-4 bg-white overscroll-contain" ref={scrollRef}>
         {(messages || []).map((msg: any, i: number) => {
           const isMe = msg.senderId === currentUser?.uid;
           return (
@@ -224,7 +224,7 @@ export default function ChatDetailPage() {
       </div>
 
       {/* Fixed Bottom Input Area */}
-      <div className="px-6 py-4 bg-white border-t border-gray-100 flex flex-col space-y-3 z-10 pb-safe flex-shrink-0">
+      <div className="px-6 py-4 bg-white border-t border-gray-100 flex flex-col space-y-3 z-10 pb-[env(safe-area-inset-bottom,16px)] flex-shrink-0">
         {suggestions.length > 0 && (
           <div className="flex space-x-2 overflow-x-auto pb-2 -mx-2 px-2">
             {suggestions.map((s, i) => (
