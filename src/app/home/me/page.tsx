@@ -57,14 +57,14 @@ export default function MePage() {
         </div>
         
         <h2 className="text-3xl font-black text-white mb-1 tracking-tight drop-shadow-sm">{displayName}</h2>
-        <p className="text-[10px] font-black text-white/70 uppercase tracking-[0.2em] mb-8">
+        <p className="text-[10px] font-black text-white/70 uppercase tracking-[0.2em] mb-6">
           {profile.gender} • Verified Official Profile
         </p>
 
         {/* ID Pill */}
         <div 
           onClick={copyId}
-          className="flex items-center space-x-2 bg-white/20 backdrop-blur-md px-6 py-3 rounded-full border border-white/10 cursor-pointer active:scale-95 transition-all group z-30 shadow-lg mb-4"
+          className="flex items-center space-x-2 bg-white/20 backdrop-blur-md px-6 py-3 rounded-full border border-white/10 cursor-pointer active:scale-95 transition-all group z-30 shadow-lg mb-2"
         >
           <span className="text-xs font-black text-white tracking-widest uppercase">ID: {profile.numericId}</span>
           <Copy className="w-3.5 h-3.5 text-white/60 group-hover:text-white transition-colors" />
@@ -80,7 +80,7 @@ export default function MePage() {
             <h3 className="text-3xl font-black text-gray-900 mb-6 tracking-tight">{profile.balance ?? 0}</h3>
             <button 
               onClick={() => router.push('/home/wallet')}
-              className="w-full py-3 bg-primary text-white rounded-full text-xs font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-primary/20"
+              className="w-full py-2 bg-primary text-white rounded-full text-xs font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-primary/20"
             >
               Recharge
             </button>
@@ -92,7 +92,7 @@ export default function MePage() {
             </div>
             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Earnings</p>
             <h3 className="text-3xl font-black text-gray-900 mb-6 tracking-tight">{profile.earnings ?? 0}</h3>
-            <button className="w-full py-3 bg-black text-white rounded-full text-xs font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg">
+            <button className="w-full py-2 bg-black text-white rounded-full text-xs font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg">
               Income
             </button>
           </div>
