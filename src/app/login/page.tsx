@@ -124,11 +124,11 @@ export default function LoginPage() {
       </video>
 
       {/* Dark Overlay for Readability */}
-      <div className="absolute inset-0 bg-black/50 z-1" />
+      <div className="absolute inset-0 bg-black/60 z-[1]" />
 
       <div className="w-full max-w-sm space-y-16 text-center z-10">
         <div className="space-y-6 animate-in fade-in zoom-in duration-700">
-          <div className="mx-auto w-24 h-24 bg-primary rounded-[2rem] flex items-center justify-center shadow-2xl shadow-primary/30 rotate-12 transition-transform hover:rotate-0 duration-500">
+          <div className="mx-auto w-24 h-24 bg-primary rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-primary/30 rotate-12 transition-transform hover:rotate-0 duration-500">
             <Zap className="text-white w-12 h-12" />
           </div>
           <div className="space-y-2">
@@ -232,8 +232,13 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="absolute bottom-12 text-[9px] text-white/20 font-black tracking-[0.5em] uppercase z-10">
-        Secure Communication Ecosystem
+      <div className="absolute bottom-10 flex flex-col items-center space-y-2 z-10 px-6 text-center">
+        <p className="text-[8px] font-black text-white/30 uppercase tracking-[0.1em] leading-relaxed max-w-xs">
+          By signing up, you agree to our <span className="text-white/50 underline">Terms</span> and <span className="text-white/50 underline">Privacy Policy</span>.
+        </p>
+        <div className="text-[9px] text-white/10 font-black tracking-[0.4em] uppercase">
+          Secure Ecosystem
+        </div>
       </div>
     </div>
   );
