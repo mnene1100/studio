@@ -1,12 +1,12 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Zap, Mail, ArrowRight, Lock, UserPlus, Loader2 } from "lucide-react";
-import { useAuth } from '@/firebase';
+import { useAuth, useUser } from '@/firebase';
 import { signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { toast } from "@/hooks/use-toast";
 
@@ -17,6 +17,14 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const auth = useAuth();
+  const { user } = useUser();
+
+  // If user is already authenticated, send them to the entry check
+  useEffect(() => {
+    if (user) {
+      router.push('/');
+    }
+  }, [user, router]);
 
   const handleFastLogin = async () => {
     setIsLoading(true);
@@ -48,7 +56,7 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // Layout logic handles redirection to / or /onboarding
+      router.push('/');
     } catch (error: any) {
       let message = "Invalid email or password.";
       if (error.code === 'auth/user-not-found') message = "No account found with this email.";
@@ -87,6 +95,7 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await createUserWithEmailAndPassword(auth, email, password);
+      router.push('/');
     } catch (error: any) {
       let message = "Could not create account.";
       if (error.code === 'auth/email-already-in-use') {

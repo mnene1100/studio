@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { User, Camera, ArrowRight, Calendar } from "lucide-react";
 import { useAuth, useFirestore, useUser } from '@/firebase';
-import { doc, serverTimestamp } from 'firebase/firestore';
+import { doc } from 'firebase/firestore';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { generateNexoId } from "@/app/lib/store";
 
@@ -61,14 +61,18 @@ export default function OnboardingPage() {
       profilePictureUrl: `https://picsum.photos/seed/${user.uid}/200/200`,
       createdAt: new Date().toISOString(),
       lastOnlineAt: new Date().toISOString(),
+      statusMessage: "Hey there! I'm using NEXO.",
     };
 
     const userRef = doc(db, 'userProfiles', user.uid);
+    
+    // Save to Firestore
     setDocumentNonBlocking(userRef, profileData, { merge: true });
     
-    // Save to local storage as a quick cache/backup for the UI
+    // Save to local storage for instant UI updates
     localStorage.setItem('nexo_profile', JSON.stringify(profileData));
     
+    // Navigate home
     router.push('/home/chat');
   };
 
@@ -102,7 +106,7 @@ export default function OnboardingPage() {
                 <Camera className="w-4 h-4 text-accent-foreground" />
               </div>
             </div>
-            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Avatar Set</p>
+            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Avatar Generated</p>
           </div>
 
           <div className="space-y-4">
@@ -120,7 +124,7 @@ export default function OnboardingPage() {
             <div className="space-y-2">
               <Label htmlFor="dob" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Date of Birth</Label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                 <Input 
                   id="dob" 
                   type="date"
