@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -40,6 +41,7 @@ export default function WalletPage() {
     setIsLoading(true);
     try {
       const coinAmount = selectedPackage.coins.replace(',', '');
+      // Callback URL includes the coins to credit so the callback page knows the package
       const callbackUrl = `${window.location.origin}/home/wallet/callback?coins=${coinAmount}`;
       
       const result = await createPesapalOrder({
@@ -113,6 +115,8 @@ export default function WalletPage() {
               <span className="text-[8px] font-black text-primary uppercase tracking-widest italic">Coins</span>
             </div>
           </div>
+          {/* Decorative elements to make it feel premium */}
+          <div className="absolute top-0 right-0 w-24 h-24 bg-primary/20 blur-3xl rounded-full -mr-12 -mt-12" />
         </div>
 
         {/* Region Selector - Extra Compact */}
@@ -139,7 +143,7 @@ export default function WalletPage() {
             <h3 className="text-[7px] font-black text-muted-foreground uppercase tracking-widest">Select Package</h3>
             <div className="flex items-center space-x-1">
                <Zap className="w-2 h-2 text-primary fill-primary" />
-               <span className="text-[6px] font-black text-primary uppercase tracking-widest">Instant</span>
+               <span className="text-[6px] font-black text-primary uppercase tracking-widest">Instant STK</span>
             </div>
           </div>
           

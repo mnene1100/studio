@@ -1,8 +1,9 @@
+
 'use server';
 
 /**
  * @fileOverview Server Actions for PesaPal V3 Integration.
- * Updated for Production (Live) environment.
+ * Updated for Production (Live) environment with background IPN support.
  */
 
 interface PesapalOrderInput {
@@ -46,7 +47,10 @@ export async function createPesapalOrder(input: PesapalOrderInput) {
 
     const token = authData.token;
 
-    // 2. Register IPN
+    // 2. Register IPN (Background confirmation URL)
+    // The IPN URL should be your app's base URL + /api/pesapal/ipn
+    const ipnUrl = new URL(input.callbackUrl).origin + '/api/pesapal/ipn';
+    
     const ipnResponse = await fetch(`${baseUrl}/api/URLSetup/RegisterIPN`, {
       method: 'POST',
       headers: {
@@ -55,7 +59,7 @@ export async function createPesapalOrder(input: PesapalOrderInput) {
         'Accept': 'application/json',
       },
       body: JSON.stringify({
-        url: `${input.callbackUrl.replace('/callback', '/ipn')}`,
+        url: ipnUrl,
         ipn_notification_type: 'GET',
       }),
     });
@@ -81,7 +85,7 @@ export async function createPesapalOrder(input: PesapalOrderInput) {
         notification_id: ipnId,
         billing_address: {
           email_address: input.email,
-          phone_number: input.phoneNumber || "", // Removed hardcoded fallback so PesaPal prompts user
+          phone_number: input.phoneNumber || "", // Left blank so PesaPal prompts the user
           country_code: 'KE',
           first_name: input.firstName,
           last_name: input.lastName,
@@ -92,7 +96,11 @@ export async function createPesapalOrder(input: PesapalOrderInput) {
     const orderData = await orderResponse.json();
     
     if (orderData.redirect_url) {
-      return { redirectUrl: orderData.redirect_url, orderTrackingId: orderData.order_tracking_id };
+      return { 
+        redirectUrl: orderData.redirect_url, 
+        orderTrackingId: orderData.order_tracking_id,
+        merchantReference: merchantReference
+      };
     } else {
       console.error('PesaPal Order Error:', orderData);
       throw new Error(orderData.message || 'Failed to initiate PesaPal transaction.');

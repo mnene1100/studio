@@ -86,6 +86,24 @@
         "createdAt"
       ]
     },
+    "Transaction": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Transaction",
+      "type": "object",
+      "description": "Represents a financial transaction for a user.",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "trackingId": { "type": "string" },
+        "merchantRef": { "type": "string" },
+        "amount": { "type": "number" },
+        "coins": { "type": "number" },
+        "status": { "type": "string" },
+        "type": { "type": "string", "enum": ["recharge", "spent"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "trackingId", "amount", "coins", "status", "type", "createdAt"]
+    },
     "ProfileVisitor": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "ProfileVisitor",
@@ -174,6 +192,16 @@
             "$ref": "#/backend/entities/UserProfile"
           },
           "description": "Stores individual user profile information."
+        }
+      },
+      {
+        "path": "/transactions/{transactionId}",
+        "definition": {
+          "entityName": "Transaction",
+          "schema": {
+            "$ref": "#/backend/entities/Transaction"
+          },
+          "description": "Stores financial transactions."
         }
       },
       {

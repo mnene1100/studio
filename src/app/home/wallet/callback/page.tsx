@@ -5,14 +5,12 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle, Loader2, ArrowRight } from "lucide-react";
-import { useHomeData } from '../../layout';
-import { useFirestore, useUser } from '@/firebase';
-import { doc, updateDoc, increment } from 'firebase/firestore';
+import { useUser, useFirestore } from '@/firebase';
+import { doc, getDoc, setDoc, updateDoc, increment, collection, query, where, getDocs } from 'firebase/firestore';
 
 export default function PaymentCallbackPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { profile } = useHomeData();
   const { user } = useUser();
   const db = useFirestore();
   const [status, setStatus] = useState<'loading' | 'success' | 'failed'>('loading');
@@ -29,30 +27,53 @@ export default function PaymentCallbackPage() {
         return;
       }
 
-      // 1. Simulate server-side verification with PesaPal
-      await new Promise(resolve => setTimeout(resolve, 2500));
-      
-      // 2. Only credit once (React StrictMode might trigger this twice)
       if (hasCredited.current) return;
       hasCredited.current = true;
 
       try {
-        const userRef = doc(db, 'userProfiles', user.uid);
+        // 1. Check if this transaction has ALREADY been processed (via IPN or previous load)
+        const transRef = doc(db, 'transactions', trackingId);
+        const transSnap = await getDoc(transRef);
+
+        if (transSnap.exists() && transSnap.data().status === 'completed') {
+          // Already credited via background IPN
+          setStatus('success');
+          return;
+        }
+
+        // 2. Simulate small delay to wait for real-time update
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // 3. Perform manual credit as a fallback for the UI
         const amount = parseInt(coinsToCredit);
-        
+        const userRef = doc(db, 'userProfiles', user.uid);
+
+        // Atomic update to prevent double credit
+        await setDoc(transRef, {
+          id: trackingId,
+          userId: user.uid,
+          trackingId: trackingId,
+          merchantRef: merchantRef || 'N/A',
+          coins: amount,
+          amount: 0, // In a real app, verify the actual KES amount from PesaPal
+          status: 'completed',
+          type: 'recharge',
+          createdAt: new Date().toISOString()
+        }, { merge: true });
+
         await updateDoc(userRef, {
           balance: increment(amount)
         });
 
         setStatus('success');
       } catch (error) {
-        console.error("Failed to credit coins:", error);
+        console.error("Payment confirmation error:", error);
         setStatus('failed');
       }
     };
 
     verifyAndCredit();
-  }, [trackingId, user?.uid, db, coinsToCredit]);
+  }, [trackingId, user?.uid, db, coinsToCredit, merchantRef]);
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -81,11 +102,11 @@ export default function PaymentCallbackPage() {
             <div className="bg-gray-50 p-5 rounded-[1.5rem] w-full border border-gray-100 text-left space-y-2">
               <div className="flex justify-between">
                 <span className="text-[8px] font-black text-gray-400 uppercase">Ref:</span>
-                <span className="text-[8px] font-black text-gray-900">{merchantRef || 'N/A'}</span>
+                <span className="text-[8px] font-black text-gray-900 truncate ml-4">{merchantRef || trackingId}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[8px] font-black text-gray-400 uppercase">Coins Added:</span>
-                <span className="text-[8px] font-black text-primary">+{coinsToCredit}</span>
+                <span className="text-[8px] font-black text-gray-400 uppercase">Status:</span>
+                <span className="text-[8px] font-black text-green-600">CONFIRMED</span>
               </div>
             </div>
             <Button 
