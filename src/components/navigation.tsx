@@ -9,6 +9,12 @@ import { cn } from '@/lib/utils';
 export function Navigation() {
   const pathname = usePathname();
 
+  // Define which paths should show the navigation bar
+  const mainTabs = ['/home', '/home/chat', '/home/me'];
+  const shouldShow = mainTabs.includes(pathname);
+
+  if (!shouldShow) return null;
+
   const navItems = [
     { 
       label: 'Home', 
@@ -30,9 +36,7 @@ export function Navigation() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 h-[4.75rem] w-full bg-white border-t border-gray-100 flex items-center justify-around px-6 shadow-[0_-4px_30px_rgba(0,0,0,0.08)] pb-safe">
       {navItems.map((item) => {
-        const isActive = item.href === '/home' 
-          ? pathname === '/home' 
-          : pathname.startsWith(item.href);
+        const isActive = pathname === item.href;
           
         return (
           <Link 

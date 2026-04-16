@@ -8,7 +8,6 @@ export const metadata: Metadata = {
   title: 'NEXO | Premium Communication',
   description: 'Seamless real-time video, voice, and text messaging platform.',
   manifest: '/manifest.json',
-  themeColor: '#28B4A4',
   viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover',
   appleWebApp: {
     capable: true,
@@ -32,7 +31,6 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="https://picsum.photos/seed/nexo-logo/180/180" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="theme-color" content="#28B4A4" />
       </head>
       <body className="font-body antialiased bg-white text-foreground min-h-screen overflow-x-hidden pb-safe">

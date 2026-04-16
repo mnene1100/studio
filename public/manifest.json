@@ -2,7 +2,7 @@
 {
   "name": "NEXO Premium",
   "short_name": "NEXO",
-  "description": "Seamless real-time video, voice, and text messaging platform.",
+  "description": "Premium real-time communication ecosystem.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -11,12 +11,14 @@
     {
       "src": "https://picsum.photos/seed/nexo-logo/192/192",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "https://picsum.photos/seed/nexo-logo/512/512",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
