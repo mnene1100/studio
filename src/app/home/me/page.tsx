@@ -34,7 +34,7 @@ export default function MePage() {
   };
 
   if (isLoading) return (
-    <div className="flex items-center justify-center h-screen bg-background">
+    <div className="flex items-center justify-center h-screen bg-black">
       <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
     </div>
   );
@@ -45,7 +45,7 @@ export default function MePage() {
   const initials = displayName.length > 0 ? displayName[0].toUpperCase() : '?';
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#F8F9FA] pb-32">
+    <div className="flex flex-col min-h-screen bg-black pb-32">
       {/* Top Teal Section - Straight & Shorter */}
       <div className="bg-primary pt-10 pb-12 px-6 relative rounded-none shadow-lg">
         {/* ID Pill at the very top */}
@@ -87,25 +87,25 @@ export default function MePage() {
       {/* Floating Cards Section */}
       <div className="px-6 -mt-6 grid grid-cols-2 gap-4">
         {/* Balance Card */}
-        <div className="bg-white rounded-[2rem] p-5 shadow-[0_15px_35px_rgba(0,0,0,0.05)] flex flex-col items-center text-center">
-          <div className="p-2.5 bg-primary/5 rounded-xl mb-3">
+        <div className="bg-[#121212] rounded-[2rem] p-5 shadow-2xl flex flex-col items-center text-center border border-white/5">
+          <div className="p-2.5 bg-primary/10 rounded-xl mb-3">
             <Coins className="w-5 h-5 text-primary" />
           </div>
-          <p className="text-[9px] font-black text-muted-foreground/50 uppercase tracking-widest mb-1">Balance</p>
-          <h3 className="text-2xl font-black text-foreground mb-3">500</h3>
+          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Balance</p>
+          <h3 className="text-2xl font-black text-white mb-3">500</h3>
           <button className="w-full py-3 bg-primary text-white text-[9px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-primary/20 active:scale-95 transition-all">
             Recharge
           </button>
         </div>
 
         {/* Earnings Card */}
-        <div className="bg-white rounded-[2rem] p-5 shadow-[0_15px_35px_rgba(0,0,0,0.05)] flex flex-col items-center text-center">
-          <div className="p-2.5 bg-blue-500/5 rounded-xl mb-3">
+        <div className="bg-[#121212] rounded-[2rem] p-5 shadow-2xl flex flex-col items-center text-center border border-white/5">
+          <div className="p-2.5 bg-blue-500/10 rounded-xl mb-3">
             <Diamond className="w-5 h-5 text-blue-500" />
           </div>
-          <p className="text-[9px] font-black text-muted-foreground/50 uppercase tracking-widest mb-1">Earnings</p>
-          <h3 className="text-2xl font-black text-foreground mb-3">0</h3>
-          <button className="w-full py-3 bg-[#1A1A1A] text-white text-[9px] font-black uppercase tracking-widest rounded-full shadow-lg active:scale-95 transition-all">
+          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Earnings</p>
+          <h3 className="text-2xl font-black text-white mb-3">0</h3>
+          <button className="w-full py-3 bg-white text-black text-[9px] font-black uppercase tracking-widest rounded-full shadow-lg active:scale-95 transition-all">
             Income
           </button>
         </div>
@@ -114,8 +114,8 @@ export default function MePage() {
       {/* Account & Safety Section */}
       <div className="px-6 mt-8 space-y-5">
         <div className="flex items-center space-x-4">
-          <h3 className="text-[11px] font-black text-muted-foreground/40 uppercase tracking-[0.1em] whitespace-nowrap">Account & Safety</h3>
-          <div className="h-[1px] w-full bg-muted-foreground/10" />
+          <h3 className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.1em] whitespace-nowrap">Account & Safety</h3>
+          <div className="h-[1px] w-full bg-white/5" />
         </div>
 
         <div className="space-y-3">
@@ -129,39 +129,39 @@ export default function MePage() {
           </button>
 
           {/* Customer Support */}
-          <button className="w-full flex items-center p-4 bg-white rounded-[1.75rem] shadow-[0_8px_30px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-all group">
+          <button className="w-full flex items-center p-4 bg-[#121212] rounded-[1.75rem] border border-white/5 active:scale-[0.98] transition-all group">
             <div className="p-2.5 bg-primary/10 rounded-xl mr-4">
               <Headset className="w-5 h-5 text-primary" />
             </div>
-            <span className="flex-1 text-left font-black text-foreground text-base">Customer support</span>
-            <ChevronRight className="w-5 h-5 text-muted-foreground/20 group-active:translate-x-1 transition-transform" />
+            <span className="flex-1 text-left font-black text-white text-base">Customer support</span>
+            <ChevronRight className="w-5 h-5 text-white/10 group-active:translate-x-1 transition-transform" />
           </button>
 
           {/* Games Center */}
-          <button className="w-full flex items-center p-4 bg-white rounded-[1.75rem] shadow-[0_8px_30px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-all group">
+          <button className="w-full flex items-center p-4 bg-[#121212] rounded-[1.75rem] border border-white/5 active:scale-[0.98] transition-all group">
             <div className="p-2.5 bg-orange-500/10 rounded-xl mr-4">
               <Gamepad2 className="w-5 h-5 text-orange-500" />
             </div>
-            <span className="flex-1 text-left font-black text-foreground text-base">Games center</span>
-            <ChevronRight className="w-5 h-5 text-muted-foreground/20 group-active:translate-x-1 transition-transform" />
+            <span className="flex-1 text-left font-black text-white text-base">Games center</span>
+            <ChevronRight className="w-5 h-5 text-white/10 group-active:translate-x-1 transition-transform" />
           </button>
 
           {/* Settings */}
           <button 
             onClick={() => router.push('/home/me/settings')}
-            className="w-full flex items-center p-4 bg-white rounded-[1.75rem] shadow-[0_8px_30px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-all group"
+            className="w-full flex items-center p-4 bg-[#121212] rounded-[1.75rem] border border-white/5 active:scale-[0.98] transition-all group"
           >
-            <div className="p-2.5 bg-muted rounded-xl mr-4">
+            <div className="p-2.5 bg-white/5 rounded-xl mr-4">
               <Settings className="w-5 h-5 text-muted-foreground" />
             </div>
-            <span className="flex-1 text-left font-black text-foreground text-base">Settings</span>
-            <ChevronRight className="w-5 h-5 text-muted-foreground/20 group-active:translate-x-1 transition-transform" />
+            <span className="flex-1 text-left font-black text-white text-base">Settings</span>
+            <ChevronRight className="w-5 h-5 text-white/10 group-active:translate-x-1 transition-transform" />
           </button>
         </div>
       </div>
 
-      <div className="mt-12 text-center opacity-30 pb-10">
-        <p className="text-[9px] font-black uppercase tracking-[0.4em]">Nexo Premium v1.0.4</p>
+      <div className="mt-12 text-center opacity-20 pb-10">
+        <p className="text-[9px] font-black text-white uppercase tracking-[0.4em]">Nexo Premium v1.0.4</p>
       </div>
     </div>
   );
