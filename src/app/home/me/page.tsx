@@ -25,7 +25,6 @@ export default function MePage() {
 
   const copyId = () => {
     if (profile?.numericId) {
-      // In a real environment, navigator.clipboard might require a secure context
       try {
         navigator.clipboard.writeText(profile.numericId);
         toast({
@@ -54,15 +53,37 @@ export default function MePage() {
       {/* Top Teal Section */}
       <div className="bg-primary pt-12 pb-8 px-6 relative flex flex-col items-center shadow-lg">
         {/* Visitors Button (Top Right) */}
-        <button className="absolute top-6 right-6 flex flex-col items-center space-y-1 group active:scale-95 transition-all">
+        <button className="absolute top-6 right-6 flex flex-col items-center space-y-1 group active:scale-95 transition-all z-10">
           <div className="p-2 bg-white/20 backdrop-blur-md rounded-full border border-white/30">
             <Eye className="w-4 h-4 text-white" />
           </div>
           <span className="text-[9px] font-black text-white/70 uppercase tracking-widest">Visitors</span>
         </button>
 
-        {/* Recharge & Income Cards at the Top */}
-        <div className="grid grid-cols-2 gap-4 w-full mb-8 mt-4">
+        {/* Profile Avatar - NOW AT THE TOP */}
+        <div className="relative mb-4 mt-4">
+          <Avatar className="w-24 h-24 border-4 border-white/20 ring-4 ring-black/5 shadow-2xl">
+            <AvatarImage src={profile.profilePictureUrl} />
+            <AvatarFallback className="bg-white/10 text-white text-3xl font-black">{initials}</AvatarFallback>
+          </Avatar>
+          <button className="absolute bottom-0 right-0 p-2 bg-[#1A1A1A] rounded-full border-2 border-primary shadow-xl active:scale-90 transition-transform">
+            <Pencil className="w-3 h-3 text-white" />
+          </button>
+        </div>
+        
+        <h2 className="text-xl font-black text-white mb-2 tracking-tight">{displayName}</h2>
+
+        {/* ID Pill */}
+        <div 
+          onClick={copyId}
+          className="flex items-center space-x-2 bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 cursor-pointer active:scale-95 transition-all mb-8"
+        >
+          <span className="text-[10px] font-black text-white uppercase tracking-wider">ID: {profile.numericId}</span>
+          <Copy className="w-3 h-3 text-white/70" />
+        </div>
+
+        {/* Recharge & Income Cards - NOW BELOW PROFILE INFO */}
+        <div className="grid grid-cols-2 gap-4 w-full">
           <div className="bg-white/10 backdrop-blur-md rounded-[2rem] p-4 flex flex-col items-center text-center border border-white/20 shadow-sm active:scale-95 transition-all cursor-pointer h-24 justify-center">
             <div className="p-2 bg-white/20 rounded-xl mb-1">
               <Coins className="w-4 h-4 text-white" />
@@ -78,28 +99,6 @@ export default function MePage() {
             <p className="text-[8px] font-black text-white/70 uppercase tracking-widest mb-0.5">Income</p>
             <h3 className="text-xl font-black text-white">0</h3>
           </div>
-        </div>
-
-        {/* Profile Avatar */}
-        <div className="relative mb-4">
-          <Avatar className="w-24 h-24 border-4 border-white/20 ring-4 ring-black/5 shadow-2xl">
-            <AvatarImage src={profile.profilePictureUrl} />
-            <AvatarFallback className="bg-white/10 text-white text-3xl font-black">{initials}</AvatarFallback>
-          </Avatar>
-          <button className="absolute bottom-0 right-0 p-2 bg-[#1A1A1A] rounded-full border-2 border-primary shadow-xl active:scale-90 transition-transform">
-            <Pencil className="w-3 h-3 text-white" />
-          </button>
-        </div>
-        
-        <h2 className="text-xl font-black text-white mb-2 tracking-tight">{displayName}</h2>
-
-        {/* ID Pill */}
-        <div 
-          onClick={copyId}
-          className="flex items-center space-x-2 bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 cursor-pointer active:scale-95 transition-all mb-4"
-        >
-          <span className="text-[10px] font-black text-white uppercase tracking-wider">ID: {profile.numericId}</span>
-          <Copy className="w-3 h-3 text-white/70" />
         </div>
       </div>
 
