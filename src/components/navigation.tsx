@@ -14,21 +14,24 @@ export function Navigation() {
       label: 'Home', 
       icon: Home, 
       href: '/home',
+      activeColor: "text-red-500"
     },
     { 
       label: 'Chats', 
       icon: MessageCircle, 
       href: '/home/chat',
+      activeColor: "text-blue-400"
     },
     { 
       label: 'You', 
       icon: User, 
       href: '/home/me',
+      activeColor: "text-pink-300"
     },
   ];
 
   return (
-    <nav className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 w-[70%] max-w-[240px] h-11 bg-black/80 backdrop-blur-2xl border border-white/5 rounded-full shadow-2xl flex items-center justify-around px-2">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 h-24 bg-white border-t border-gray-100 flex items-center justify-around px-6">
       {navItems.map((item) => {
         const isActive = item.href === '/home' 
           ? pathname === '/home' 
@@ -38,17 +41,25 @@ export function Navigation() {
           <Link 
             key={item.href} 
             href={item.href}
-            className={cn(
-              "flex flex-col items-center justify-center transition-all duration-300",
-              isActive ? "text-primary" : "text-white/20"
-            )}
+            className="flex flex-col items-center justify-center space-y-1 group"
           >
-            <item.icon 
-              className={cn(
-                "w-5 h-5 transition-transform", 
-                isActive ? "stroke-[2.5px] scale-110" : "stroke-[2px]"
-              )} 
-            />
+            <div className={cn(
+              "p-2 rounded-2xl transition-all duration-300",
+              isActive ? "scale-110" : "opacity-40"
+            )}>
+              <item.icon 
+                className={cn(
+                  "w-7 h-7", 
+                  isActive ? "text-primary fill-primary/20" : "text-gray-400"
+                )} 
+              />
+            </div>
+            <span className={cn(
+              "text-[10px] font-black uppercase tracking-widest transition-colors",
+              isActive ? "text-primary" : "text-gray-300"
+            )}>
+              {item.label}
+            </span>
           </Link>
         );
       })}

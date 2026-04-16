@@ -1,10 +1,11 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 190 60% 98%;
+    --background: 0 0% 100%;
     --foreground: 210 8% 6%;
     --card: 0 0% 100%;
     --card-foreground: 210 8% 6%;
@@ -73,10 +74,6 @@
   @apply sticky top-0 z-30 bg-primary/95 backdrop-blur-2xl border-b border-white/5 shadow-xl;
 }
 
-.glass-nav {
-  @apply fixed bottom-6 left-4 right-4 z-50 bg-black/80 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] shadow-2xl max-w-md mx-auto;
-}
-
 .premium-gradient {
   background: radial-gradient(circle at top left, hsl(172, 66%, 15%), transparent),
               radial-gradient(circle at bottom right, hsl(172, 66%, 10%), transparent);
@@ -92,8 +89,4 @@
 
 .chat-bubble-contact {
   @apply bg-muted/50 text-foreground rounded-[1.75rem] rounded-tl-none px-5 py-3 max-w-[85%] border border-white/5 shadow-sm;
-}
-
-.teal-glow {
-  box-shadow: 0 0 20px -5px hsl(172, 66%, 45%);
 }
