@@ -1,18 +1,133 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
     /**
-     * NEXO APPLICATION SECURITY RULES (OPEN PROTOTYPING MODE)
-     * 
-     * Allows all read/write access to all collections for development.
+     * NEXO APPLICATION SECURITY RULES
+     *
+     * CORE PHILOSOPHY
+     * This ruleset implements a strict user-ownership and shared-membership model. It prioritizes 
+     * Authorization Independence by using denormalized data (maps) to perform security checks 
+     * without costly cross-document lookups (get() calls).
+     *
+     * DATA STRUCTURE
+     * 1. Private User Space: /users/{userId} contains profiles and AI recommendations.
+     * 2. Collaborative Space: /chatRooms and /calls are top-level collections representing shared 
+     *    interactions. Access is controlled via internal membership/participant maps.
+     * 3. Message Sub-collections: /chatRooms/{chatRoomId}/messages/{messageId} denormalize 
+     *    the room's member list for direct authorization.
+     *
+     * KEY SECURITY DECISIONS
+     * - Prototyping Mode: Logic focuses on "who" can access data (authorization) rather than 
+     *   validating the exact "shape" of the data (schema).
+     * - Map-Based Access: Shared documents use Map structures (e.g., { "uid": true }) for 
+     *   O(1) membership verification.
+     * - Relational Integrity: Enforces that user IDs in the data match the auth context 
+     *   and the document paths.
+     * - Immutability: Critical fields like 'id', 'userId', and 'senderId' are protected 
+     *   from modification after creation.
      */
-    match /{document=**} {
-      allow read, write: if true;
+
+    // --- GLOBAL HELPER FUNCTIONS ---
+
+    /** Checks if the request is from an authenticated user. */
+    function isSignedIn() {
+      return request.auth != null;
     }
-    
-    // Explicitly allow transactions collection for the list method to prevent permission errors
-    match /transactions/{transactionId} {
-      allow read, write, list: if true;
+
+    /** Checks if the authenticated user's UID matches the provided ID. */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /** Combines ownership check with document existence for updates and deletes. */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /** Checks if the authenticated user is present in a denormalized membership map. */
+    function isMember(membersMap) {
+      return isSignedIn() && membersMap[request.auth.uid] == true;
+    }
+
+    /** Combines membership check with document existence for updates and deletes. */
+    function isExistingMember(membersMap) {
+      return isMember(membersMap) && resource != null;
+    }
+
+    // --- COLLECTION RULES ---
+
+    /**
+     * @description Rules for individual user profiles.
+     * @path /users/{userId}
+     * @allow Authenticated user (get), (create: if data.id matches path), (update: if id is immutable).
+     * @deny Unauthenticated users, or users trying to access/modify profiles other than their own.
+     * @principle Restricts access to a user's own data tree and enforces internal ID consistency.
+     */
+    match /users/{userId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+
+      /**
+       * @description Rules for AI-generated recommendations specific to a user.
+       * @path /users/{userId}/aiRecommendations/{recommendationId}
+       * @allow Owner of the parent user profile (get, list, create, update, delete).
+       * @deny Any user other than the path-specified owner.
+       * @principle Enforces strict ownership via path-based authorization.
+       */
+      match /aiRecommendations/{recommendationId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+      }
+    }
+
+    /**
+     * @description Rules for collaborative chat rooms.
+     * @path /chatRooms/{chatRoomId}
+     * @allow Members present in the 'members' map (get, update, delete).
+     * @deny Non-members or unauthenticated users.
+     * @principle Shared Access (Closed Collaborators) using denormalized membership maps.
+     */
+    match /chatRooms/{chatRoomId} {
+      allow get: if isMember(resource.data.members);
+      allow list: if isSignedIn(); // Queries must filter by members[uid] == true as per P6.
+      allow create: if isMember(request.resource.data.members);
+      allow update: if isExistingMember(resource.data.members);
+      allow delete: if isExistingMember(resource.data.members);
+
+      /**
+       * @description Rules for messages within a chat room.
+       * @path /chatRooms/{chatRoomId}/messages/{messageId}
+       * @allow Members included in the message's denormalized 'members' map.
+       * @deny Users not participating in the parent chat room.
+       * @principle Authorization Independence by denormalizing member lists into sub-documents.
+       */
+      match /messages/{messageId} {
+        allow get: if isMember(resource.data.members);
+        allow list: if isSignedIn(); // Path-based scoping or query filters required.
+        allow create: if isMember(request.resource.data.members) && request.resource.data.senderId == request.auth.uid;
+        allow update: if isExistingMember(resource.data.members) && request.resource.data.senderId == resource.data.senderId;
+        allow delete: if isExistingMember(resource.data.members);
+      }
+    }
+
+    /**
+     * @description Rules for recording voice or video calls.
+     * @path /calls/{callId}
+     * @allow Participants present in the 'participants' map.
+     * @deny Non-participants.
+     * @principle Shared Access pattern ensuring only involved users can see call metadata.
+     */
+    match /calls/{callId} {
+      allow get: if isMember(resource.data.participants);
+      allow list: if isSignedIn(); // Queries must filter by participants[uid] == true.
+      allow create: if isMember(request.resource.data.participants) && request.resource.data.callerId == request.auth.uid;
+      allow update: if isExistingMember(resource.data.participants) && request.resource.data.callerId == resource.data.callerId;
+      allow delete: if isExistingMember(resource.data.participants);
     }
   }
 }
