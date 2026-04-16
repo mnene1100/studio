@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRouter } from 'next/navigation';
@@ -61,8 +62,8 @@ export default function MePage() {
 
         {/* Profile Avatar - Reduced Size */}
         <div className="relative mb-4 mt-2">
-          <div className="p-1 bg-white/20 rounded-full backdrop-blur-md shadow-2xl">
-            <Avatar className="w-24 h-24 border-4 border-white ring-4 ring-black/10">
+          <div className="p-1 bg-white/10 rounded-full backdrop-blur-md shadow-2xl">
+            <Avatar className="w-24 h-24 border-none ring-0">
               <AvatarImage src={profile.profilePictureUrl} />
               <AvatarFallback className="bg-white/10 text-white text-3xl font-black">{initials}</AvatarFallback>
             </Avatar>
@@ -85,7 +86,7 @@ export default function MePage() {
 
         {/* Recharge & Income Cards - Reduced Height */}
         <div className="grid grid-cols-2 gap-4 w-full max-w-sm">
-          <div className="bg-white/10 backdrop-blur-xl rounded-[2rem] p-4 flex flex-col items-center text-center border border-white/20 shadow-xl active:scale-95 transition-all cursor-pointer h-24 justify-center group">
+          <div className="bg-white/10 backdrop-blur-xl rounded-[2rem] p-4 flex flex-col items-center justify-center text-center border border-white/20 shadow-xl active:scale-95 transition-all cursor-pointer h-24 group">
             <div className="p-2 bg-white/20 rounded-xl mb-1.5 group-hover:scale-110 transition-transform">
               <Coins className="w-4 h-4 text-white" />
             </div>
@@ -93,7 +94,7 @@ export default function MePage() {
             <h3 className="text-xl font-black text-white tracking-tighter">500</h3>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-xl rounded-[2rem] p-4 flex flex-col items-center text-center border border-white/20 shadow-xl active:scale-95 transition-all cursor-pointer h-24 justify-center group">
+          <div className="bg-white/10 backdrop-blur-xl rounded-[2rem] p-4 flex flex-col items-center justify-center text-center border border-white/20 shadow-xl active:scale-95 transition-all cursor-pointer h-24 group">
             <div className="p-2 bg-white/20 rounded-xl mb-1.5 group-hover:scale-110 transition-transform">
               <Diamond className="w-4 h-4 text-white" />
             </div>
