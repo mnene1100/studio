@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRouter } from 'next/navigation';
@@ -114,20 +115,12 @@ export default function MePage() {
       {/* Content Spacer */}
       <div className="h-20 shrink-0" />
 
-      {/* Support Section */}
+      {/* Main Actions Area */}
       <div className="px-6 mt-8 space-y-4">
         <div className="flex items-center space-x-4 mb-2">
-          <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] whitespace-nowrap">Account & Safety</h3>
+          <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] whitespace-nowrap">Service & Support</h3>
           <div className="h-[1px] w-full bg-border" />
         </div>
-
-        <button className="w-full flex items-center p-5 bg-blue-600 rounded-[1.75rem] shadow-xl shadow-blue-500/20 active:scale-[0.98] transition-all group">
-          <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mr-4">
-            <ShieldCheck className="w-6 h-6 text-white" />
-          </div>
-          <span className="flex-1 text-left font-black text-white text-base tracking-tight">Verify profile</span>
-          <ChevronRight className="w-5 h-5 text-white/50" />
-        </button>
 
         <button 
           onClick={() => router.push('/home/support')}
@@ -141,8 +134,21 @@ export default function MePage() {
         </button>
       </div>
 
-      {/* Settings at the bottom */}
-      <div className="px-6 mt-8">
+      {/* Account Controls */}
+      <div className="px-6 mt-12 space-y-4">
+        <div className="flex items-center space-x-4 mb-2">
+          <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] whitespace-nowrap">Account Controls</h3>
+          <div className="h-[1px] w-full bg-border" />
+        </div>
+
+        <button className="w-full flex items-center p-5 bg-primary rounded-[1.75rem] shadow-xl shadow-primary/20 active:scale-[0.98] transition-all group">
+          <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mr-4">
+            <ShieldCheck className="w-6 h-6 text-white" />
+          </div>
+          <span className="flex-1 text-left font-black text-white text-base tracking-tight">Verify profile</span>
+          <ChevronRight className="w-5 h-5 text-white/50" />
+        </button>
+
         <button 
           onClick={() => router.push('/home/me/settings')}
           className="w-full flex items-center p-5 bg-foreground rounded-[1.75rem] shadow-xl active:scale-[0.98] transition-all group"

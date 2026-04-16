@@ -14,7 +14,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen pb-32 bg-background">
       {/* Top Section - Structural teal header with extra top space */}
-      <div className="bg-primary safe-top px-5 pb-8 pt-20 shadow-lg">
+      <div className="bg-primary safe-top px-5 pb-8 pt-20">
         <div className="grid grid-cols-2 gap-4 mt-6">
           <div className="bg-white/20 backdrop-blur-md rounded-[1.75rem] flex flex-col items-center justify-center p-5 border border-white/20 transition-all cursor-pointer h-36 shadow-lg group active:scale-95">
             <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-2xl flex items-center justify-center mb-2 shadow-xl transform group-hover:rotate-6 transition-transform">
@@ -46,7 +46,7 @@ export default function HomePage() {
         {isUsersLoading ? (
           <div className="grid grid-cols-2 gap-2.5">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="aspect-[4/5] bg-muted rounded-3xl animate-pulse" />
+              <div key={i} className="aspect-[1/1.2] bg-muted rounded-[2rem] animate-pulse" />
             ))}
           </div>
         ) : discoveryUsers.length > 0 ? (
@@ -58,7 +58,7 @@ export default function HomePage() {
                 <div 
                   key={u.id} 
                   onClick={() => router.push(`/home/profile/${u.id}`)}
-                  className="group relative aspect-[1/1.2] overflow-hidden rounded-[2.5rem] shadow-xl transition-all cursor-pointer bg-card active:scale-[0.98]"
+                  className="group relative aspect-[1/1.2] overflow-hidden rounded-[2rem] shadow-xl transition-all cursor-pointer bg-card active:scale-[0.98]"
                 >
                   <Image 
                     src={u.profilePictureUrl || `https://picsum.photos/seed/${u.id}/600/750`} 
@@ -79,21 +79,21 @@ export default function HomePage() {
                     }}
                     className="absolute top-4 right-4 z-20"
                   >
-                    <div className="bg-primary px-4 py-2 rounded-[1.2rem] flex items-center justify-center shadow-lg active:scale-90 transition-transform">
-                      <MessageSquare className="w-4 h-4 text-white fill-white mr-1" />
-                      <span className="text-[10px] font-black text-white uppercase italic">Chat</span>
+                    <div className="bg-primary px-4 py-2 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform">
+                      <MessageSquare className="w-3 h-3 text-white fill-white mr-1" />
+                      <span className="text-[9px] font-black text-white uppercase italic">Chat</span>
                     </div>
                   </button>
 
-                  <div className="absolute bottom-5 left-5 right-5">
+                  <div className="absolute bottom-4 left-4 right-4">
                     <div className="flex items-center space-x-1 mb-2">
                       <h4 className="text-[14px] font-black text-white truncate drop-shadow-md tracking-tight">
                         {u.displayName?.toLowerCase() || 'guest_user'}
                       </h4>
-                      <UserCheck className="w-4 h-4 text-primary fill-primary" />
+                      {u.isVerified && <UserCheck className="w-4 h-4 text-primary fill-primary" />}
                     </div>
                     
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="flex flex-wrap gap-1">
                       {/* Gender/Age Badge */}
                       <div className="px-2 py-0 bg-primary/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-primary/30">
                         <span className="text-[8px] font-black text-white uppercase tracking-tighter">
@@ -102,8 +102,8 @@ export default function HomePage() {
                       </div>
                       
                       {/* Country Badge */}
-                      <div className="px-2 py-0 bg-primary/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-primary/30">
-                        <span className="text-[8px] font-black text-white uppercase tracking-widest text-center">
+                      <div className="px-2 py-0 bg-primary/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-primary/30 min-w-[3rem]">
+                        <span className="text-[8px] font-black text-white uppercase tracking-widest text-center w-full">
                           {u.country?.substring(0, 5) || 'Kenya'}
                         </span>
                       </div>

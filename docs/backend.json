@@ -55,6 +55,10 @@
           "type": "number",
           "description": "The user's total earnings."
         },
+        "isVerified": {
+          "type": "boolean",
+          "description": "Whether the user's profile is verified."
+        },
         "lastOnlineAt": {
           "type": "string",
           "description": "Timestamp indicating the last time the user was online.",
