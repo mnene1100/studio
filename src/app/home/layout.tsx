@@ -28,7 +28,6 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   const router = useRouter();
   const { user, isUserLoading: isAuthLoading } = useUser();
   const db = useFirestore();
-  const [hasCheckedOnboarding, setHasCheckedOnboarding] = useState(false);
 
   // Persistent Listeners: These stay active as long as the user is within the /home sub-routes.
   const profileRef = useMemoFirebase(() => {
@@ -55,21 +54,25 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   const discoveryUsers = allUsers?.filter(u => u.id !== user?.uid) || [];
 
   useEffect(() => {
-    if (isAuthLoading || isProfileLoading) return;
+    // Only perform redirection logic once the initial auth state is resolved
+    if (isAuthLoading) return;
 
     if (!user) {
       router.push('/login');
-    } else if (!profile && !isProfileLoading) {
-      // Check local storage as a fallback to prevent loops if Firestore hasn't propagated
-      const localProfile = localStorage.getItem('nexo_profile_completed');
-      if (!localProfile) {
+      return;
+    }
+
+    // Once we have a user, check for profile completion
+    if (!isProfileLoading) {
+      const localProfileCompleted = localStorage.getItem('nexo_profile_completed');
+      if (!profile && !localProfileCompleted) {
         router.push('/onboarding');
       }
     }
   }, [user, isAuthLoading, profile, isProfileLoading, router]);
 
   // Initial loading gate for auth and primary profile data
-  if (isAuthLoading || (isProfileLoading && !profile)) {
+  if (isAuthLoading || (isProfileLoading && !profile && !localStorage.getItem('nexo_profile_completed'))) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-black">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -87,7 +90,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
       isUsersLoading
     }}>
       <div className="min-h-screen bg-black relative">
-        <main className="max-w-md mx-auto min-h-screen pb-24">
+        <main className="max-w-md mx-auto min-h-screen pb-20">
           {children}
         </main>
         <Navigation />

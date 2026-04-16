@@ -31,6 +31,8 @@ export default function SettingsPage() {
     if (!auth) return;
     try {
       await signOut(auth);
+      // Clean up all persistence flags
+      localStorage.removeItem('nexo_profile_completed');
       localStorage.removeItem('nexo_profile');
       router.push('/login');
     } catch (error) {
@@ -45,6 +47,7 @@ export default function SettingsPage() {
       await deleteDoc(userProfileRef);
       await deleteUser(user);
       
+      localStorage.removeItem('nexo_profile_completed');
       localStorage.removeItem('nexo_profile');
       toast({
         title: "Account Deleted",
