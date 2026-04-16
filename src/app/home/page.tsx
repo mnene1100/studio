@@ -86,7 +86,7 @@ export default function HomePage() {
 
                   <div className="absolute bottom-5 left-5 right-5">
                     <div className="flex items-center space-x-1 mb-2">
-                      <h4 className="text-[16px] font-black text-white truncate drop-shadow-md tracking-tight">
+                      <h4 className="text-[14px] font-black text-white truncate drop-shadow-md tracking-tight">
                         {u.displayName?.toLowerCase() || 'guest_user'}
                       </h4>
                       <UserCheck className="w-4 h-4 text-[#D9FF00] fill-[#D9FF00]" />
