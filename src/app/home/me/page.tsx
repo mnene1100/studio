@@ -28,7 +28,7 @@ export default function MePage() {
       navigator.clipboard.writeText(profile.numericId);
       toast({
         title: "Copied ID",
-        description: `NEXO ID ${profile.numericId} is ready to share.`,
+        description: `ID ${profile.numericId} is ready to share.`,
       });
     }
   };
@@ -69,7 +69,7 @@ export default function MePage() {
             onClick={copyId}
             className="flex items-center space-x-3 bg-card/60 px-5 py-3 rounded-[1.5rem] border border-white/5 active:scale-95 transition-all shadow-xl"
           >
-            <span className="text-[10px] uppercase font-black tracking-[0.2em] text-accent">NEXO ID</span>
+            <span className="text-[10px] uppercase font-black tracking-[0.2em] text-accent">ID</span>
             <span className="text-xl font-mono font-bold text-white tracking-widest">
               {profile.numericId}
             </span>

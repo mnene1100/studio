@@ -1,19 +1,16 @@
+
 "use client";
 
-import { useState } from 'react';
 import Link from 'next/link';
-import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Search, Plus, MessageSquare } from "lucide-react";
+import { Plus, MessageSquare } from "lucide-react";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, where } from 'firebase/firestore';
 
 export default function ChatListPage() {
-  const [search, setSearch] = useState('');
   const { user } = useUser();
   const db = useFirestore();
 
-  // Removed orderBy from the Firestore query to avoid index requirement errors
   const chatsQuery = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
     return query(
@@ -31,10 +28,6 @@ export default function ChatListPage() {
     return dateB - dateA;
   }) : [];
 
-  const filteredChats = sortedChats.filter(chat => 
-    chat.id.toLowerCase().includes(search.toLowerCase())
-  );
-
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-background">
       <header className="glass-header px-6 pt-14 pb-6 flex items-center justify-between">
@@ -44,27 +37,15 @@ export default function ChatListPage() {
         </button>
       </header>
 
-      <div className="px-6 py-6">
-        <div className="relative group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-accent transition-colors" />
-          <Input 
-            placeholder="Search conversations..." 
-            className="pl-12 h-14 bg-card/40 border-white/5 rounded-[1.25rem] focus-visible:ring-accent/20"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-      </div>
-
-      <div className="flex-1 overflow-y-auto px-4 pb-32">
+      <div className="flex-1 overflow-y-auto px-4 pb-32 pt-4">
         {isLoading ? (
           <div className="space-y-4 px-2">
             {[1, 2, 3].map(i => (
               <div key={i} className="h-20 bg-card/20 rounded-[1.75rem] animate-pulse" />
             ))}
           </div>
-        ) : filteredChats.length > 0 ? (
-          filteredChats.map((chat) => (
+        ) : sortedChats.length > 0 ? (
+          sortedChats.map((chat) => (
             <Link 
               key={chat.id} 
               href={`/home/chat/${chat.id}`}
