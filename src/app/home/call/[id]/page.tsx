@@ -56,7 +56,7 @@ export default function CallPage() {
         const appId = process.env.NEXT_PUBLIC_AGORA_APP_ID;
         
         if (!appId) {
-          setErrorMessage('AGORA_APP_ID is missing. Please check your .env configuration.');
+          setErrorMessage('AGORA_CONFIGURATION_MISSING');
           return;
         }
 
@@ -201,15 +201,15 @@ export default function CallPage() {
 
   if (errorMessage) {
     return (
-      <div className="fixed inset-0 bg-black z-[100] flex items-center justify-center p-8">
+      <div className="fixed inset-0 bg-black z-[100] flex items-center justify-center p-8 text-center">
         <Alert variant="destructive" className="bg-zinc-900 border-red-500/50 rounded-[2rem] p-8 shadow-2xl">
-          <AlertCircle className="h-6 w-6 mb-4 text-red-500" />
+          <AlertCircle className="h-6 w-6 mb-4 text-red-500 mx-auto" />
           <AlertTitle className="text-xl font-black uppercase tracking-tight text-white">Call Error</AlertTitle>
           <AlertDescription className="text-[10px] font-medium text-white/50 leading-relaxed mt-2 uppercase tracking-widest">
             {errorMessage === 'AGORA_CONFIGURATION_MISSING' 
-              ? 'Agora credentials (App ID or Certificate) are missing on the server.' 
+              ? 'Agora credentials (App ID or Certificate) are missing. Please set AGORA_APP_ID and AGORA_APP_CERTIFICATE in your secrets.' 
               : errorMessage === 'TOKEN_GENERATION_FAILED'
-              ? 'Secure token generation failed. Please verify your Agora App Certificate.'
+              ? 'Secure token generation failed. Please verify your Agora App Certificate in the Agora Console.'
               : `An error occurred: ${errorMessage}.`}
           </AlertDescription>
           <Button onClick={() => router.back()} className="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] h-14 rounded-full">
@@ -223,8 +223,8 @@ export default function CallPage() {
   if (hasPermission === false) {
     return (
       <div className="fixed inset-0 bg-black z-[100] flex items-center justify-center p-8">
-        <Alert variant="destructive" className="bg-zinc-900 border-red-500/50 rounded-[2rem] p-8 shadow-2xl">
-          <AlertCircle className="h-6 w-6 mb-4 text-red-500" />
+        <Alert variant="destructive" className="bg-zinc-900 border-red-500/50 rounded-[2rem] p-8 shadow-2xl text-center">
+          <AlertCircle className="h-6 w-6 mb-4 text-red-500 mx-auto" />
           <AlertTitle className="text-xl font-black uppercase tracking-tight text-white">Access Denied</AlertTitle>
           <AlertDescription className="text-[10px] font-medium text-white/50 leading-relaxed mt-2 uppercase tracking-widest">
             NEXO requires {callType === 'video' ? 'Camera & Mic' : 'Microphone'} access. Please check your browser settings.
