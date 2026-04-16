@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -62,6 +62,14 @@ export default function EditProfilePage() {
     profilePictureUrl: ''
   });
 
+  const maxDate = useMemo(() => {
+    const today = new Date();
+    const year = today.getFullYear() - 18;
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }, []);
+
   useEffect(() => {
     if (profile) {
       setFormData({
@@ -92,8 +100,6 @@ export default function EditProfilePage() {
   };
 
   const simulateGalleryAccess = () => {
-    // In a real app, this would trigger a file picker and upload to Firebase Storage.
-    // For this prototype, we'll cycle through a few high-quality placeholders.
     const newSeed = Math.floor(Math.random() * 1000);
     const newUrl = `https://picsum.photos/seed/${newSeed}/400/400`;
     setFormData(prev => ({ ...prev, profilePictureUrl: newUrl }));
@@ -108,7 +114,6 @@ export default function EditProfilePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      {/* Premium Header */}
       <header className="bg-primary safe-top sticky top-0 z-50 shrink-0">
         <div className="px-4 h-16 flex items-center justify-between">
           <Button 
@@ -132,7 +137,6 @@ export default function EditProfilePage() {
       </header>
 
       <div className="flex-1 overflow-y-auto px-6 py-8 pb-32 space-y-8">
-        {/* Avatar Selection Section */}
         <div className="flex flex-col items-center">
           <div className="relative group">
             <Avatar className="w-32 h-32 border-4 border-gray-50 shadow-2xl">
@@ -151,7 +155,6 @@ export default function EditProfilePage() {
           <p className="mt-4 text-[9px] font-black text-gray-300 uppercase tracking-widest italic">Tap camera to access gallery</p>
         </div>
 
-        {/* Basic Info Group */}
         <div className="space-y-6">
           <div className="flex items-center space-x-4">
             <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] whitespace-nowrap">Basic Info</h3>
@@ -184,6 +187,7 @@ export default function EditProfilePage() {
               <div className="relative">
                 <Input 
                   type="date"
+                  max={maxDate}
                   value={formData.dob}
                   onChange={(e) => setFormData(prev => ({ ...prev, dob: e.target.value }))}
                   className="h-12 bg-gray-50 border-none rounded-2xl px-4 text-xs font-bold pl-10"
@@ -208,7 +212,6 @@ export default function EditProfilePage() {
           </div>
         </div>
 
-        {/* Life Style Group */}
         <div className="space-y-6">
           <div className="flex items-center space-x-4">
             <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] whitespace-nowrap">Lifestyle & Education</h3>
@@ -260,11 +263,9 @@ export default function EditProfilePage() {
           </div>
         </div>
 
-        {/* Safe area spacer */}
         <div className="h-20" />
       </div>
 
-      {/* Sticky Bottom Save Button */}
       <div className="fixed bottom-8 left-6 right-6 z-40">
         <Button 
           onClick={handleSave}

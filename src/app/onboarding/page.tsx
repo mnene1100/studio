@@ -70,7 +70,6 @@ export default function OnboardingPage() {
       const randomName = RANDOM_NAMES[Math.floor(Math.random() * RANDOM_NAMES.length)] + "_" + Math.floor(Math.random() * 1000);
       finalName = randomName;
       
-      // Default Fast Login users to age 20
       const currentYear = new Date().getFullYear();
       const birthYear = currentYear - 20;
       const birthMonth = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
