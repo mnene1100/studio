@@ -93,6 +93,7 @@ export default function ChatDetailPage() {
   const handleSendMessage = async () => {
     if (!input.trim() || !chatId || !currentUser || !db) return;
     
+    // Message deduction for male users
     if (currentUserProfile?.gender === 'Male') {
       const currentBalance = currentUserProfile.balance ?? 0;
       if (currentBalance < 15) {
@@ -109,6 +110,18 @@ export default function ChatDetailPage() {
       await updateDoc(userRef, {
         balance: increment(-15)
       });
+
+      // Record transaction
+      const transId = `msg_${Date.now()}_${currentUser.uid}`;
+      setDocumentNonBlocking(doc(db, 'transactions', transId), {
+        id: transId,
+        userId: currentUser.uid,
+        type: 'message_fee',
+        coins: 15,
+        description: 'Sent text message',
+        createdAt: new Date().toISOString(),
+        status: 'completed'
+      }, { merge: true });
     }
 
     const now = new Date().toISOString();
@@ -154,7 +167,7 @@ export default function ChatDetailPage() {
       toast({
         variant: 'destructive',
         title: 'Insufficient Balance',
-        description: `You need at least ${costPerMin} coins.`,
+        description: `You need at least ${costPerMin} coins to start this call.`,
       });
       router.push('/home/wallet');
       return;

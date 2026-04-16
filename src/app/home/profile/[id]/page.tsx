@@ -35,7 +35,6 @@ export default function UserProfilePage() {
 
   const { data: profile, isLoading } = useDoc(userRef);
 
-  // Record visitor (one-time per session view)
   useEffect(() => {
     if (!db || !currentUser || !id || currentUser.uid === id || visitorRecordedRef.current) return;
     visitorRecordedRef.current = true;
@@ -53,7 +52,6 @@ export default function UserProfilePage() {
     return differenceInYears(new Date(), new Date(profile.dob));
   }, [profile?.dob]);
 
-  // Accurate presence: 90s threshold for 60s heartbeat
   const isOnline = profile?.lastOnlineAt 
     ? (Date.now() - new Date(profile.lastOnlineAt).getTime() < 90000) 
     : false;
@@ -84,7 +82,6 @@ export default function UserProfilePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white relative pb-40">
-      {/* Full Screen Image Viewer */}
       {isFullScreen && (
         <div 
           className="fixed inset-0 z-[100] bg-black flex items-center justify-center animate-in fade-in duration-300" 
@@ -102,7 +99,6 @@ export default function UserProfilePage() {
         </div>
       )}
 
-      {/* Main Image Header */}
       <div className="relative w-full aspect-[1/1.15] overflow-hidden" onClick={() => setIsFullScreen(true)}>
         <Image 
           src={profile.profilePictureUrl || `https://picsum.photos/seed/${profile.id}/800/1000`} 
@@ -111,7 +107,6 @@ export default function UserProfilePage() {
           className="object-cover" 
         />
         
-        {/* Top Actions */}
         <div className="absolute top-10 left-0 right-0 px-4 flex items-center justify-between">
           <Button 
             variant="ghost" 
@@ -122,7 +117,6 @@ export default function UserProfilePage() {
             <ChevronLeft />
           </Button>
 
-          {/* Three Dots Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button 
@@ -134,7 +128,7 @@ export default function UserProfilePage() {
                 <MoreVertical className="w-5 h-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 rounded-2xl border-none shadow-2xl p-2 bg-white/95 backdrop-blur-xl">
+            <DropdownMenuContent align="end" className="w-48 rounded-[1.5rem] border-none shadow-2xl p-2 bg-white/95 backdrop-blur-xl">
               <DropdownMenuItem onClick={handleBlock} className="flex items-center px-4 py-3 rounded-xl text-red-500 font-bold focus:bg-red-50">
                 <Ban className="w-4 h-4 mr-3" />
                 <span className="text-xs uppercase tracking-widest">Block User</span>
@@ -148,7 +142,6 @@ export default function UserProfilePage() {
         </div>
       </div>
 
-      {/* Profile Details - ROUNDED CORNERS */}
       <div className="px-6 bg-white pt-10 -mt-12 flex-1 rounded-t-[3rem] relative z-10">
         <div className="mb-4">
           <div className={`inline-flex items-center px-4 py-1.5 rounded-full border ${isOnline ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
@@ -169,7 +162,6 @@ export default function UserProfilePage() {
            </p>
         </div>
 
-        {/* Life Info - ROUNDED BLOCKS */}
         <div className="grid grid-cols-2 gap-4 pb-12">
           <div className="bg-gray-50 p-5 border border-gray-100 rounded-[2rem]">
             <h4 className="text-[8px] font-black text-gray-300 uppercase tracking-widest mb-1.5">Education</h4>
@@ -182,7 +174,6 @@ export default function UserProfilePage() {
         </div>
       </div>
 
-      {/* Fixed Chat Action - ROUNDED BUTTON */}
       <div className="fixed bottom-10 left-8 right-8 z-30">
         <Button 
           onClick={() => router.push(`/home/chat/${profile.id}`)} 

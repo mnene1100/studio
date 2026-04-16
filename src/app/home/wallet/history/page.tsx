@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRouter } from 'next/navigation';
@@ -14,22 +15,21 @@ function TransactionItem({ item }: { item: any }) {
     <div className="bg-gray-50 rounded-[2rem] p-5 flex items-center border border-gray-50 shadow-sm">
       <div className={cn(
         "w-12 h-12 rounded-2xl flex items-center justify-center mr-4",
-        isRecharge ? "bg-green-500/10 text-green-600" : "bg-gray-100 text-gray-400"
+        isRecharge ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-600"
       )}>
-        {/* Recharge = Arrow UP, Spent = Arrow DOWN */}
         {isRecharge ? <ArrowUpRight className="w-6 h-6" /> : <ArrowDownLeft className="w-6 h-6" />}
       </div>
       
       <div className="flex-1">
         <div className="flex items-center justify-between mb-0.5">
-          <h3 className="font-black text-gray-900 text-sm tracking-tight">
-            {isRecharge ? 'Recharge' : 'Spent'}
+          <h3 className="font-black text-gray-900 text-sm tracking-tight capitalize">
+            {item.type.replace('_', ' ')}
           </h3>
           <div className="flex items-center space-x-1">
             <Coins className="w-3 h-3 text-primary" />
             <span className={cn(
               "text-sm font-black tracking-tight",
-              isRecharge ? "text-green-600" : "text-gray-900"
+              isRecharge ? "text-green-600" : "text-red-600"
             )}>
               {isRecharge ? '+' : '-'}{item.coins}
             </span>
@@ -37,7 +37,7 @@ function TransactionItem({ item }: { item: any }) {
         </div>
         <div className="flex items-center justify-between">
           <p className="text-[10px] font-medium text-gray-400">
-            {isRecharge ? 'Wallet Top-up' : 'Platform Use'}
+            {item.description || (isRecharge ? 'Wallet Top-up' : 'Platform Deduction')}
           </p>
           <div className="flex items-center space-x-1 text-gray-300">
             <Clock className="w-2.5 h-2.5" />
@@ -56,7 +56,6 @@ export default function WalletHistoryPage() {
   const { user } = useUser();
   const db = useFirestore();
 
-  // Simplified query to avoid permission/index errors during prototyping
   const transactionsQuery = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
     return query(
@@ -68,14 +67,12 @@ export default function WalletHistoryPage() {
 
   const { data: transactions, isLoading } = useCollection(transactionsQuery);
 
-  // Client-side sorting as a fallback to ensure chronological order without index requirements
   const sortedTransactions = [...(transactions || [])].sort((a, b) => {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      {/* Seamless Header - No Shadow/Border */}
       <header className="bg-primary safe-top sticky top-0 z-50">
         <div className="px-4 h-16 flex items-center justify-between">
           <Button 

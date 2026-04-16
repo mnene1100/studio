@@ -80,16 +80,19 @@ export default function CallPage() {
 
       try {
         await updateDoc(userRef, { balance: increment(-costPerMin) });
-        // Record billing transaction
+        
+        // Record billing transaction in history
         const billingId = `bill_${Date.now()}_${currentUser.uid}`;
         setDocumentNonBlocking(doc(db, 'transactions', billingId), {
           id: billingId,
           userId: currentUser.uid,
           type: 'call_billing',
           coins: costPerMin,
-          callType: callType,
-          createdAt: new Date().toISOString()
+          description: `${callType === 'video' ? 'Video' : 'Voice'} Call Session`,
+          createdAt: new Date().toISOString(),
+          status: 'completed'
         }, { merge: true });
+
         return true;
       } catch (e) {
         handleEndCall();
@@ -124,7 +127,6 @@ export default function CallPage() {
         const costPerMin = callType === 'video' ? 160 : 80;
         const currentBalance = currentUserProfile?.balance ?? 0;
 
-        // Ensure first minute coverage before starting
         if (currentBalance < costPerMin) {
           toast({
             variant: 'destructive',
