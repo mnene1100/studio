@@ -6,11 +6,9 @@ import { useRouter, useParams } from 'next/navigation';
 import { useFirestore, useDoc, useMemoFirebase, useUser, setDocumentNonBlocking } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, MoreHorizontal, Copy, Ban, Flag, MessageCircle, X } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
-import { differenceInYears, formatDistanceToNow } from 'date-fns';
+import { ChevronLeft, MessageCircle, Loader2 } from "lucide-react";
+import { differenceInYears } from 'date-fns';
 import Image from 'next/image';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export default function UserProfilePage() {
   const { id } = useParams();
@@ -37,7 +35,7 @@ export default function UserProfilePage() {
   const age = useMemo(() => profile?.dob ? differenceInYears(new Date(), new Date(profile.dob)) : null, [profile?.dob]);
   const isOnline = profile?.lastOnlineAt ? (Date.now() - new Date(profile.lastOnlineAt).getTime() < 90000) : false;
 
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-white"><Loader2 className="animate-spin" /></div>;
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-white"><Loader2 className="animate-spin text-primary" /></div>;
   if (!profile) return null;
 
   return (

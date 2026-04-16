@@ -51,15 +51,9 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
       router.replace('/login');
       return;
     }
+  }, [user, isAuthLoading, isProfileLoading, router]);
 
-    // Source of Truth protection for Home area
-    if (!profile) {
-      localStorage.removeItem('nexo_profile_completed');
-      router.replace('/onboarding');
-    }
-  }, [user, isAuthLoading, profile, isProfileLoading, router]);
-
-  const shouldShowLoader = isAuthLoading || isProfileLoading || !profile;
+  const shouldShowLoader = isAuthLoading || isProfileLoading;
 
   if (shouldShowLoader) {
     return (

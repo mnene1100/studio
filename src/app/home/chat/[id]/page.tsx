@@ -136,7 +136,6 @@ export default function ChatDetailPage() {
     if (!profile?.lastOnlineAt) return false;
     const lastOnline = new Date(profile.lastOnlineAt).getTime();
     const now = Date.now();
-    // Use 90s threshold for more accurate status relative to 60s update interval
     return now - lastOnline < 90000;
   }, [profile?.lastOnlineAt]);
 
@@ -250,7 +249,7 @@ export default function ChatDetailPage() {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="w-12 h-12 bg-gray-50 rounded-full text-red-500 shadow-sm flex-shrink-0"
+              className="w-12 h-12 bg-gray-50 rounded-full text-red-500 shadow-sm flex-shrink-0 overflow-hidden"
               onClick={handleGetSuggestions}
             >
               <Gift className="w-5 h-5 fill-red-500" />
@@ -267,7 +266,7 @@ export default function ChatDetailPage() {
               <Button 
                 size="icon" 
                 className={cn(
-                  "absolute right-1.5 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full shadow-sm transition-all duration-300",
+                  "absolute right-1.5 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full shadow-sm transition-all duration-300 overflow-hidden",
                   isInputEmpty 
                     ? "bg-primary/20 text-white/50 cursor-not-allowed" 
                     : "bg-primary text-white shadow-lg active:scale-90"

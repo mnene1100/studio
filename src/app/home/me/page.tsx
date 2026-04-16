@@ -92,7 +92,7 @@ export default function MePage() {
                 priority
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-white text-3xl font-black">
+              <div className="w-full h-full flex items-center justify-center text-white text-3xl font-black rounded-full">
                 {initials}
               </div>
             )}

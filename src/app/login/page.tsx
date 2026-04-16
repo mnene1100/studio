@@ -5,11 +5,14 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Zap, Mail, ArrowRight, Lock, UserPlus, Loader2 } from "lucide-react";
+import { Zap, Mail, UserPlus, Loader2 } from "lucide-react";
 import { useAuth, useUser, useFirestore } from '@/firebase';
-import { signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword, User } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { toast } from "@/hooks/use-toast";
+import { generateNexoId } from "@/app/lib/store";
+
+const RANDOM_NAMES = ["SilverFox", "DesertStar", "NeoWave", "SkyWalker", "NexoUser", "SwiftWind", "DeepBlue", "SolarFlare"];
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -23,31 +26,47 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!isUserLoading && user) {
-      const checkAndRedirect = async () => {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists()) {
-          localStorage.setItem('nexo_session_active', 'true');
-          localStorage.setItem('nexo_profile_completed', 'true');
-          router.replace('/home');
-        }
-      };
-      checkAndRedirect();
+      router.replace('/home');
     }
-  }, [user, isUserLoading, db, router]);
+  }, [user, isUserLoading, router]);
+
+  const ensureUserProfile = async (firebaseUser: User) => {
+    if (!db) return;
+    const userRef = doc(db, 'users', firebaseUser.uid);
+    const userDoc = await getDoc(userRef);
+
+    if (!userDoc.exists()) {
+      const randomName = RANDOM_NAMES[Math.floor(Math.random() * RANDOM_NAMES.length)] + "_" + Math.floor(Math.random() * 1000);
+      const defaultProfile = {
+        id: firebaseUser.uid,
+        numericId: generateNexoId(),
+        email: firebaseUser.email || 'guest@nexo.com',
+        displayName: randomName,
+        gender: 'Other',
+        dob: '2000-01-01',
+        country: 'Kenya',
+        education: 'N/A',
+        profilePictureUrl: `https://picsum.photos/seed/${firebaseUser.uid}/200/200`,
+        createdAt: new Date().toISOString(),
+        lastOnlineAt: new Date().toISOString(),
+        statusMessage: "Hey there! I'm using NEXO.",
+        balance: 500,
+        earnings: 0,
+        isVerified: false,
+      };
+      await setDoc(userRef, defaultProfile, { merge: true });
+    }
+    localStorage.setItem('nexo_session_active', 'true');
+    localStorage.setItem('nexo_profile_completed', 'true');
+  };
 
   const handleFastLogin = async () => {
     if (!auth) return;
     setIsLoading(true);
     try {
       const userCredential = await signInAnonymously(auth);
-      localStorage.setItem('nexo_session_active', 'true');
-      const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
-      if (userDoc.exists()) {
-        localStorage.setItem('nexo_profile_completed', 'true');
-        router.replace('/home');
-      } else {
-        router.replace('/onboarding');
-      }
+      await ensureUserProfile(userCredential.user);
+      router.replace('/home');
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -65,14 +84,8 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      localStorage.setItem('nexo_session_active', 'true');
-      const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
-      if (userDoc.exists()) {
-        localStorage.setItem('nexo_profile_completed', 'true');
-        router.replace('/home');
-      } else {
-        router.replace('/onboarding');
-      }
+      await ensureUserProfile(userCredential.user);
+      router.replace('/home');
     } catch (error: any) {
       toast({ variant: "destructive", title: "Sign in failed", description: "Check credentials and connection." });
     } finally {
@@ -85,9 +98,9 @@ export default function LoginPage() {
     if (!email.trim() || !password.trim() || !auth) return;
     setIsLoading(true);
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      localStorage.setItem('nexo_session_active', 'true');
-      router.replace('/onboarding');
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await ensureUserProfile(userCredential.user);
+      router.replace('/home');
     } catch (error: any) {
       toast({ variant: "destructive", title: "Sign up failed", description: error.message });
     } finally {

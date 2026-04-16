@@ -83,7 +83,7 @@ export default function ChatListPage() {
         <h1 className="text-3xl text-white font-black italic tracking-tight uppercase pt-2">
           Chats
         </h1>
-        <button className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 active:scale-90 transition-all mt-2">
+        <button className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 active:scale-90 transition-all mt-2 overflow-hidden">
           <MessageSquare className="w-4 h-4 text-white fill-white" />
         </button>
       </header>

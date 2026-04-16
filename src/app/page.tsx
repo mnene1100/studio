@@ -3,42 +3,21 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUser, useFirestore } from '@/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { useUser } from '@/firebase';
 
 export default function EntryPage() {
   const router = useRouter();
   const { user, isUserLoading } = useUser();
-  const db = useFirestore();
 
   useEffect(() => {
     if (isUserLoading) return;
 
-    const isSessionActive = localStorage.getItem('nexo_session_active') === 'true';
-
-    if (!user || !isSessionActive) {
+    if (!user) {
       router.replace('/login');
     } else {
-      const checkProfileStatus = async () => {
-        try {
-          // Mandatory Source of Truth check against Firestore
-          const userDoc = await getDoc(doc(db, 'users', user.uid));
-          if (userDoc.exists()) {
-            localStorage.setItem('nexo_profile_completed', 'true');
-            router.replace('/home');
-          } else {
-            // No profile found, user MUST onboard
-            localStorage.removeItem('nexo_profile_completed');
-            router.replace('/onboarding');
-          }
-        } catch (e) {
-          console.error("Profile check failed:", e);
-          router.replace('/onboarding');
-        }
-      };
-      checkProfileStatus();
+      router.replace('/home');
     }
-  }, [user, isUserLoading, router, db]);
+  }, [user, isUserLoading, router]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background premium-gradient">
