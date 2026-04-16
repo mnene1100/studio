@@ -14,6 +14,7 @@ import { useFirestore, useDoc, useCollection, useMemoFirebase, useUser, addDocum
 import { doc, collection, query, orderBy, limit, where, getDocs } from 'firebase/firestore';
 import { aiSuggestedConversationStarters } from "@/ai/flows/ai-suggested-conversation-starters";
 import { formatDistanceToNow } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 export default function ChatDetailPage() {
   const { id: targetUserId } = useParams();
@@ -144,10 +145,12 @@ export default function ChatDetailPage() {
   const displayName = profile?.displayName || "Loading...";
   const initials = displayName.substring(0, 2).toUpperCase();
 
+  const isInputEmpty = !input.trim();
+
   return (
     <div className="flex flex-col h-screen bg-white overflow-hidden">
       {/* Fixed Header */}
-      <header className="bg-primary safe-top px-4 shadow-md sticky top-0 z-50">
+      <header className="bg-primary safe-top px-4 shadow-md sticky top-0 z-50 flex-shrink-0">
         <div className="h-20 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Button 
@@ -204,8 +207,8 @@ export default function ChatDetailPage() {
         })}
       </div>
 
-      {/* Fixed Bottom Input */}
-      <div className="px-6 py-4 bg-white border-t border-gray-100 flex flex-col space-y-3 z-10 pb-safe">
+      {/* Fixed Bottom Input Area */}
+      <div className="px-6 py-4 bg-white border-t border-gray-100 flex flex-col space-y-3 z-10 pb-safe flex-shrink-0">
         {suggestions.length > 0 && (
           <div className="flex space-x-2 overflow-x-auto pb-2 -mx-2 px-2">
             {suggestions.map((s, i) => (
@@ -240,8 +243,14 @@ export default function ChatDetailPage() {
             />
             <Button 
               size="icon" 
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-[#BEE5DF] text-white hover:bg-[#A8D8D0] h-9 w-9 rounded-full shadow-sm"
+              className={cn(
+                "absolute right-1.5 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full shadow-sm transition-all duration-300",
+                isInputEmpty 
+                  ? "bg-primary/20 text-white/50 cursor-not-allowed" 
+                  : "bg-primary text-white shadow-lg active:scale-90"
+              )}
               onClick={handleSendMessage}
+              disabled={isInputEmpty}
             >
               <Send className="w-4 h-4" />
             </Button>
