@@ -2,16 +2,34 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MessageSquare, User, Home } from 'lucide-react';
+import { MessageCircle, User, Home } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function Navigation() {
   const pathname = usePathname();
 
   const navItems = [
-    { label: 'Home', icon: Home, href: '/home' },
-    { label: 'Chats', icon: MessageSquare, href: '/home/chat' },
-    { label: 'You', icon: User, href: '/home/me' },
+    { 
+      label: 'Home', 
+      icon: Home, 
+      href: '/home',
+      color: 'text-rose-400',
+      activeColor: 'text-primary'
+    },
+    { 
+      label: 'Chats', 
+      icon: MessageCircle, 
+      href: '/home/chat',
+      color: 'text-blue-400',
+      activeColor: 'text-primary'
+    },
+    { 
+      label: 'You', 
+      icon: User, 
+      href: '/home/me',
+      color: 'text-rose-300',
+      activeColor: 'text-primary'
+    },
   ];
 
   return (
@@ -28,18 +46,21 @@ export function Navigation() {
               href={item.href}
               className={cn(
                 "flex flex-col items-center space-y-1.5 group transition-all duration-300 active:scale-90",
-                isActive ? "text-primary" : "text-muted-foreground/60"
+                isActive ? item.activeColor : item.color
               )}
             >
               <div className={cn(
                 "transition-all duration-300",
                 isActive ? "scale-110" : ""
               )}>
-                <item.icon className={cn("w-6 h-6", isActive && "fill-primary/20")} strokeWidth={isActive ? 3 : 2} />
+                <item.icon 
+                  className={cn("w-7 h-7", isActive && "fill-current")} 
+                  strokeWidth={isActive ? 3 : 2.5} 
+                />
               </div>
               <span className={cn(
-                "text-[11px] font-black tracking-tight",
-                isActive ? "opacity-100" : "opacity-70"
+                "text-[10px] font-black tracking-tight",
+                isActive ? "opacity-100" : "opacity-70 text-muted-foreground"
               )}>
                 {item.label}
               </span>
