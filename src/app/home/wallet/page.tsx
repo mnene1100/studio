@@ -20,7 +20,7 @@ import { createPesapalOrder } from '@/app/actions/pesapal';
 import { toast } from '@/hooks/use-toast';
 
 const PACKAGES = [
-  { id: 'pkg_0', coins: "25", price: 3, currency: "KES", label: "Ksh 3", badge: "Trial" },
+  { id: 'pkg_0', coins: "25", price: 0.64, currency: "KES", label: "Ksh 0.64", badge: "Trial" },
   { id: 'pkg_1', coins: "500", price: 70, currency: "KES", label: "Ksh 70", badge: "Best Seller" },
   { id: 'pkg_2', coins: "1,000", price: 120, currency: "KES", label: "Ksh 120" },
   { id: 'pkg_3', coins: "2,000", price: 240, currency: "KES", label: "Ksh 240" },
