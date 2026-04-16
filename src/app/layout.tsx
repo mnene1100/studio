@@ -10,6 +10,11 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   themeColor: '#28B4A4',
   viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'NEXO',
+  },
 };
 
 export default function RootLayout({
@@ -24,8 +29,10 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
         <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="https://picsum.photos/seed/nexo-logo/180/180" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="mobile-web-app-capable" content="yes" />
       </head>
       <body className="font-body antialiased bg-background text-foreground min-h-screen overflow-x-hidden pb-safe">
         <FirebaseClientProvider>
