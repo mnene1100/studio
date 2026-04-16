@@ -56,8 +56,8 @@ export default function OnboardingPage() {
       numericId: generateNexoId(),
       email: user.email || '',
       displayName: name,
-      dob,
-      country,
+      dob: dob,
+      country: country,
       profilePictureUrl: `https://picsum.photos/seed/${user.uid}/200/200`,
       createdAt: new Date().toISOString(),
       lastOnlineAt: new Date().toISOString(),
@@ -69,7 +69,7 @@ export default function OnboardingPage() {
     // Save to Firestore
     setDocumentNonBlocking(userRef, profileData, { merge: true });
     
-    // Save to local storage for instant UI updates
+    // Save to local storage for instant UI updates (optional, but entry check will handle Firestore)
     localStorage.setItem('nexo_profile', JSON.stringify(profileData));
     
     // Navigate home
