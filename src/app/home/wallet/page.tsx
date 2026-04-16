@@ -32,7 +32,7 @@ const PACKAGES = [
 export default function WalletPage() {
   const router = useRouter();
   const { profile } = useHomeData();
-  const [selectedPackage, setSelectedPackage] = useState<typeof PACKAGES[0] | null>(null);
+  const [selectedPackage, setSelectedPackage] = useState<typeof PACKAGES[0] | null>(PACKAGES[0]);
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePayment = async () => {
@@ -147,7 +147,7 @@ export default function WalletPage() {
                 key={pkg.id} 
                 onClick={() => setSelectedPackage(pkg)}
                 className={cn(
-                  "relative bg-white rounded-[2rem] p-5 flex flex-col items-center border transition-all duration-300 cursor-pointer",
+                  "relative bg-white rounded-[2rem] p-4 flex flex-col items-center border transition-all duration-300 cursor-pointer",
                   selectedPackage?.id === pkg.id 
                     ? "border-primary bg-primary/[0.02] shadow-xl scale-[1.02]" 
                     : "border-gray-50 hover:bg-gray-50/50"
@@ -159,18 +159,18 @@ export default function WalletPage() {
                   </div>
                 )}
                 <div className={cn(
-                  "w-10 h-10 rounded-2xl flex items-center justify-center mb-2.5 transition-all shadow-sm",
+                  "w-9 h-9 rounded-2xl flex items-center justify-center mb-2 transition-all shadow-sm",
                   selectedPackage?.id === pkg.id ? "bg-primary text-white" : "bg-gray-50 text-gray-300"
                 )}>
-                  <Coins className="w-5 h-5" />
+                  <Coins className="w-4 h-4" />
                 </div>
-                <span className="text-xl font-black text-gray-900 tracking-tight">{pkg.coins}</span>
-                <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-3">{pkg.label}</span>
+                <span className="text-lg font-black text-gray-900 tracking-tight">{pkg.coins}</span>
+                <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-2">{pkg.label}</span>
                 <div className={cn(
-                  "w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all",
+                  "w-5 h-5 rounded-full flex items-center justify-center border-2 transition-all",
                   selectedPackage?.id === pkg.id ? "bg-primary border-primary text-white shadow-lg" : "border-gray-100 bg-white"
                 )}>
-                  {selectedPackage?.id === pkg.id && <ArrowRight className="w-3 h-3" />}
+                  {selectedPackage?.id === pkg.id && <ArrowRight className="w-2.5 h-2.5" />}
                 </div>
               </div>
             ))}
