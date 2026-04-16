@@ -30,7 +30,7 @@ export function Navigation() {
   ];
 
   return (
-    <nav className="glass-nav px-6 pb-8 pt-4 h-24">
+    <nav className="glass-nav px-6 pb-6 pt-3 h-20">
       <div className="max-w-md mx-auto flex justify-around items-center h-full">
         {navItems.map((item) => {
           const isActive = item.href === '/home' 
@@ -42,29 +42,29 @@ export function Navigation() {
               key={item.href} 
               href={item.href}
               className={cn(
-                "relative flex flex-col items-center justify-center space-y-1.5 group transition-all duration-300 min-w-[64px]",
+                "relative flex flex-col items-center justify-center space-y-1 group transition-all duration-300 min-w-[64px]",
                 isActive ? item.activeColor : "text-muted-foreground/40"
               )}
             >
               <div className={cn(
-                "p-2.5 rounded-[1.25rem] transition-all duration-500 active:scale-90",
-                isActive && "bg-primary/10 shadow-[0_0_20px_rgba(20,184,166,0.1)]"
+                "p-2 rounded-[1rem] transition-all duration-500 active:scale-90",
+                isActive && "bg-primary/10 shadow-[0_0_15px_rgba(20,184,166,0.1)]"
               )}>
                 <item.icon 
                   className={cn(
-                    "w-7 h-7 transition-all duration-500", 
+                    "w-6 h-6 transition-all duration-500", 
                     isActive ? "scale-110 stroke-[2.5px]" : "stroke-[2px]"
                   )} 
                 />
               </div>
               <span className={cn(
-                "text-[10px] font-black tracking-[0.1em] uppercase transition-all duration-500",
+                "text-[9px] font-black tracking-[0.1em] uppercase transition-all duration-500",
                 isActive ? "opacity-100 translate-y-0" : "opacity-40 translate-y-0.5"
               )}>
                 {item.label}
               </span>
               {isActive && (
-                <div className="absolute -top-2 w-1.5 h-1.5 bg-primary rounded-full animate-in fade-in zoom-in duration-500 shadow-[0_0_10px_#14b8a6]" />
+                <div className="absolute -top-1 w-1 h-1 bg-primary rounded-full animate-in fade-in zoom-in duration-500 shadow-[0_0_10px_#14b8a6]" />
               )}
             </Link>
           );
