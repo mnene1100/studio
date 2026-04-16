@@ -16,7 +16,8 @@ import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 export default function ChatDetailPage() {
-  const { id: targetUserId } = useParams();
+  const { targetUserId } = useParams();
+  const id = targetUserId as string;
   const router = useRouter();
   const db = useFirestore();
   const { user: currentUser } = useUser();
@@ -28,14 +29,14 @@ export default function ChatDetailPage() {
 
   // 1. Get Target User Profile
   const targetUserRef = useMemoFirebase(() => {
-    if (!db || !targetUserId) return null;
-    return doc(db, 'userProfiles', targetUserId as string);
-  }, [db, targetUserId]);
+    if (!db || !id) return null;
+    return doc(db, 'userProfiles', id);
+  }, [db, id]);
   const { data: profile } = useDoc(targetUserRef);
 
   // 2. Find or Create Chat Conversation
   useEffect(() => {
-    if (!db || !currentUser || !targetUserId) return;
+    if (!db || !currentUser || !id) return;
 
     const findConversation = async () => {
       const q = query(
@@ -46,19 +47,19 @@ export default function ChatDetailPage() {
       let found = false;
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        if (data.participantIds.includes(targetUserId)) {
+        if (data.participantIds.includes(id)) {
           setChatId(doc.id);
           found = true;
         }
       });
 
       if (!found) {
-        const newChatId = [currentUser.uid, targetUserId].sort().join('_');
+        const newChatId = [currentUser.uid, id].sort().join('_');
         const chatRef = doc(db, 'chatConversations', newChatId);
         setDocumentNonBlocking(chatRef, {
           id: newChatId,
           type: 'private',
-          participantIds: [currentUser.uid, targetUserId],
+          participantIds: [currentUser.uid, id],
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         }, { merge: true });
@@ -67,7 +68,7 @@ export default function ChatDetailPage() {
     };
 
     findConversation();
-  }, [db, currentUser, targetUserId]);
+  }, [db, currentUser, id]);
 
   // 3. Listen to Real-time Messages
   const messagesQuery = useMemoFirebase(() => {
@@ -127,7 +128,7 @@ export default function ChatDetailPage() {
   };
 
   const startCall = (type: 'video' | 'audio') => {
-    router.push(`/home/call/${targetUserId}?type=${type}`);
+    router.push(`/home/call/${id}?type=${type}`);
   };
 
   const isOnline = useMemo(() => {
@@ -153,9 +154,9 @@ export default function ChatDetailPage() {
   const isInputEmpty = !input.trim();
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-white overflow-hidden overscroll-none">
+    <div className="fixed inset-0 flex flex-col bg-white overflow-hidden">
       {/* Seamless Fixed Header */}
-      <header className="bg-primary safe-top sticky top-0 z-50 flex-shrink-0">
+      <header className="bg-primary safe-top flex-shrink-0 z-20">
         <div className="h-16 px-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Button 
@@ -206,8 +207,12 @@ export default function ChatDetailPage() {
       </header>
 
       {/* Scrollable Messages Area */}
-      <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col space-y-4 bg-white overscroll-contain" ref={scrollRef}>
-        {(messages || []).map((msg: any, i: number) => {
+      <div 
+        className="flex-1 overflow-y-auto px-6 py-6 flex flex-col space-y-4 bg-white overscroll-contain" 
+        ref={scrollRef}
+        style={{ WebkitOverflowScrolling: 'touch' }}
+      >
+        {messages.map((msg: any, i: number) => {
           const isMe = msg.senderId === currentUser?.uid;
           return (
             <div key={i} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
@@ -223,52 +228,54 @@ export default function ChatDetailPage() {
       </div>
 
       {/* Fixed Bottom Input Area */}
-      <div className="px-6 py-4 bg-white border-t border-gray-100 flex flex-col space-y-3 z-10 pb-[env(safe-area-inset-bottom,16px)] flex-shrink-0">
-        {suggestions.length > 0 && (
-          <div className="flex space-x-2 overflow-x-auto pb-2 -mx-2 px-2">
-            {suggestions.map((s, i) => (
-              <button 
-                key={i}
-                onClick={() => setInput(s)}
-                className="whitespace-nowrap px-4 py-2 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest rounded-full border border-primary/10 active:scale-95 transition-all"
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        )}
-        
-        <div className="flex items-center space-x-3">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="w-12 h-12 bg-gray-50 rounded-full text-red-500 shadow-sm flex-shrink-0"
-            onClick={handleGetSuggestions}
-          >
-            <Gift className="w-5 h-5 fill-red-500" />
-          </Button>
-
-          <div className="flex-1 relative">
-            <Input 
-              placeholder="Message..." 
-              className="w-full bg-gray-50 border-none rounded-full h-12 px-6 text-sm font-medium placeholder:text-gray-400 focus-visible:ring-primary/20"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-            />
+      <div className="bg-white border-t border-gray-100 flex-shrink-0 z-10 pb-safe">
+        <div className="px-6 py-4 flex flex-col space-y-3">
+          {suggestions.length > 0 && (
+            <div className="flex space-x-2 overflow-x-auto pb-2 -mx-2 px-2 no-scrollbar">
+              {suggestions.map((s, i) => (
+                <button 
+                  key={i}
+                  onClick={() => setInput(s)}
+                  className="whitespace-nowrap px-4 py-2 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest rounded-full border border-primary/10 active:scale-95 transition-all"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          )}
+          
+          <div className="flex items-center space-x-3">
             <Button 
+              variant="ghost" 
               size="icon" 
-              className={cn(
-                "absolute right-1.5 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full shadow-sm transition-all duration-300",
-                isInputEmpty 
-                  ? "bg-primary/20 text-white/50 cursor-not-allowed" 
-                  : "bg-primary text-white shadow-lg active:scale-90"
-              )}
-              onClick={handleSendMessage}
-              disabled={isInputEmpty}
+              className="w-12 h-12 bg-gray-50 rounded-full text-red-500 shadow-sm flex-shrink-0"
+              onClick={handleGetSuggestions}
             >
-              <Send className="w-4 h-4" />
+              <Gift className="w-5 h-5 fill-red-500" />
             </Button>
+
+            <div className="flex-1 relative">
+              <Input 
+                placeholder="Message..." 
+                className="w-full bg-gray-50 border-none rounded-full h-12 px-6 text-sm font-medium placeholder:text-gray-400 focus-visible:ring-primary/20"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+              />
+              <Button 
+                size="icon" 
+                className={cn(
+                  "absolute right-1.5 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full shadow-sm transition-all duration-300",
+                  isInputEmpty 
+                    ? "bg-primary/20 text-white/50 cursor-not-allowed" 
+                    : "bg-primary text-white shadow-lg active:scale-90"
+                )}
+                onClick={handleSendMessage}
+                disabled={isInputEmpty}
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
