@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
@@ -21,7 +22,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen pb-32 bg-black">
       {/* Compact Scrollable Header Area */}
-      <div className="bg-primary pt-10 pb-6 px-6 shadow-2xl">
+      <div className="bg-primary pt-4 pb-6 px-6 shadow-2xl">
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-white/10 backdrop-blur-xl rounded-[1.75rem] flex flex-col items-center justify-center p-4 border border-white/20 active:scale-95 transition-all cursor-pointer h-24 shadow-lg group">
             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-2 group-hover:rotate-12 transition-transform">
