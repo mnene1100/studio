@@ -28,7 +28,7 @@ export function Navigation() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 h-14 w-full bg-white border-t border-gray-100 flex items-center justify-around px-6 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] pb-safe">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 h-[4.75rem] w-full bg-white border-t border-gray-100 flex items-center justify-around px-6 shadow-[0_-4px_30px_rgba(0,0,0,0.08)] pb-safe">
       {navItems.map((item) => {
         const isActive = item.href === '/home' 
           ? pathname === '/home' 
@@ -38,7 +38,7 @@ export function Navigation() {
           <Link 
             key={item.href} 
             href={item.href}
-            className="flex flex-col items-center justify-center space-y-1 group relative flex-1 h-full"
+            className="flex flex-col items-center justify-center space-y-1.5 group relative flex-1 h-full pt-1"
           >
             <div className={cn(
               "transition-all duration-300",
