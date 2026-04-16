@@ -117,7 +117,10 @@ export default function MePage() {
           <ChevronRight className="w-5 h-5 text-white/50" />
         </button>
 
-        <button className="w-full flex items-center p-5 bg-white border border-gray-100 rounded-[1.75rem] shadow-sm active:scale-[0.98] transition-all group">
+        <button 
+          onClick={() => router.push('/home/support')}
+          className="w-full flex items-center p-5 bg-white border border-gray-100 rounded-[1.75rem] shadow-sm active:scale-[0.98] transition-all group"
+        >
           <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center mr-4">
             <Headset className="w-6 h-6 text-primary" />
           </div>

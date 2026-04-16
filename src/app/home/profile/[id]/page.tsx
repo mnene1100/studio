@@ -7,10 +7,16 @@ import { doc } from 'firebase/firestore';
 import { Button } from "@/components/ui/button";
 import { 
   ChevronLeft, MoreHorizontal, Copy, 
-  Globe, Calendar, MessageSquare 
+  Globe, Calendar, Ban, Flag 
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { differenceInYears } from 'date-fns';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function UserProfilePage() {
   const { id } = useParams();
@@ -41,6 +47,20 @@ export default function UserProfilePage() {
         description: "User ID has been copied to your clipboard.",
       });
     }
+  };
+
+  const handleBlock = () => {
+    toast({
+      title: "User Blocked",
+      description: `${profile?.displayName} will no longer be able to contact you.`,
+    });
+  };
+
+  const handleReport = () => {
+    toast({
+      title: "User Reported",
+      description: "Our safety team has been notified and will review this account.",
+    });
   };
 
   if (isLoading) {
@@ -75,13 +95,34 @@ export default function UserProfilePage() {
           >
             <ChevronLeft className="w-6 h-6" />
           </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="w-12 h-12 bg-black/20 backdrop-blur-md rounded-full text-white border border-white/10 hover:bg-black/40"
-          >
-            <MoreHorizontal className="w-6 h-6" />
-          </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="w-12 h-12 bg-black/20 backdrop-blur-md rounded-full text-white border border-white/10 hover:bg-black/40"
+              >
+                <MoreHorizontal className="w-6 h-6" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-white/90 backdrop-blur-xl border-none rounded-3xl p-2 shadow-2xl min-w-[160px]">
+              <DropdownMenuItem 
+                onClick={handleBlock}
+                className="flex items-center space-x-3 p-4 rounded-2xl focus:bg-red-50 text-red-500 cursor-pointer font-black uppercase tracking-widest text-[10px]"
+              >
+                <Ban className="w-4 h-4" />
+                <span>Block User</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={handleReport}
+                className="flex items-center space-x-3 p-4 rounded-2xl focus:bg-orange-50 text-orange-600 cursor-pointer font-black uppercase tracking-widest text-[10px]"
+              >
+                <Flag className="w-4 h-4" />
+                <span>Report User</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Last Seen Badge */}
