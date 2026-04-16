@@ -100,17 +100,10 @@ export default function HomePage() {
                         </span>
                       </div>
                       
-                      {/* Distance Badge */}
+                      {/* Country Badge */}
                       <div className="px-2.5 py-1 bg-[#D9FF00] rounded-full">
                         <span className="text-[8px] font-black text-black uppercase tracking-widest">
-                          {u.country?.substring(0, 5) || '>500KM'}
-                        </span>
-                      </div>
-
-                      {/* Status Badge */}
-                      <div className="px-2.5 py-1 bg-black/60 backdrop-blur-sm rounded-full">
-                        <span className="text-[8px] font-black text-white uppercase tracking-tighter">
-                          In NEXO
+                          {u.country?.substring(0, 5) || 'Kenya'}
                         </span>
                       </div>
                     </div>
