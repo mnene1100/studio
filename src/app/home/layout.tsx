@@ -1,11 +1,10 @@
-
 "use client";
 
-import { useEffect, useState, createContext, useContext } from 'react';
+import { useEffect, createContext, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { Navigation } from "@/components/navigation";
 import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase, updateDocumentNonBlocking } from '@/firebase';
-import { doc, collection, query, where, limit, serverTimestamp } from 'firebase/firestore';
+import { doc, collection, query, where, limit } from 'firebase/firestore';
 
 interface HomeDataContextType {
   profile: any;
@@ -89,7 +88,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
 
   if (isAuthLoading || (isProfileLoading && !profile && !localStorage.getItem('nexo_profile_completed'))) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-white">
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
@@ -104,7 +103,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
       isChatsLoading,
       isUsersLoading
     }}>
-      <div className="min-h-screen bg-white relative">
+      <div className="min-h-screen bg-background relative">
         <main className="max-w-md mx-auto min-h-screen">
           {children}
         </main>

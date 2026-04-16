@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from 'next/link';
@@ -34,7 +33,7 @@ export function Navigation() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 h-[4.75rem] w-full bg-white border-t border-gray-100 flex items-center justify-around px-6 shadow-[0_-4px_30px_rgba(0,0,0,0.08)] pb-safe">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 h-[4.75rem] w-full bg-background border-t border-border flex items-center justify-around px-6 shadow-[0_-4px_30px_rgba(0,0,0,0.08)] pb-safe">
       {navItems.map((item) => {
         const isActive = pathname === item.href;
           
@@ -51,13 +50,13 @@ export function Navigation() {
               <item.icon 
                 className={cn(
                   "w-5 h-5", 
-                  isActive ? "text-primary fill-primary/10" : "text-gray-400"
+                  isActive ? "text-primary fill-primary/10" : "text-muted-foreground"
                 )} 
               />
             </div>
             <span className={cn(
               "text-[9px] font-black uppercase tracking-widest transition-colors",
-              isActive ? "text-primary" : "text-gray-300"
+              isActive ? "text-primary" : "text-muted-foreground"
             )}>
               {item.label}
             </span>

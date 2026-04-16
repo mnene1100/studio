@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useHomeData } from './layout';
@@ -11,7 +10,7 @@ export default function HomePage() {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col min-h-screen pb-32 bg-white">
+    <div className="flex flex-col min-h-screen pb-32 bg-background">
       <div className="bg-primary safe-top pb-6 px-5 rounded-b-[2.5rem] shadow-lg">
         <div className="grid grid-cols-2 gap-4 mb-6 pt-2">
           <div className="bg-white/20 backdrop-blur-md rounded-3xl flex flex-col items-center justify-center p-5 border border-white/20 transition-all cursor-pointer h-36 shadow-lg group">
@@ -52,7 +51,7 @@ export default function HomePage() {
                 <div 
                   key={u.id} 
                   onClick={() => router.push(`/home/profile/${u.id}`)}
-                  className="group relative aspect-[3/4.6] overflow-hidden rounded-[1.25rem] shadow-xl transition-all cursor-pointer bg-gray-50 border border-gray-100"
+                  className="group relative aspect-[3/4.6] overflow-hidden rounded-[1.25rem] shadow-xl transition-all cursor-pointer bg-card border border-border"
                 >
                   <Image 
                     src={u.profilePictureUrl || `https://picsum.photos/seed/${u.id}/600/900`} 

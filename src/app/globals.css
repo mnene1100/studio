@@ -60,12 +60,11 @@
     -webkit-text-size-adjust: 100%;
     height: 100%;
     background-color: #28B4A4;
-    /* Disable pull-to-refresh at the root */
     overscroll-behavior-y: none;
   }
 
   body {
-    @apply bg-white text-foreground antialiased;
+    @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
     overscroll-behavior-y: none;
     min-height: 100%;
