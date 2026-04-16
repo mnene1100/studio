@@ -1,13 +1,13 @@
 
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { RefreshCw, MessageSquare, UserCheck, Loader2 } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { differenceInYears } from 'date-fns';
-import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, limit, orderBy } from 'firebase/firestore';
+import { useUser, useFirestore } from '@/firebase';
+import { collection, query, limit, orderBy, getDocs, where } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
@@ -15,31 +15,47 @@ export default function HomePage() {
   const router = useRouter();
   const { user } = useUser();
   const db = useFirestore();
+  
+  const [discoveryUsers, setDiscoveryUsers] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [pageSize, setPageSize] = useState(6);
+  const [hasMore, setHasMore] = useState(true);
 
   const mysteryIcon = PlaceHolderImages.find(img => img.id === 'mystery-icon');
   const taskIcon = PlaceHolderImages.find(img => img.id === 'task-icon');
 
-  const discoveryQuery = useMemoFirebase(() => {
-    if (!db || !user?.uid) return null;
-    return query(
-      collection(db, 'users'), 
-      orderBy('lastOnlineAt', 'desc'),
-      limit(pageSize)
-    );
-  }, [db, user?.uid, pageSize]);
-  
-  const { data: allUsers, isLoading: isUsersLoading } = useCollection(discoveryQuery);
-  
-  const discoveryUsers = useMemo(() => {
-    if (!allUsers || !user?.uid) return [];
-    return allUsers.filter(u => u.id !== user.uid);
-  }, [allUsers, user?.uid]);
+  // Optimized: Use getDocs instead of useCollection (onSnapshot) 
+  // to avoid charging for every heartbeat update of every user in the list.
+  const fetchUsers = async (currentSize: number) => {
+    if (!db || !user?.uid) return;
+    
+    setIsLoading(true);
+    try {
+      const q = query(
+        collection(db, 'users'), 
+        orderBy('lastOnlineAt', 'desc'),
+        limit(currentSize + 1) // Fetch one extra to check for more
+      );
+      
+      const snapshot = await getDocs(q);
+      const docs = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }))
+        .filter(u => u.id !== user.uid);
+      
+      const limitedDocs = docs.slice(0, currentSize);
+      setDiscoveryUsers(limitedDocs);
+      setHasMore(docs.length > currentSize);
+    } catch (e) {
+      console.error("Error fetching discovery users:", e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  const hasMore = useMemo(() => {
-    if (!allUsers) return false;
-    return allUsers.length >= pageSize;
-  }, [allUsers, pageSize]);
+  useEffect(() => {
+    if (user?.uid) {
+      fetchUsers(pageSize);
+    }
+  }, [user?.uid, pageSize]);
 
   const handleLoadMore = () => {
     setPageSize(prev => prev + 6);
@@ -47,11 +63,8 @@ export default function HomePage() {
 
   const handleRefresh = () => {
     setPageSize(6);
+    fetchUsers(6);
   };
-
-  // Improved visibility logic: showEmpty ONLY if loading is definitively finished and no users exist
-  const showLoading = isUsersLoading || (allUsers === null && user?.uid);
-  const showEmpty = !isUsersLoading && allUsers !== null && discoveryUsers.length === 0;
 
   return (
     <div className="flex flex-col min-h-screen pb-32 bg-background">
@@ -100,7 +113,7 @@ export default function HomePage() {
       </div>
 
       <div className="px-3 pt-4 flex-1">
-        {showLoading ? (
+        {isLoading && discoveryUsers.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 className="w-8 h-8 text-primary animate-spin" />
             <p className="mt-4 text-[9px] font-black text-primary/40 uppercase tracking-[0.3em]">Finding matches...</p>
@@ -157,7 +170,7 @@ export default function HomePage() {
               );
             })}
           </div>
-        ) : showEmpty ? (
+        ) : !isLoading ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-20 px-10">
             <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
                <RefreshCw className="w-8 h-8 text-gray-200" />
@@ -167,7 +180,7 @@ export default function HomePage() {
           </div>
         ) : null}
 
-        {!showLoading && discoveryUsers.length > 0 && (
+        {!isLoading && discoveryUsers.length > 0 && (
           <div className="flex flex-col items-center justify-center pb-16 pt-4">
             {hasMore ? (
               <Button 

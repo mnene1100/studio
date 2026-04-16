@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useMemo, useEffect, useState } from 'react';
+import { useMemo, useEffect, useState, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useFirestore, useDoc, useMemoFirebase, useUser, setDocumentNonBlocking } from '@/firebase';
 import { doc } from 'firebase/firestore';
@@ -26,6 +26,7 @@ export default function UserProfilePage() {
   const db = useFirestore();
   const { user: currentUser } = useUser();
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const visitorRecordedRef = useRef(false);
 
   const userRef = useMemoFirebase(() => {
     if (!db || !id || !currentUser?.uid) return null;
@@ -34,9 +35,11 @@ export default function UserProfilePage() {
 
   const { data: profile, isLoading } = useDoc(userRef);
 
+  // Optimized Visitor Recording: Only write once per session to reduce writes
   useEffect(() => {
-    if (!db || !currentUser || !id || currentUser.uid === id) return;
+    if (!db || !currentUser || !id || currentUser.uid === id || visitorRecordedRef.current) return;
     
+    visitorRecordedRef.current = true;
     const visitorRef = doc(db, 'users', id as string, 'visitors', currentUser.uid);
     setDocumentNonBlocking(visitorRef, {
       id: currentUser.uid,
@@ -58,8 +61,7 @@ export default function UserProfilePage() {
     if (!profile?.lastOnlineAt) return false;
     const lastOnline = new Date(profile.lastOnlineAt).getTime();
     const now = Date.now();
-    // Tighter threshold (90s) to better reflect real-time activity based on heartbeat
-    return now - lastOnline < 90000;
+    return now - lastOnline < 150000; // Aligned with 2min heartbeat
   }, [profile?.lastOnlineAt]);
 
   const statusText = useMemo(() => {
@@ -188,7 +190,6 @@ export default function UserProfilePage() {
         </div>
       </div>
 
-      {/* Profile Details Area - Edges made fully straight per user request */}
       <div className="px-6 bg-white relative z-10 pt-8 flex-1 rounded-none border-t border-gray-100">
         <div className="mb-3">
           <div className={`inline-flex items-center px-3 py-1 rounded-none border ${isOnline ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>

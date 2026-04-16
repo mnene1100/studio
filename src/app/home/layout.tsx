@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, createContext, useContext } from 'react';
@@ -24,39 +25,35 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   const { user, isUserLoading: isAuthLoading } = useUser();
   const db = useFirestore();
 
-  // Presence Tracking
+  // Presence Tracking: Optimized to 2 minutes to reduce writes
   useEffect(() => {
     if (!db || !user?.uid) return;
 
     const userRef = doc(db, 'users', user.uid);
     
     const updatePresence = () => {
-      // Use set with merge instead of update to handle non-existent docs safely during onboarding
       setDocumentNonBlocking(userRef, {
         lastOnlineAt: new Date().toISOString()
       }, { merge: true });
     };
 
     updatePresence();
-    const interval = setInterval(updatePresence, 60000);
+    const interval = setInterval(updatePresence, 120000); // 2 minutes
     return () => clearInterval(interval);
   }, [db, user?.uid]);
 
-  // Essential Global Listener: User Profile
   const profileRef = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
     return doc(db, 'users', user.uid);
   }, [db, user?.uid]);
   const { data: profile, isLoading: isProfileLoading } = useDoc(profileRef);
 
-  // Profile status maintenance
   useEffect(() => {
     if (!isProfileLoading && profile) {
       localStorage.setItem('nexo_profile_completed', 'true');
     }
   }, [profile, isProfileLoading]);
 
-  // Auth and Session Guard
   useEffect(() => {
     if (isAuthLoading) return;
 
@@ -67,7 +64,6 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
       return;
     }
 
-    // Only redirect to onboarding if we are sure the profile doesn't exist
     if (!isProfileLoading && !profile) {
       const localProfileCompleted = localStorage.getItem('nexo_profile_completed') === 'true';
       if (!localProfileCompleted) {
