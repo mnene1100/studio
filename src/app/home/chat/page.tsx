@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from 'next/link';
@@ -16,9 +15,9 @@ export default function ChatListPage() {
   });
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-white">
+    <div className="flex flex-col min-h-screen bg-white pb-32">
       {/* Reference Image Header: Teal background, script 'Chats' title */}
-      <header className="bg-primary px-6 pt-10 pb-4 flex items-center justify-between shadow-sm relative z-10">
+      <header className="bg-primary px-6 pt-10 pb-4 flex items-center justify-between shadow-sm sticky top-0 z-10">
         <h1 className="text-4xl text-white font-medium italic tracking-tight" style={{ fontFamily: 'cursive, sans-serif' }}>
           Chats
         </h1>
@@ -27,7 +26,7 @@ export default function ChatListPage() {
         </button>
       </header>
 
-      <div className="flex-1 overflow-y-auto px-4 pb-32 pt-4 bg-white">
+      <div className="flex-1 px-4 pt-4 bg-white">
         {isChatsLoading ? (
           <div className="space-y-4 px-2">
             {[1, 2, 3].map(i => (
@@ -73,7 +72,7 @@ export default function ChatListPage() {
           </div>
         ) : (
           /* Empty State exactly matching the provided screenshot */
-          <div className="flex flex-col items-center justify-center h-full text-center pb-20">
+          <div className="flex flex-col items-center justify-center h-[60vh] text-center">
             <div className="w-32 h-32 bg-gray-50 rounded-full flex items-center justify-center mb-8 border border-gray-100 shadow-sm">
               <MessageSquare className="w-14 h-14 text-gray-200" />
             </div>

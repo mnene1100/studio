@@ -53,30 +53,32 @@
   * {
     @apply border-border outline-none;
     -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Disable selection globally for native feel */
+  html, body {
     user-select: none;
     -webkit-user-select: none;
+    overflow-x: hidden;
+    height: 100%;
   }
 
   /* Re-enable selection for inputs and textareas */
-  input, textarea {
+  input, textarea, [contenteditable="true"] {
     user-select: text;
     -webkit-user-select: text;
   }
 
-  html {
-    height: 100%;
-    overflow: hidden;
-  }
-
   body {
-    @apply bg-background text-foreground selection:bg-accent/30 antialiased h-full;
+    @apply bg-white text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
-    overscroll-behavior-y: none;
-    touch-action: pan-x pan-y;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: none; /* Disables pull-to-refresh */
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
   }
   
+  /* Hide scrollbars but keep functionality */
   ::-webkit-scrollbar {
     display: none;
   }
