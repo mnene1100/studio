@@ -32,9 +32,9 @@ function ChatListItem({ chat }: { chat: any }) {
       className="flex items-center px-4 py-4 rounded-none active:bg-gray-50 transition-all group border border-transparent"
     >
       <div className="relative">
-        <Avatar className="w-14 h-14 rounded-none ring-2 ring-gray-50 shadow-sm">
+        <Avatar className="w-14 h-14 rounded-full ring-2 ring-gray-50 shadow-sm">
           <AvatarImage src={profile?.profilePictureUrl} />
-          <AvatarFallback className="bg-gray-100 text-lg font-bold rounded-none">
+          <AvatarFallback className="bg-gray-100 text-lg font-bold rounded-full">
             <MessageCircle className="w-6 h-6 text-primary" />
           </AvatarFallback>
         </Avatar>
@@ -83,7 +83,7 @@ export default function ChatListPage() {
         <h1 className="text-3xl text-white font-black italic tracking-tight uppercase pt-2">
           Chats
         </h1>
-        <button className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-none flex items-center justify-center border border-white/20 active:scale-90 transition-all mt-2">
+        <button className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 active:scale-90 transition-all mt-2">
           <MessageSquare className="w-4 h-4 text-white fill-white" />
         </button>
       </header>
@@ -101,7 +101,7 @@ export default function ChatListPage() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-[60vh] text-center">
-            <div className="w-24 h-24 bg-gray-50 rounded-none flex items-center justify-center mb-6 border border-gray-100 shadow-sm">
+            <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6 border border-gray-100 shadow-sm">
               <MessageSquare className="w-10 h-10 text-gray-200" />
             </div>
             <h2 className="text-[10px] font-black text-gray-300 tracking-[0.3em] uppercase italic">
