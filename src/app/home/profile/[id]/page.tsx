@@ -18,7 +18,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/dropdown-menu";
 
 export default function UserProfilePage() {
   const { id } = useParams();
@@ -109,8 +109,8 @@ export default function UserProfilePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white relative pb-40 overflow-x-hidden">
-      {/* Hero Image Section */}
-      <div className="relative w-full aspect-[4/5] overflow-hidden bg-muted">
+      {/* Hero Image Section - Slightly shorter for compact feel */}
+      <div className="relative w-full aspect-[1/1.15] overflow-hidden bg-muted">
         <Image 
           src={profile.profilePictureUrl || `https://picsum.photos/seed/${profile.id}/800/1000`}
           alt={profile.displayName || "User"}
@@ -121,18 +121,18 @@ export default function UserProfilePage() {
         />
         
         {/* Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent h-1/3" />
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-white via-white/10 to-transparent h-32" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent h-1/4" />
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-white via-white/10 to-transparent h-24" />
 
-        {/* Top Navigation */}
-        <div className="absolute top-12 left-6 right-6 flex items-center justify-between z-20">
+        {/* Top Navigation - Smaller icons */}
+        <div className="absolute top-10 left-4 right-4 flex items-center justify-between z-20">
           <Button 
             variant="ghost" 
             size="icon" 
             onClick={() => router.back()}
-            className="w-12 h-12 bg-black/20 backdrop-blur-md rounded-full text-white border border-white/10 hover:bg-black/40 active:scale-95 transition-all"
+            className="w-10 h-10 bg-black/20 backdrop-blur-md rounded-full text-white border border-white/10 hover:bg-black/40 active:scale-95 transition-all"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-5 h-5" />
           </Button>
 
           <DropdownMenu>
@@ -140,24 +140,24 @@ export default function UserProfilePage() {
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="w-12 h-12 bg-black/20 backdrop-blur-md rounded-full text-white border border-white/10 hover:bg-black/40 active:scale-95 transition-all"
+                className="w-10 h-10 bg-black/20 backdrop-blur-md rounded-full text-white border border-white/10 hover:bg-black/40 active:scale-95 transition-all"
               >
-                <MoreHorizontal className="w-6 h-6" />
+                <MoreHorizontal className="w-5 h-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white/95 backdrop-blur-xl border-none rounded-[2rem] p-2 shadow-2xl min-w-[180px]">
+            <DropdownMenuContent className="bg-white/95 backdrop-blur-xl border-none rounded-3xl p-1 shadow-2xl min-w-[160px]">
               <DropdownMenuItem 
                 onClick={handleBlock}
-                className="flex items-center space-x-3 p-4 rounded-2xl focus:bg-red-50 text-red-500 cursor-pointer font-black uppercase tracking-widest text-[10px]"
+                className="flex items-center space-x-2.5 p-3 rounded-xl focus:bg-red-50 text-red-500 cursor-pointer font-black uppercase tracking-widest text-[9px]"
               >
-                <Ban className="w-4 h-4" />
+                <Ban className="w-3.5 h-3.5" />
                 <span>Block User</span>
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={handleReport}
-                className="flex items-center space-x-3 p-4 rounded-2xl focus:bg-orange-50 text-orange-600 cursor-pointer font-black uppercase tracking-widest text-[10px]"
+                className="flex items-center space-x-2.5 p-3 rounded-xl focus:bg-orange-50 text-orange-600 cursor-pointer font-black uppercase tracking-widest text-[9px]"
               >
-                <Flag className="w-4 h-4" />
+                <Flag className="w-3.5 h-3.5" />
                 <span>Report User</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -165,64 +165,64 @@ export default function UserProfilePage() {
         </div>
       </div>
 
-      {/* Profile Details Area */}
-      <div className="px-8 -mt-16 bg-white rounded-t-[3.5rem] relative z-10 pt-10 flex-1">
-        {/* Status Indicator - Positioned Well Above the Name */}
-        <div className="mb-4">
-          <div className={`inline-flex items-center px-4 py-1.5 rounded-full shadow-sm border ${isOnline ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
-            <div className={`w-2 h-2 ${isOnline ? 'bg-primary' : 'bg-gray-300'} rounded-full mr-2`} />
-            <span className="text-[10px] font-black uppercase tracking-widest">
+      {/* Profile Details Area - Tighter spacing */}
+      <div className="px-6 -mt-12 bg-white rounded-t-[3rem] relative z-10 pt-8 flex-1">
+        {/* Status Indicator */}
+        <div className="mb-3">
+          <div className={`inline-flex items-center px-3 py-1 rounded-full border ${isOnline ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
+            <div className={`w-1.5 h-1.5 ${isOnline ? 'bg-primary' : 'bg-gray-300'} rounded-full mr-1.5`} />
+            <span className="text-[8px] font-black uppercase tracking-widest">
               {statusText}
             </span>
           </div>
         </div>
 
-        <div className="flex items-start justify-between mb-4">
+        <div className="flex items-start justify-between mb-3">
           <div>
-            <h1 className="text-4xl font-black text-gray-900 tracking-tight leading-none mb-2">
+            <h1 className="text-2xl font-black text-gray-900 tracking-tight leading-none mb-1.5">
               {profile.displayName || "Guest_User"}
             </h1>
-            <p className="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">
+            <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">
               {profile.gender} {age ? `• ${age} Years Old` : ''}
             </p>
           </div>
-          <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center shadow-sm">
-            <Globe className="w-6 h-6 text-primary" />
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shadow-sm">
+            <Globe className="w-5 h-5 text-primary" />
           </div>
         </div>
 
-        <div className="flex items-center space-x-4 mb-10">
+        <div className="flex items-center space-x-3 mb-8">
           <div 
             onClick={copyId}
-            className="flex items-center space-x-2 bg-gray-50 px-5 py-3 rounded-full border border-gray-100 cursor-pointer active:scale-95 transition-all shadow-sm group"
+            className="flex items-center space-x-1.5 bg-gray-50 px-4 py-2 rounded-full border border-gray-100 cursor-pointer active:scale-95 transition-all shadow-sm group"
           >
-            <span className="text-[11px] font-black text-gray-900 tracking-widest">ID: {profile.numericId}</span>
-            <Copy className="w-3.5 h-3.5 text-gray-300 group-hover:text-primary transition-colors" />
+            <span className="text-[9px] font-black text-gray-900 tracking-widest">ID: {profile.numericId}</span>
+            <Copy className="w-3 h-3 text-gray-300 group-hover:text-primary transition-colors" />
           </div>
 
-          <span className="text-[11px] font-black text-gray-300 uppercase tracking-widest">{profile.country || "KENYA"}</span>
+          <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest">{profile.country || "KENYA"}</span>
         </div>
 
-        <div className="mb-10">
-           <h3 className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em] mb-4">About Me</h3>
-           <p className="text-gray-600 font-medium leading-relaxed text-[15px]">
+        <div className="mb-8">
+           <h3 className="text-[8px] font-black text-gray-300 uppercase tracking-[0.3em] mb-2.5">About Me</h3>
+           <p className="text-gray-600 font-medium leading-relaxed text-[13px]">
              {profile.statusMessage || "Passionate traveler and coffee enthusiast. Let's connect and share stories!"}
            </p>
         </div>
 
         {hasInformation && (
-          <div className="space-y-6 pb-20">
-            <h3 className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em]">Information</h3>
+          <div className="space-y-4 pb-20">
+            <h3 className="text-[8px] font-black text-gray-300 uppercase tracking-[0.3em]">Information</h3>
             
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-3">
               {profile.createdAt && (
-                <div className="bg-white border border-gray-100 rounded-[2.5rem] p-6 flex items-center shadow-sm">
-                  <div className="w-14 h-14 bg-primary/5 rounded-2xl flex items-center justify-center mr-5">
-                    <Calendar className="w-7 h-7 text-primary" />
+                <div className="bg-white border border-gray-100 rounded-[2rem] p-4 flex items-center shadow-sm">
+                  <div className="w-10 h-10 bg-primary/5 rounded-xl flex items-center justify-center mr-4">
+                    <Calendar className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Member Since</p>
-                    <h4 className="text-lg font-black text-gray-900 tracking-tight">
+                    <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Member Since</p>
+                    <h4 className="text-sm font-black text-gray-900 tracking-tight">
                       {new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()}
                     </h4>
                   </div>
@@ -233,14 +233,14 @@ export default function UserProfilePage() {
         )}
       </div>
 
-      {/* Floating Action Button */}
-      <div className="fixed bottom-8 left-0 right-0 px-8 z-30 pointer-events-none">
+      {/* Floating Action Button - Slightly more compact */}
+      <div className="fixed bottom-6 left-0 right-0 px-6 z-30 pointer-events-none">
         <div className="max-w-md mx-auto pointer-events-auto">
           <Button 
             onClick={() => router.push(`/home/chat/${profile.id}`)}
-            className="w-full h-16 bg-primary text-white hover:bg-primary/90 font-black rounded-full text-base shadow-2xl shadow-primary/40 transition-all active:scale-95 uppercase tracking-[0.2em] flex items-center justify-center space-x-3"
+            className="w-full h-14 bg-primary text-white hover:bg-primary/90 font-black rounded-full text-sm shadow-2xl shadow-primary/40 transition-all active:scale-95 uppercase tracking-[0.2em] flex items-center justify-center space-x-2.5"
           >
-            <MessageCircle className="w-5 h-5 fill-white" />
+            <MessageCircle className="w-4 h-4 fill-white" />
             <span>Start Chat</span>
           </Button>
         </div>
