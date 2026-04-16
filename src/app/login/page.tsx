@@ -5,24 +5,36 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Zap, Mail, ArrowRight, Lock, UserPlus } from "lucide-react";
+import { Zap, Mail, ArrowRight, Lock, UserPlus, Loader2 } from "lucide-react";
 import { useAuth } from '@/firebase';
-import { initiateAnonymousSignIn, initiateEmailSignIn, initiateEmailSignUp } from '@/firebase/non-blocking-login';
+import { signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { toast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isEmailVisible, setIsEmailVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const auth = useAuth();
 
-  const handleFastLogin = () => {
-    initiateAnonymousSignIn(auth);
-    router.push('/');
+  const handleFastLogin = async () => {
+    setIsLoading(true);
+    try {
+      await signInAnonymously(auth);
+      router.push('/');
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Login failed",
+        description: error.message || "Could not sign in anonymously.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password.trim()) {
       toast({
@@ -32,10 +44,27 @@ export default function LoginPage() {
       });
       return;
     }
-    initiateEmailSignIn(auth, email, password);
+    
+    setIsLoading(true);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      // Layout logic handles redirection to / or /onboarding
+    } catch (error: any) {
+      let message = "Invalid email or password.";
+      if (error.code === 'auth/user-not-found') message = "No account found with this email.";
+      if (error.code === 'auth/wrong-password') message = "Incorrect password.";
+      
+      toast({
+        variant: "destructive",
+        title: "Sign in failed",
+        description: message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSignUp = (e: React.MouseEvent) => {
+  const handleSignUp = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!email.trim() || !password.trim()) {
       toast({
@@ -45,7 +74,33 @@ export default function LoginPage() {
       });
       return;
     }
-    initiateEmailSignUp(auth, email, password);
+
+    if (password.length < 6) {
+      toast({
+        variant: "destructive",
+        title: "Weak password",
+        description: "Password should be at least 6 characters.",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+    } catch (error: any) {
+      let message = "Could not create account.";
+      if (error.code === 'auth/email-already-in-use') {
+        message = "An account with this email already exists. Try signing in instead.";
+      }
+      
+      toast({
+        variant: "destructive",
+        title: "Sign up failed",
+        description: message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -71,6 +126,7 @@ export default function LoginPage() {
             <div className="space-y-4 animate-in fade-in slide-in-from-bottom-6 duration-500">
               <Button 
                 onClick={() => setIsEmailVisible(true)}
+                disabled={isLoading}
                 className="w-full h-16 bg-white text-black hover:bg-white/90 font-bold rounded-2xl text-lg flex items-center justify-center group shadow-xl"
               >
                 <Mail className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
@@ -80,9 +136,14 @@ export default function LoginPage() {
               <Button 
                 variant="ghost"
                 onClick={handleFastLogin}
+                disabled={isLoading}
                 className="w-full h-16 text-accent hover:text-accent hover:bg-accent/10 font-bold rounded-2xl text-lg flex items-center justify-center group"
               >
-                <Zap className="mr-3 h-5 w-5 fill-accent/20 group-hover:scale-110 transition-transform" />
+                {isLoading ? (
+                  <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                ) : (
+                  <Zap className="mr-3 h-5 w-5 fill-accent/20 group-hover:scale-110 transition-transform" />
+                )}
                 Fast Guest Login
               </Button>
             </div>
@@ -99,6 +160,7 @@ export default function LoginPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
+                      disabled={isLoading}
                     />
                   </div>
                   <div className="relative group">
@@ -110,6 +172,7 @@ export default function LoginPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
+                      disabled={isLoading}
                     />
                   </div>
                 </div>
@@ -117,9 +180,10 @@ export default function LoginPage() {
                 <div className="flex flex-col space-y-3 pt-2">
                   <Button 
                     type="submit" 
+                    disabled={isLoading}
                     className="w-full h-14 bg-accent text-accent-foreground hover:bg-accent/90 font-bold rounded-2xl shadow-lg shadow-accent/20"
                   >
-                    Sign In
+                    {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Sign In"}
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
 
@@ -127,6 +191,7 @@ export default function LoginPage() {
                     type="button"
                     variant="outline"
                     onClick={handleSignUp}
+                    disabled={isLoading}
                     className="w-full h-14 border-white/10 bg-white/5 text-white hover:bg-white/10 font-bold rounded-2xl"
                   >
                     <UserPlus className="mr-2 h-5 w-5" />
@@ -138,6 +203,7 @@ export default function LoginPage() {
                     variant="ghost"
                     onClick={() => setIsEmailVisible(false)}
                     className="text-muted-foreground text-xs h-auto p-0 mx-auto"
+                    disabled={isLoading}
                   >
                     Back to options
                   </Button>
