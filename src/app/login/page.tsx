@@ -132,7 +132,7 @@ export default function LoginPage() {
             <Zap className="text-white w-12 h-12" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-6xl font-black tracking-tighter text-white italic">NEXO</h1>
+            <h1 className="text-6xl text-white italic font-['Pacifico'] font-normal">NEXO</h1>
             <p className="text-white/70 font-black tracking-[0.3em] uppercase text-[10px]">
               Premium Communication
             </p>
@@ -148,7 +148,7 @@ export default function LoginPage() {
                 className="w-full h-16 bg-white text-black hover:bg-white/90 font-black rounded-2xl text-lg flex items-center justify-center group shadow-xl uppercase tracking-widest"
               >
                 <Mail className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
-                Email Login
+                Continue With Email
               </Button>
 
               <Button 
@@ -162,7 +162,7 @@ export default function LoginPage() {
                 ) : (
                   <Zap className="mr-3 h-5 w-5 fill-white/20 group-hover:scale-110 transition-transform" />
                 )}
-                Fast Guest
+                Fast Login
               </Button>
             </div>
           ) : (
@@ -232,7 +232,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="absolute bottom-10 flex flex-col items-center space-y-2 z-10 px-6 text-center">
+      <div className="fixed bottom-10 flex flex-col items-center space-y-2 z-10 px-6 text-center">
         <p className="text-[8px] font-black text-white/30 uppercase tracking-[0.1em] leading-relaxed max-w-xs">
           By signing up, you agree to our <span className="text-white/50 underline">Terms</span> and <span className="text-white/50 underline">Privacy Policy</span>.
         </p>
