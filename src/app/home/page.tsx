@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from 'react';
-import { RefreshCw, MessageSquare, UserCheck, Loader2 } from "lucide-react";
+import { RefreshCw, MessageSquare, UserCheck, Loader2, MessageCircle } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { differenceInYears } from 'date-fns';
@@ -47,6 +47,7 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen pb-32 bg-background">
+      {/* Header with quick links */}
       <div className="bg-primary safe-top px-5 pb-8 pt-20">
         <div className="grid grid-cols-2 gap-4 mt-6">
           <div className="bg-white/20 backdrop-blur-md rounded-[1.75rem] h-36 flex flex-col items-center justify-center p-5 border border-white/20 active:scale-95 transition-all cursor-pointer shadow-lg">
@@ -64,6 +65,7 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* Recommended Sticky Label - Seamless (No Shadow) */}
       <div className="sticky top-0 z-40 bg-primary px-5 py-4">
         <div className="flex items-center justify-between">
           <h3 className="text-[10px] font-black text-white tracking-widest uppercase italic">Recommended</h3>
@@ -73,6 +75,7 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* Discovery Grid */}
       <div className="px-3 pt-4 flex-1">
         {isLoading && discoveryUsers.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
@@ -84,8 +87,19 @@ export default function HomePage() {
             {discoveryUsers.map((u, i) => {
               const age = u.dob ? differenceInYears(new Date(), new Date(u.dob)) : 20;
               return (
-                <div key={u.id} onClick={() => router.push(`/home/profile/${u.id}`)} className="relative aspect-[1/1.25] overflow-hidden rounded-[2rem] shadow-xl bg-card active:scale-[0.98] border border-white/5 group">
-                  <Image src={u.profilePictureUrl || `https://picsum.photos/seed/${u.id}/600/750`} alt={u.displayName || 'User'} fill className="object-cover" sizes="50vw" priority={i < 4} />
+                <div 
+                  key={u.id} 
+                  onClick={() => router.push(`/home/profile/${u.id}`)} 
+                  className="relative aspect-[1/1.25] overflow-hidden rounded-[2rem] shadow-xl bg-card active:scale-[0.98] border border-white/5 group"
+                >
+                  <Image 
+                    src={u.profilePictureUrl || `https://picsum.photos/seed/${u.id}/600/750`} 
+                    alt={u.displayName || 'User'} 
+                    fill 
+                    className="object-cover" 
+                    sizes="50vw" 
+                    priority={i < 4} 
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
                   
                   <div className="absolute bottom-4 left-4 right-4">
@@ -97,6 +111,8 @@ export default function HomePage() {
                       <div className="h-5 px-2 bg-primary/30 backdrop-blur-md rounded-full border border-primary/40 flex items-center">
                         <span className="text-[9px] font-black text-white uppercase">{u.gender === 'Female' ? '♀' : '♂'} {age}</span>
                       </div>
+                      
+                      {/* Chat Button Restored */}
                       <button 
                         onClick={(e) => {
                           e.stopPropagation();

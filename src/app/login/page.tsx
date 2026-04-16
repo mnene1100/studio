@@ -32,6 +32,7 @@ export default function LoginPage() {
 
   const detectCountry = async (): Promise<string> => {
     try {
+      // Using ipapi.co for simple IP-based location detection
       const response = await fetch('https://ipapi.co/json/');
       const data = await response.json();
       return data.country_name || 'Kenya';
