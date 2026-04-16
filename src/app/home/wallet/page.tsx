@@ -1,11 +1,12 @@
 
 "use client";
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { 
   ChevronLeft, History, Globe, 
-  Users, UserPlus 
+  Users, UserPlus, Loader2 
 } from "lucide-react";
 import { 
   Select, 
@@ -15,23 +16,58 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { useHomeData } from '../layout';
+import { cn } from '@/lib/utils';
+import { createPesapalOrder } from '@/app/actions/pesapal';
+import { toast } from '@/hooks/use-toast';
 
 const PACKAGES = [
-  { coins: "500", price: "Ksh 70" },
-  { coins: "1,000", price: "Ksh 120" },
-  { coins: "2,000", price: "Ksh 240" },
-  { coins: "5,000", price: "Ksh 600" },
-  { coins: "10,000", price: "Ksh 1,200" },
-  { coins: "12,500", price: "Ksh 1,500" },
+  { id: 'pkg_1', coins: "500", price: 70, currency: "KES", label: "Ksh 70" },
+  { id: 'pkg_2', coins: "1,000", price: 120, currency: "KES", label: "Ksh 120" },
+  { id: 'pkg_3', coins: "2,000", price: 240, currency: "KES", label: "Ksh 240" },
+  { id: 'pkg_4', coins: "5,000", price: 600, currency: "KES", label: "Ksh 600" },
+  { id: 'pkg_5', coins: "10,000", price: 1200, currency: "KES", label: "Ksh 1,200" },
+  { id: 'pkg_6', coins: "12,500", price: 1500, currency: "KES", label: "Ksh 1,500" },
 ];
 
 export default function WalletPage() {
   const router = useRouter();
   const { profile } = useHomeData();
+  const [selectedPackage, setSelectedPackage] = useState<typeof PACKAGES[0] | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handlePayment = async () => {
+    if (!selectedPackage || !profile) return;
+
+    setIsLoading(true);
+    try {
+      const result = await createPesapalOrder({
+        amount: selectedPackage.price,
+        email: profile.email || "guest@nexo.com",
+        phoneNumber: "", // Could be added to profile later
+        firstName: profile.displayName || "Nexo",
+        lastName: "User",
+        description: `Recharge ${selectedPackage.coins} Nexo Coins`,
+        callbackUrl: `${window.location.origin}/home/wallet/callback`,
+      });
+
+      if (result.redirectUrl) {
+        window.location.href = result.redirectUrl;
+      } else {
+        throw new Error("Failed to get payment URL");
+      }
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Payment Initialization Failed",
+        description: error.message || "Could not connect to PesaPal.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F9FAFB] pb-32">
-      {/* Teal Header */}
       <header className="bg-primary px-6 h-32 flex items-center justify-between shadow-lg relative z-10">
         <Button 
           variant="ghost" 
@@ -56,9 +92,7 @@ export default function WalletPage() {
         </Button>
       </header>
 
-      {/* Main Content */}
       <div className="px-6 -mt-8 relative z-20">
-        {/* Balance Card */}
         <div className="bg-white rounded-[2.5rem] p-8 flex items-center space-x-6 shadow-2xl shadow-gray-200 border border-gray-50 mb-10">
           <div className="w-20 h-20 bg-[#E8F8F5] rounded-[1.75rem] flex items-center justify-center">
             <div className="text-primary text-3xl font-black italic">S</div>
@@ -71,7 +105,6 @@ export default function WalletPage() {
           </div>
         </div>
 
-        {/* Region Selector */}
         <div className="space-y-4 mb-10">
           <div className="flex items-center space-x-3 px-2">
             <Globe className="w-4 h-4 text-primary opacity-50" />
@@ -90,26 +123,30 @@ export default function WalletPage() {
           </Select>
         </div>
 
-        {/* Package Grid */}
         <div className="space-y-6 mb-12">
           <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] px-2">Select Package</h3>
           <div className="grid grid-cols-3 gap-4">
-            {PACKAGES.map((pkg, i) => (
+            {PACKAGES.map((pkg) => (
               <div 
-                key={i} 
-                className="bg-white rounded-[2rem] p-5 flex flex-col items-center justify-center shadow-sm border border-gray-50 active:scale-95 transition-all cursor-pointer group hover:border-primary/20"
+                key={pkg.id} 
+                onClick={() => setSelectedPackage(pkg)}
+                className={cn(
+                  "bg-white rounded-[2rem] p-5 flex flex-col items-center justify-center shadow-sm border transition-all cursor-pointer group active:scale-95",
+                  selectedPackage?.id === pkg.id 
+                    ? "border-primary ring-2 ring-primary/20 bg-primary/5" 
+                    : "border-gray-50 hover:border-primary/20"
+                )}
               >
                 <div className="w-10 h-10 bg-[#E8F8F5] rounded-xl flex items-center justify-center mb-3">
                   <span className="text-primary text-sm font-black italic">S</span>
                 </div>
                 <span className="text-lg font-black text-gray-900 leading-none">{pkg.coins}</span>
-                <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-1.5">{pkg.price}</span>
+                <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-1.5">{pkg.label}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* P2P Section */}
         <div className="space-y-4 mb-12">
           <div className="flex items-center space-x-3 px-2">
             <Users className="w-4 h-4 text-primary opacity-50" />
@@ -125,12 +162,24 @@ export default function WalletPage() {
           </Button>
         </div>
 
-        {/* Action Button */}
         <div className="fixed bottom-10 left-8 right-8 z-30">
           <Button 
-            className="w-full h-16 bg-primary/40 text-white rounded-full text-lg font-black shadow-2xl transition-all active:scale-95 pointer-events-none"
+            onClick={handlePayment}
+            disabled={!selectedPackage || isLoading}
+            className={cn(
+              "w-full h-16 rounded-full text-lg font-black shadow-2xl transition-all active:scale-95",
+              selectedPackage 
+                ? "bg-primary text-white" 
+                : "bg-primary/40 text-white pointer-events-none opacity-50"
+            )}
           >
-            Select a Package
+            {isLoading ? (
+              <Loader2 className="w-6 h-6 animate-spin" />
+            ) : selectedPackage ? (
+              `Pay ${selectedPackage.label}`
+            ) : (
+              "Select a Package"
+            )}
           </Button>
         </div>
       </div>
