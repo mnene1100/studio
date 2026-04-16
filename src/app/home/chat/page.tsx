@@ -99,8 +99,8 @@ export default function ChatListPage() {
             <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6 border border-gray-100 shadow-sm">
               <MessageSquare className="w-10 h-10 text-gray-200" />
             </div>
-            <h2 className="text-sm font-black text-gray-300 tracking-[0.2em] uppercase italic">
-              No Messages
+            <h2 className="text-[10px] font-black text-gray-300 tracking-[0.3em] uppercase italic">
+              No active conversations
             </h2>
           </div>
         )}
