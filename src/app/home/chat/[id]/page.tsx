@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { 
   ChevronLeft, Phone, Video, Send, 
-  Sparkles, Zap, MessageCircle 
+  Sparkles, Gift, MessageCircle 
 } from "lucide-react";
 import { useFirestore, useDoc, useCollection, useMemoFirebase, useUser, addDocumentNonBlocking, updateDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase';
 import { doc, collection, query, orderBy, limit, where, getDocs } from 'firebase/firestore';
@@ -244,10 +244,10 @@ export default function ChatDetailPage() {
         <Button 
           variant="ghost" 
           size="icon" 
-          className="w-12 h-12 bg-gray-50 rounded-full text-orange-500 shadow-sm flex-shrink-0"
+          className="w-12 h-12 bg-gray-50 rounded-full text-red-500 shadow-sm flex-shrink-0"
           onClick={handleGetSuggestions}
         >
-          <Zap className="w-5 h-5 fill-orange-500" />
+          <Gift className="w-5 h-5 fill-red-500" />
         </Button>
 
         <div className="flex-1 relative">
