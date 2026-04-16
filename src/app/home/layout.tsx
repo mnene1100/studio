@@ -25,47 +25,34 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   const { user, isUserLoading: isAuthLoading } = useUser();
   const db = useFirestore();
 
-  // Presence Tracking: Optimized to 60 seconds heartbeat
+  const profileRef = useMemoFirebase(() => {
+    if (!db || !user?.uid) return null;
+    return doc(db, 'users', user.uid);
+  }, [db, user?.uid]);
+  
+  const { data: profile, isLoading: isProfileLoading } = useDoc(profileRef);
+
+  // Presence Tracking: Accurate 60s heartbeat
   useEffect(() => {
     if (!db || !user?.uid) return;
-
     const userRef = doc(db, 'users', user.uid);
-    
     const updatePresence = () => {
-      setDocumentNonBlocking(userRef, {
-        lastOnlineAt: new Date().toISOString()
-      }, { merge: true });
+      setDocumentNonBlocking(userRef, { lastOnlineAt: new Date().toISOString() }, { merge: true });
     };
-
     updatePresence();
     const interval = setInterval(updatePresence, 60000); 
     return () => clearInterval(interval);
   }, [db, user?.uid]);
 
-  const profileRef = useMemoFirebase(() => {
-    if (!db || !user?.uid) return null;
-    return doc(db, 'users', user.uid);
-  }, [db, user?.uid]);
-  const { data: profile, isLoading: isProfileLoading } = useDoc(profileRef);
-
   useEffect(() => {
-    if (!isProfileLoading && profile) {
-      localStorage.setItem('nexo_profile_completed', 'true');
-    }
-  }, [profile, isProfileLoading]);
-
-  useEffect(() => {
-    // Gatekeeper: Prevents showing ANY home content if auth or profile is missing
     if (isAuthLoading || isProfileLoading) return;
 
-    const isSessionActive = localStorage.getItem('nexo_session_active') === 'true';
-
-    if (!user || !isSessionActive) {
+    if (!user) {
       router.replace('/login');
       return;
     }
 
-    // Only allow home if profile definitely exists in Firestore
+    // Source of Truth protection for Home area
     if (!profile) {
       localStorage.removeItem('nexo_profile_completed');
       router.replace('/onboarding');
@@ -83,10 +70,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   }
 
   return (
-    <HomeDataContext.Provider value={{ 
-      profile, 
-      isProfileLoading
-    }}>
+    <HomeDataContext.Provider value={{ profile, isProfileLoading }}>
       <div className="min-h-screen bg-background relative">
         <main className="max-w-md mx-auto min-h-screen pb-safe">
           {children}

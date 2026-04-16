@@ -21,60 +21,26 @@ export default function LoginPage() {
   const db = useFirestore();
   const { user, isUserLoading } = useUser();
 
-  // Handle automatic redirection for existing sessions
   useEffect(() => {
-    const isSessionActive = localStorage.getItem('nexo_session_active') === 'true';
-    if (!isUserLoading && user && isSessionActive) {
-      router.replace('/');
+    if (!isUserLoading && user) {
+      const checkAndRedirect = async () => {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          localStorage.setItem('nexo_session_active', 'true');
+          localStorage.setItem('nexo_profile_completed', 'true');
+          router.replace('/home');
+        }
+      };
+      checkAndRedirect();
     }
-  }, [user, isUserLoading, router]);
+  }, [user, isUserLoading, db, router]);
 
   const handleFastLogin = async () => {
     if (!auth) return;
     setIsLoading(true);
-    
     try {
       const userCredential = await signInAnonymously(auth);
-      if (userCredential.user) {
-        localStorage.setItem('nexo_session_active', 'true');
-        // Check if profile exists before deciding where to go
-        const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
-        if (userDoc.exists()) {
-          localStorage.setItem('nexo_profile_completed', 'true');
-          router.replace('/home');
-        } else {
-          router.replace('/onboarding');
-        }
-      }
-    } catch (error: any) {
-      console.error("Fast login error:", error);
-      toast({
-        variant: "destructive",
-        title: "Connection Issue",
-        description: "Could not sign in anonymously. Please try again.",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim() || !password.trim() || !auth) {
-      toast({
-        variant: "destructive",
-        title: "Missing fields",
-        description: "Please enter both email and password.",
-      });
-      return;
-    }
-    
-    setIsLoading(true);
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       localStorage.setItem('nexo_session_active', 'true');
-      
-      // Verification step to ensure they have a profile
       const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
       if (userDoc.exists()) {
         localStorage.setItem('nexo_profile_completed', 'true');
@@ -83,12 +49,32 @@ export default function LoginPage() {
         router.replace('/onboarding');
       }
     } catch (error: any) {
-      console.error("Sign in error:", error);
       toast({
         variant: "destructive",
-        title: "Sign in failed",
-        description: "Invalid email or password.",
+        title: "Login Error",
+        description: error.message || "Network issue detected.",
       });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim() || !password.trim() || !auth) return;
+    setIsLoading(true);
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      localStorage.setItem('nexo_session_active', 'true');
+      const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
+      if (userDoc.exists()) {
+        localStorage.setItem('nexo_profile_completed', 'true');
+        router.replace('/home');
+      } else {
+        router.replace('/onboarding');
+      }
+    } catch (error: any) {
+      toast({ variant: "destructive", title: "Sign in failed", description: "Check credentials and connection." });
     } finally {
       setIsLoading(false);
     }
@@ -96,37 +82,14 @@ export default function LoginPage() {
 
   const handleSignUp = async (e: React.MouseEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password.trim() || !auth) {
-      toast({
-        variant: "destructive",
-        title: "Missing fields",
-        description: "Please enter both email and password.",
-      });
-      return;
-    }
-
-    if (password.length < 6) {
-      toast({
-        variant: "destructive",
-        title: "Weak password",
-        description: "Password should be at least 6 characters.",
-      });
-      return;
-    }
-
+    if (!email.trim() || !password.trim() || !auth) return;
     setIsLoading(true);
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       localStorage.setItem('nexo_session_active', 'true');
-      // New sign-ups ALWAYS go to onboarding
       router.replace('/onboarding');
     } catch (error: any) {
-      console.error("Sign up error:", error);
-      toast({
-        variant: "destructive",
-        title: "Sign up failed",
-        description: error.message || "Could not create account.",
-      });
+      toast({ variant: "destructive", title: "Sign up failed", description: error.message });
     } finally {
       setIsLoading(false);
     }
@@ -135,109 +98,42 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-black relative overflow-hidden">
       <div className="absolute inset-0 bg-black/60 z-[1]" />
-
-      <div className="w-full max-sm space-y-16 text-center z-10">
+      <div className="w-full max-w-sm space-y-16 text-center z-10">
         <div className="space-y-6 animate-in fade-in zoom-in duration-700">
-          <div className="mx-auto w-24 h-24 bg-primary rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-primary/30 rotate-12 transition-transform hover:rotate-0 duration-500">
+          <div className="mx-auto w-24 h-24 bg-primary rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-primary/30 rotate-12">
             <Zap className="text-white w-12 h-12" />
           </div>
           <div className="space-y-2">
             <h1 className="text-5xl text-white font-['Pacifico'] font-light tracking-tight">NEXO</h1>
-            <p className="text-white/40 font-black tracking-[0.4em] uppercase text-[9px]">
-              Premium Communication
-            </p>
+            <p className="text-white/40 font-black tracking-[0.4em] uppercase text-[9px]">Premium Communication</p>
           </div>
         </div>
-
         <div className="space-y-5">
           {!isEmailVisible ? (
-            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-6 duration-500">
-              <Button 
-                onClick={() => setIsEmailVisible(true)}
-                disabled={isLoading}
-                className="w-full h-16 bg-white text-black hover:bg-white/90 font-black rounded-2xl text-base flex items-center justify-center group shadow-xl uppercase tracking-widest"
-              >
-                <Mail className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
-                Continue With Email
+            <div className="space-y-4">
+              <Button onClick={() => setIsEmailVisible(true)} className="w-full h-16 bg-white text-black font-black rounded-2xl uppercase tracking-widest shadow-xl">
+                <Mail className="mr-3 h-5 w-5" /> Continue With Email
               </Button>
-
-              <Button 
-                variant="ghost"
-                onClick={handleFastLogin}
-                disabled={isLoading}
-                className="w-full h-16 text-white hover:text-white hover:bg-white/10 font-black rounded-2xl text-base flex items-center justify-center group uppercase tracking-widest"
-              >
-                {isLoading ? (
-                  <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                ) : (
-                  <Zap className="mr-3 h-5 w-5 fill-white/20 group-hover:scale-110 transition-transform" />
-                )}
-                Fast Login
+              <Button variant="ghost" onClick={handleFastLogin} className="w-full h-16 text-white font-black rounded-2xl uppercase tracking-widest">
+                {isLoading ? <Loader2 className="mr-3 h-5 w-5 animate-spin" /> : <Zap className="mr-3 h-5 w-5" />} Fast Login
               </Button>
             </div>
           ) : (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <form onSubmit={handleSignIn} className="space-y-4 text-left">
-                <div className="space-y-3">
-                  <div className="relative group">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50 group-focus-within:text-primary transition-colors" />
-                    <Input 
-                      type="email" 
-                      placeholder="Email address" 
-                      className="pl-12 h-14 bg-white/10 border-white/10 rounded-2xl text-white placeholder:text-white/30 focus-visible:ring-primary/50 focus-visible:border-primary/50"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      disabled={isLoading}
-                    />
-                  </div>
-                  <div className="relative group">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50 group-focus-within:text-primary transition-colors" />
-                    <Input 
-                      type="password" 
-                      placeholder="Password" 
-                      className="pl-12 h-14 bg-white/10 border-white/10 rounded-2xl text-white placeholder:text-white/30 focus-visible:ring-primary/50 focus-visible:border-primary/50"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      disabled={isLoading}
-                    />
-                  </div>
-                </div>
-                
-                <div className="flex flex-col space-y-3 pt-2">
-                  <Button 
-                    type="submit" 
-                    disabled={isLoading}
-                    className="w-full h-14 bg-primary text-white hover:bg-primary/90 font-black rounded-2xl shadow-lg shadow-primary/20 uppercase tracking-widest"
-                  >
-                    {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Sign In"}
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-
-                  <Button 
-                    type="button"
-                    variant="outline"
-                    onClick={handleSignUp}
-                    disabled={isLoading}
-                    className="w-full h-14 border-white/10 bg-white/5 text-white hover:bg-white/10 font-black rounded-2xl uppercase tracking-widest"
-                  >
-                    <UserPlus className="mr-2 h-5 w-5" />
-                    New Account
-                  </Button>
-
-                  <Button 
-                    type="button"
-                    variant="ghost"
-                    onClick={() => setIsEmailVisible(false)}
-                    className="text-white/40 text-[10px] h-auto p-0 mx-auto font-black uppercase tracking-[0.3em]"
-                    disabled={isLoading}
-                  >
-                    Back to options
-                  </Button>
-                </div>
-              </form>
-            </div>
+            <form onSubmit={handleSignIn} className="space-y-4 text-left animate-in slide-in-from-bottom-4">
+              <div className="space-y-3">
+                <Input type="email" placeholder="Email address" className="h-14 bg-white/10 border-white/10 text-white rounded-2xl" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <Input type="password" placeholder="Password" className="h-14 bg-white/10 border-white/10 text-white rounded-2xl" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              </div>
+              <div className="flex flex-col space-y-3 pt-2">
+                <Button type="submit" disabled={isLoading} className="w-full h-14 bg-primary text-white font-black rounded-2xl shadow-lg shadow-primary/20 uppercase tracking-widest">
+                  {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Sign In"}
+                </Button>
+                <Button type="button" variant="outline" onClick={handleSignUp} className="w-full h-14 border-white/10 bg-white/5 text-white font-black rounded-2xl uppercase tracking-widest">
+                  <UserPlus className="mr-2 h-5 w-5" /> New Account
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => setIsEmailVisible(false)} className="text-white/40 text-[10px] uppercase tracking-widest">Back</Button>
+              </div>
+            </form>
           )}
         </div>
       </div>

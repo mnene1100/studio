@@ -20,23 +20,19 @@ export default function EntryPage() {
       router.replace('/login');
     } else {
       const checkProfileStatus = async () => {
-        // First check local storage for a quick win
-        const localFlag = localStorage.getItem('nexo_profile_completed') === 'true';
-        
         try {
-          // Always verify with the source of truth (Firestore) to prevent session issues
+          // Mandatory Source of Truth check against Firestore
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           if (userDoc.exists()) {
             localStorage.setItem('nexo_profile_completed', 'true');
             router.replace('/home');
           } else {
-            // No profile found, force onboarding
+            // No profile found, user MUST onboard
             localStorage.removeItem('nexo_profile_completed');
             router.replace('/onboarding');
           }
         } catch (e) {
-          console.error("Error checking profile status:", e);
-          // Fallback to onboarding if we can't confirm profile existence
+          console.error("Profile check failed:", e);
           router.replace('/onboarding');
         }
       };

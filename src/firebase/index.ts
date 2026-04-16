@@ -2,18 +2,14 @@
 'use client';
 
 import { firebaseConfig } from '@/firebase/config';
-import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore'
 
-// Global singleton instance to prevent multiple initializations
 let initializedApp: FirebaseApp | undefined;
 
-// IMPORTANT: DO NOT MODIFY THIS FUNCTION
 export function initializeFirebase() {
-  if (initializedApp) {
-    return getSdks(initializedApp);
-  }
+  if (initializedApp) return getSdks(initializedApp);
 
   const existingApps = getApps();
   if (existingApps.length) {
@@ -22,11 +18,10 @@ export function initializeFirebase() {
   }
 
   try {
-    // Attempt to initialize via Firebase App Hosting environment variables
-    initializedApp = initializeApp();
-  } catch (e) {
-    // Fallback to config object if environment variables are not available (e.g., during development)
+    // Robust initialization to prevent network failed issues
     initializedApp = initializeApp(firebaseConfig);
+  } catch (e) {
+    initializedApp = initializeApp();
   }
 
   return getSdks(initializedApp);
