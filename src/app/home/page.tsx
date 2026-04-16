@@ -13,8 +13,8 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen pb-32 bg-background">
-      {/* Scrollable Top Section */}
-      <div className="bg-primary safe-top px-5 pb-8 pt-2 rounded-b-[2rem] shadow-lg">
+      {/* Top Section - Removed rounded-b-[2rem] */}
+      <div className="bg-primary safe-top px-5 pb-8 pt-2 shadow-lg">
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-white/20 backdrop-blur-md rounded-[1.75rem] flex flex-col items-center justify-center p-5 border border-white/20 transition-all cursor-pointer h-36 shadow-lg group active:scale-95">
             <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-2xl flex items-center justify-center mb-2 shadow-xl transform group-hover:rotate-6 transition-transform">
@@ -46,7 +46,7 @@ export default function HomePage() {
         {isUsersLoading ? (
           <div className="grid grid-cols-2 gap-2.5">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="aspect-[3/4.8] bg-muted rounded-xl animate-pulse" />
+              <div key={i} className="aspect-[3/4] bg-muted rounded-2xl animate-pulse" />
             ))}
           </div>
         ) : discoveryUsers.length > 0 ? (
@@ -58,7 +58,7 @@ export default function HomePage() {
                 <div 
                   key={u.id} 
                   onClick={() => router.push(`/home/profile/${u.id}`)}
-                  className="group relative aspect-[3/4.8] overflow-hidden rounded-xl shadow-lg transition-all cursor-pointer bg-card border border-border/50 active:scale-[0.98]"
+                  className="group relative aspect-[3/4] overflow-hidden rounded-[1.5rem] shadow-lg transition-all cursor-pointer bg-card border border-border/50 active:scale-[0.98]"
                 >
                   <Image 
                     src={u.profilePictureUrl || `https://picsum.photos/seed/${u.id}/600/900`} 
