@@ -13,7 +13,7 @@ export default function SupportPage() {
   return (
     <div className="flex flex-col h-screen bg-white">
       {/* Header - Matching screenshot */}
-      <header className="bg-primary px-4 h-24 flex items-center justify-between shadow-md relative z-20">
+      <header className="bg-primary px-4 h-24 flex items-center justify-between relative z-20">
         <div className="flex items-center space-x-3">
           <Button 
             variant="ghost" 

@@ -152,7 +152,7 @@ export default function ChatDetailPage() {
   return (
     <div className="flex flex-col h-screen bg-white overflow-hidden">
       {/* Fixed Header */}
-      <header className="bg-primary safe-top px-4 shadow-md sticky top-0 z-50 flex-shrink-0">
+      <header className="bg-primary safe-top px-4 sticky top-0 z-50 flex-shrink-0">
         <div className="h-20 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Button 

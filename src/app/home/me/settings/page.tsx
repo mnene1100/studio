@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRouter } from 'next/navigation';
@@ -71,7 +72,7 @@ export default function SettingsPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {/* Teal Header with Safe Top */}
-      <header className="bg-primary safe-top relative shadow-md shrink-0">
+      <header className="bg-primary safe-top relative shrink-0">
         <div className="px-4 h-20 flex items-center justify-center">
           <Button 
             variant="ghost" 

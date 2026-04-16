@@ -74,7 +74,7 @@ export default function ChatListPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white pb-32">
-      <header className="bg-primary safe-top px-6 pb-4 flex items-center justify-between shadow-sm sticky top-0 z-40">
+      <header className="bg-primary safe-top px-6 pb-4 flex items-center justify-between sticky top-0 z-40">
         <h1 className="text-3xl text-white font-black italic tracking-tight uppercase pt-2" style={{ fontFamily: 'Inter, sans-serif' }}>
           Chats
         </h1>

@@ -92,7 +92,7 @@ export default function VisitorsPage() {
   return (
     <div className="flex flex-col min-h-screen bg-white pb-32">
       {/* Header */}
-      <header className="bg-primary safe-top px-4 h-24 flex items-center justify-between shadow-md relative z-20">
+      <header className="bg-primary safe-top px-4 h-24 flex items-center justify-between relative z-20">
         <div className="flex items-center space-x-3">
           <Button 
             variant="ghost" 
