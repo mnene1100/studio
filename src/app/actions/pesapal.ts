@@ -1,9 +1,8 @@
-
 'use server';
 
 /**
  * @fileOverview Server Actions for PesaPal V3 Integration.
- * Handles authentication and order creation for secure payments.
+ * Updated for Production (Live) environment.
  */
 
 interface PesapalOrderInput {
@@ -19,7 +18,8 @@ interface PesapalOrderInput {
 export async function createPesapalOrder(input: PesapalOrderInput) {
   const consumerKey = process.env.PESAPAL_CONSUMER_KEY;
   const consumerSecret = process.env.PESAPAL_CONSUMER_SECRET;
-  const baseUrl = process.env.PESAPAL_BASE_URL || 'https://cybil.pesapal.com/pesapalv3';
+  // Use production URL by default if not specified in env
+  const baseUrl = process.env.PESAPAL_BASE_URL || 'https://pay.pesapal.com/v3';
 
   if (!consumerKey || !consumerSecret) {
     throw new Error('PesaPal credentials are not configured on the server.');
@@ -41,13 +41,13 @@ export async function createPesapalOrder(input: PesapalOrderInput) {
 
     const authData = await authResponse.json();
     if (!authData.token) {
+      console.error('PesaPal Auth Error:', authData);
       throw new Error('Failed to authenticate with PesaPal.');
     }
 
     const token = authData.token;
 
-    // 2. Register IPN (In a real app, you'd save this ID or ensure it's registered once)
-    // For this prototype, we'll try to register one to ensure the flow works.
+    // 2. Register IPN
     const ipnResponse = await fetch(`${baseUrl}/api/URLSetup/RegisterIPN`, {
       method: 'POST',
       headers: {
@@ -82,7 +82,7 @@ export async function createPesapalOrder(input: PesapalOrderInput) {
         notification_id: ipnId,
         billing_address: {
           email_address: input.email,
-          phone_number: input.phoneNumber,
+          phone_number: input.phoneNumber || '0700000000',
           country_code: 'KE',
           first_name: input.firstName,
           last_name: input.lastName,
