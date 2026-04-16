@@ -2,21 +2,24 @@
 {
   "name": "NEXO",
   "short_name": "NEXO",
-  "description": "Premium Communication Platform",
+  "description": "Premium Communication & Social Ecosystem",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#28B4A4",
+  "background_color": "#ffffff",
   "theme_color": "#28B4A4",
   "icons": [
     {
       "src": "https://picsum.photos/seed/nexo-logo/192/192",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "https://picsum.photos/seed/nexo-logo/512/512",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "orientation": "portrait"
 }
