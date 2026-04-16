@@ -2,7 +2,7 @@
 "use client";
 
 import { useHomeData } from './layout';
-import { HelpCircle, ClipboardCheck, RefreshCw, MessageSquare, UserCheck } from "lucide-react";
+import { RefreshCw, MessageSquare, UserCheck } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { differenceInYears } from 'date-fns';
@@ -16,15 +16,30 @@ export default function HomePage() {
       {/* Top Section - Structural teal header with extra top space */}
       <div className="bg-primary safe-top px-5 pb-8 pt-20">
         <div className="grid grid-cols-2 gap-4 mt-6">
+          {/* Mystery Note Button */}
           <div className="bg-white/20 backdrop-blur-md rounded-[1.75rem] flex flex-col items-center justify-center p-5 border border-white/20 transition-all cursor-pointer h-36 shadow-lg group active:scale-95">
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-2xl flex items-center justify-center mb-2 shadow-xl transform group-hover:rotate-6 transition-transform">
-               <HelpCircle className="w-6 h-6 text-white" />
+            <div className="w-16 h-16 relative mb-2 transform group-hover:rotate-6 transition-transform">
+               <Image 
+                 src="/mystery.png" 
+                 alt="Mystery Note" 
+                 fill 
+                 className="object-contain" 
+                 priority 
+               />
             </div>
             <span className="text-white font-black text-[8px] tracking-[0.15em] uppercase text-center">Mystery Note</span>
           </div>
+
+          {/* Task Center Button */}
           <div className="bg-white/20 backdrop-blur-md rounded-[1.75rem] flex flex-col items-center justify-center p-5 border border-white/20 transition-all cursor-pointer h-36 shadow-lg group active:scale-95">
-            <div className="w-12 h-12 bg-gradient-to-br from-orange-300 to-yellow-500 rounded-2xl flex items-center justify-center mb-2 shadow-xl transform group-hover:-rotate-6 transition-transform">
-              <ClipboardCheck className="w-6 h-6 text-white" />
+            <div className="w-16 h-16 relative mb-2 transform group-hover:-rotate-6 transition-transform">
+              <Image 
+                src="/task.png" 
+                alt="Task Center" 
+                fill 
+                className="object-contain" 
+                priority 
+              />
             </div>
             <span className="text-white font-black text-[8px] tracking-[0.15em] uppercase text-center">Task Center</span>
           </div>
@@ -90,7 +105,7 @@ export default function HomePage() {
                   {/* Profile Details at Bottom */}
                   <div className="absolute bottom-4 left-4 right-4">
                     <div className="flex items-center space-x-1.5 mb-2.5">
-                      <h4 className="text-[13px] font-black text-white truncate drop-shadow-md tracking-tight">
+                      <h4 className="text-[14px] font-black text-white truncate drop-shadow-md tracking-tight">
                         {u.displayName?.toLowerCase() || 'guest_user'}
                       </h4>
                       {u.isVerified && <UserCheck className="w-3.5 h-3.5 text-primary fill-primary" />}
