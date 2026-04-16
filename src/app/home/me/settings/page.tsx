@@ -33,18 +33,17 @@ export default function SettingsPage() {
   const { theme, toggleTheme } = useTheme();
 
   const handleLogout = async () => {
-    if (!auth || !user) return;
+    if (!auth) return;
     try {
-      // If anonymous, we "soft logout" to allow persistence on this device
-      if (user.isAnonymous) {
-        localStorage.removeItem('nexo_session_active');
-        router.replace('/login');
-        return;
+      // Clear flags FIRST to ensure layout effect triggers correctly
+      localStorage.removeItem('nexo_session_active');
+      localStorage.removeItem('nexo_profile_completed');
+      
+      if (user && !user.isAnonymous) {
+        await signOut(auth);
       }
       
-      // Email users get fully signed out
-      await signOut(auth);
-      localStorage.clear(); 
+      // Use replace to overwrite history and prevent back-button access
       router.replace('/login');
     } catch (error: any) {
       toast({

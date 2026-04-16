@@ -17,22 +17,21 @@ export default function EntryPage() {
     const isSessionActive = localStorage.getItem('nexo_session_active') === 'true';
 
     if (!user || !isSessionActive) {
-      router.push('/login');
+      router.replace('/login');
     } else {
       const checkProfile = async () => {
-        // Optimistic check: if we have a local flag, assume they are good to go
         const localFlag = localStorage.getItem('nexo_profile_completed');
         if (localFlag) {
-          router.push('/home');
+          router.replace('/home');
           return;
         }
 
         const userDoc = await getDoc(doc(db, 'userProfiles', user.uid));
         if (userDoc.exists()) {
           localStorage.setItem('nexo_profile_completed', 'true');
-          router.push('/home');
+          router.replace('/home');
         } else {
-          router.push('/onboarding');
+          router.replace('/onboarding');
         }
       };
       checkProfile();

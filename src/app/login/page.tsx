@@ -20,10 +20,10 @@ export default function LoginPage() {
   const { user } = useUser();
 
   useEffect(() => {
-    // Only auto-redirect if a session is marked as active in this browser
+    // Only auto-redirect if a session is explicitly marked as active
     const isSessionActive = localStorage.getItem('nexo_session_active') === 'true';
     if (user && isSessionActive) {
-      router.push('/');
+      router.replace('/home');
     }
   }, [user, router]);
 
@@ -33,13 +33,13 @@ export default function LoginPage() {
       // If we already have an anonymous user session in the background, just activate it
       if (auth.currentUser && auth.currentUser.isAnonymous) {
         localStorage.setItem('nexo_session_active', 'true');
-        router.push('/');
+        router.replace('/home');
         return;
       }
       
       await signInAnonymously(auth);
       localStorage.setItem('nexo_session_active', 'true');
-      router.push('/');
+      router.replace('/home');
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -66,7 +66,7 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       localStorage.setItem('nexo_session_active', 'true');
-      router.push('/');
+      router.replace('/home');
     } catch (error: any) {
       let message = "Invalid email or password.";
       if (error.code === 'auth/user-not-found') message = "No account found with this email.";
@@ -106,7 +106,7 @@ export default function LoginPage() {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       localStorage.setItem('nexo_session_active', 'true');
-      router.push('/');
+      router.replace('/home');
     } catch (error: any) {
       let message = "Could not create account.";
       if (error.code === 'auth/email-already-in-use') {

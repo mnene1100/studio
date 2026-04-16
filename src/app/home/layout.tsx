@@ -87,15 +87,17 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     if (isAuthLoading) return;
 
-    if (!user) {
-      router.push('/login');
+    const isSessionActive = localStorage.getItem('nexo_session_active') === 'true';
+
+    if (!user || !isSessionActive) {
+      router.replace('/login');
       return;
     }
 
     if (!isProfileLoading) {
       const localProfileCompleted = localStorage.getItem('nexo_profile_completed');
       if (!profile && !localProfileCompleted) {
-        router.push('/onboarding');
+        router.replace('/onboarding');
       }
     }
   }, [user, isAuthLoading, profile, isProfileLoading, router]);
