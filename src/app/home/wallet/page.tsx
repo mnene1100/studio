@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -41,7 +40,6 @@ export default function WalletPage() {
     setIsLoading(true);
     try {
       const coinAmount = selectedPackage.coins.replace(',', '');
-      // Callback URL includes the coins to credit so the callback page knows the package
       const callbackUrl = `${window.location.origin}/home/wallet/callback?coins=${coinAmount}`;
       
       const result = await createPesapalOrder({
@@ -73,7 +71,7 @@ export default function WalletPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white pb-24">
-      {/* Seamless Header - No Shadow/Border */}
+      {/* Seamless Header */}
       <header className="bg-primary safe-top sticky top-0 z-50">
         <div className="px-4 h-16 flex items-center justify-between">
           <Button 
@@ -122,7 +120,7 @@ export default function WalletPage() {
         <div className="max-w-[40%]">
           <label className="text-[7px] font-black text-muted-foreground uppercase tracking-widest mb-1 block px-1">Region</label>
           <Select defaultValue="kenya">
-            <SelectTrigger className="w-full h-8 bg-gray-50 border-none rounded-lg px-2 text-[9px] font-black text-gray-900 focus:ring-0">
+            <SelectTrigger className="w-full h-8 bg-gray-50 border-none rounded-lg px-2 text-[9px] font-black text-gray-900 focus:ring-0 shadow-none">
               <div className="flex items-center space-x-1.5">
                 <Globe className="w-2.5 h-2.5 text-primary" />
                 <SelectValue />
@@ -155,7 +153,7 @@ export default function WalletPage() {
                   "relative bg-white rounded-[1.25rem] p-3 flex flex-col items-center border transition-all duration-200 cursor-pointer",
                   selectedPackage?.id === pkg.id 
                     ? "border-primary bg-primary/[0.02] scale-[1.01]" 
-                    : "border-gray-50"
+                    : "border-gray-50 shadow-none"
                 )}
               >
                 {pkg.badge && (
@@ -183,7 +181,7 @@ export default function WalletPage() {
         </div>
 
         {/* Vendors Link */}
-        <div className="bg-gray-50 rounded-[1.25rem] p-2.5 flex items-center justify-between border border-gray-50">
+        <div className="bg-gray-50 rounded-[1.25rem] p-2.5 flex items-center justify-between border-none">
           <div className="flex items-center space-x-2">
             <div className="w-7 h-7 bg-white rounded-lg shadow-sm flex items-center justify-center">
               <Users className="w-3.5 h-3.5 text-primary" />
@@ -210,8 +208,8 @@ export default function WalletPage() {
           onClick={handlePayment}
           disabled={!isFormValid || isLoading}
           className={cn(
-            "w-full h-14 rounded-2xl text-[10px] font-black shadow-xl transition-all uppercase tracking-[0.2em]",
-            isFormValid ? "bg-primary text-white shadow-primary/30" : "bg-gray-100 text-gray-400"
+            "w-full h-14 rounded-2xl text-[10px] font-black transition-all uppercase tracking-[0.2em] shadow-none",
+            isFormValid ? "bg-primary text-white" : "bg-gray-100 text-gray-400"
           )}
         >
           {isLoading ? (
