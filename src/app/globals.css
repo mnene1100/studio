@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -94,7 +95,7 @@
 }
 
 .glass-header {
-  @apply sticky top-0 z-50 bg-primary/95 backdrop-blur-2xl border-b border-white/5 shadow-xl;
+  @apply sticky top-0 z-50 bg-primary/95 backdrop-blur-2xl;
 }
 
 .premium-gradient {

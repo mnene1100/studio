@@ -68,6 +68,7 @@ export default function WalletPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white pb-32">
+      {/* Header - Seamless with status bar */}
       <header className="bg-primary safe-top sticky top-0 z-50">
         <div className="px-4 h-20 flex items-center justify-between">
           <Button 

@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ChevronLeft, MessageCircle, ShieldCheck, BadgeCheck } from "lucide-react";
-import { useHomeData } from '../../layout';
 
 const MOCK_SELLERS = [
   { id: 'seller_1', name: 'Nexo Official KE', location: 'Nairobi, Kenya', avatar: 'https://picsum.photos/seed/seller1/200/200' },
@@ -18,7 +17,7 @@ export default function SellersPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      {/* Header */}
+      {/* Header - Seamless with status bar */}
       <header className="bg-primary safe-top px-4 h-24 flex items-center justify-between relative z-20">
         <div className="flex items-center space-x-3">
           <Button 

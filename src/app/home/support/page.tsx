@@ -12,8 +12,8 @@ export default function SupportPage() {
 
   return (
     <div className="flex flex-col h-screen bg-white">
-      {/* Header - Matching screenshot */}
-      <header className="bg-primary px-4 h-24 flex items-center justify-between relative z-20">
+      {/* Header - Seamless with status bar */}
+      <header className="bg-primary safe-top px-4 h-24 flex items-center justify-between relative z-20">
         <div className="flex items-center space-x-3">
           <Button 
             variant="ghost" 
@@ -37,10 +37,10 @@ export default function SupportPage() {
         </div>
       </header>
 
-      {/* Messages Area - Empty for now as per screenshot */}
+      {/* Messages Area */}
       <div className="flex-1 bg-white" />
 
-      {/* Input Area - Pill Style as per screenshot */}
+      {/* Input Area */}
       <div className="px-6 py-6 bg-white flex items-center space-x-3 pb-10">
         <div className="flex-1 relative">
           <Input 
