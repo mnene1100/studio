@@ -38,9 +38,8 @@ export default function SettingsPage() {
       localStorage.removeItem('nexo_session_active');
       localStorage.removeItem('nexo_profile_completed');
       
-      if (user && !user.isAnonymous) {
-        await signOut(auth);
-      }
+      // Sign out all users regardless of anonymous status to clear Firebase Auth persistence
+      await signOut(auth);
       
       // Use replace to overwrite history and prevent back-button access
       router.replace('/login');
