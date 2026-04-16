@@ -4,17 +4,25 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Search, Plus } from "lucide-react";
-
-const MOCK_CHATS = [
-  { id: '1', name: 'Sophia Chen', lastMessage: 'See you tomorrow at 9!', time: '12:45 PM', unread: 2, avatar: 'https://picsum.photos/seed/65/200/200' },
-  { id: '2', name: 'James Wilson', lastMessage: 'The proposal looks great, just sent...', time: 'Yesterday', unread: 0, avatar: 'https://picsum.photos/seed/32/200/200' },
-  { id: '3', name: 'Product Team', lastMessage: 'Alice joined the call', time: 'Mon', unread: 0, avatar: 'https://picsum.photos/seed/tech/200/200' },
-  { id: '4', name: 'David Lee', lastMessage: 'Thanks for the invite!', time: 'Oct 12', unread: 1, avatar: 'https://picsum.photos/seed/12/200/200' },
-];
+import { Search, Plus, MessageSquare } from "lucide-react";
+import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { collection, query, where, orderBy } from 'firebase/firestore';
 
 export default function ChatListPage() {
   const [search, setSearch] = useState('');
+  const { user } = useUser();
+  const db = useFirestore();
+
+  const chatsQuery = useMemoFirebase(() => {
+    if (!db || !user?.uid) return null;
+    return query(
+      collection(db, 'chatConversations'),
+      where('participantIds', 'array-contains', user.uid),
+      orderBy('updatedAt', 'desc')
+    );
+  }, [db, user?.uid]);
+
+  const { data: chats, isLoading } = useCollection(chatsQuery);
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-background">
@@ -38,36 +46,46 @@ export default function ChatListPage() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 pb-32">
-        {MOCK_CHATS.map((chat) => (
-          <Link 
-            key={chat.id} 
-            href={`/home/chat/${chat.id}`}
-            className="flex items-center px-4 py-5 rounded-[1.75rem] active:bg-white/5 transition-all group"
-          >
-            <div className="relative">
-              <Avatar className="w-16 h-16 ring-2 ring-transparent group-active:ring-accent/20 transition-all">
-                <AvatarImage src={chat.avatar} data-ai-hint="person portrait" />
-                <AvatarFallback className="bg-muted text-lg font-bold">{chat.name[0]}</AvatarFallback>
-              </Avatar>
-              <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-background rounded-full"></div>
-            </div>
-            
-            <div className="ml-4 flex-1">
-              <div className="flex items-center justify-between mb-0.5">
-                <h3 className="font-bold text-white text-lg tracking-tight">{chat.name}</h3>
-                <span className="text-[11px] font-bold text-muted-foreground/60">{chat.time}</span>
+        {isLoading ? (
+          <div className="space-y-4 px-2">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="h-20 bg-card/20 rounded-[1.75rem] animate-pulse" />
+            ))}
+          </div>
+        ) : chats && chats.length > 0 ? (
+          chats.map((chat) => (
+            <Link 
+              key={chat.id} 
+              href={`/home/chat/${chat.id}`}
+              className="flex items-center px-4 py-5 rounded-[1.75rem] active:bg-white/5 transition-all group"
+            >
+              <div className="relative">
+                <Avatar className="w-16 h-16 ring-2 ring-transparent group-active:ring-accent/20 transition-all">
+                  <AvatarFallback className="bg-muted text-lg font-bold">
+                    <MessageSquare className="w-6 h-6" />
+                  </AvatarFallback>
+                </Avatar>
               </div>
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground line-clamp-1 font-medium">{chat.lastMessage}</p>
-                {chat.unread > 0 && (
-                  <div className="bg-accent text-accent-foreground min-w-[20px] h-5 flex items-center justify-center rounded-full text-[10px] font-black px-1.5 shadow-lg shadow-accent/20 animate-in zoom-in">
-                    {chat.unread}
-                  </div>
-                )}
+              
+              <div className="ml-4 flex-1">
+                <div className="flex items-center justify-between mb-0.5">
+                  <h3 className="font-bold text-white text-lg tracking-tight">Conversation</h3>
+                  <span className="text-[10px] font-bold text-muted-foreground/60">
+                    {chat.updatedAt ? new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground line-clamp-1 font-medium">Open to view messages</p>
+                </div>
               </div>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          ))
+        ) : (
+          <div className="flex flex-col items-center justify-center py-20 px-10 text-center opacity-40">
+            <MessageSquare className="w-12 h-12 mb-4" />
+            <p className="text-sm font-medium">No active conversations.<br/>Find someone on the home screen to start chatting!</p>
+          </div>
+        )}
       </div>
     </div>
   );
