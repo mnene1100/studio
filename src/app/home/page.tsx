@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { differenceInYears } from 'date-fns';
 import { useUser, useFirestore } from '@/firebase';
-import { collection, query, limit, orderBy, getDocs, where } from 'firebase/firestore';
+import { collection, query, limit, orderBy, getDocs } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
@@ -100,7 +100,8 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div className="sticky top-0 z-40 bg-primary px-5 py-4 shadow-md">
+      {/* Sticky header without shadow-md to remove the visual divider line */}
+      <div className="sticky top-0 z-40 bg-primary px-5 py-4">
         <div className="flex items-center justify-between">
           <h3 className="text-[10px] font-black text-white tracking-widest uppercase italic opacity-90">Recommended</h3>
           <button 
