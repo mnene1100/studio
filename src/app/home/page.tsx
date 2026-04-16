@@ -10,7 +10,7 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen pb-32 bg-white">
-      {/* Top Teal Action Section - Extended to Recommended */}
+      {/* Top Teal Action Section - Tightened spacing */}
       <div className="bg-primary pt-2 pb-6 px-6 rounded-b-[3.5rem] shadow-xl">
         <div className="grid grid-cols-2 gap-5 mb-8">
           <div className="bg-white/20 backdrop-blur-md rounded-[3rem] flex flex-col items-center justify-center p-6 border border-white/20 active:scale-95 transition-all cursor-pointer h-40 shadow-lg group">

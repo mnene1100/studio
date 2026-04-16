@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { 
   ShieldCheck, Headset, ChevronRight, Copy, 
-  Eye, Pencil, Coins, Diamond
+  Eye, Pencil, Coins, Diamond, Settings
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useHomeData } from '../layout';
@@ -99,7 +99,7 @@ export default function MePage() {
       {/* Content Spacer */}
       <div className="h-32" />
 
-      {/* Settings Section */}
+      {/* Settings & Support Section */}
       <div className="px-6 mt-12 space-y-4">
         <div className="flex items-center space-x-4 mb-2">
           <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] whitespace-nowrap">Account & Safety</h3>
@@ -108,8 +108,16 @@ export default function MePage() {
 
         <button 
           onClick={() => router.push('/home/me/settings')}
-          className="w-full flex items-center p-5 bg-blue-600 rounded-[1.75rem] shadow-xl shadow-blue-500/20 active:scale-[0.98] transition-all group"
+          className="w-full flex items-center p-5 bg-black rounded-[1.75rem] shadow-xl active:scale-[0.98] transition-all group"
         >
+          <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mr-4">
+            <Settings className="w-6 h-6 text-white" />
+          </div>
+          <span className="flex-1 text-left font-black text-white text-base tracking-tight">Settings</span>
+          <ChevronRight className="w-5 h-5 text-white/50" />
+        </button>
+
+        <button className="w-full flex items-center p-5 bg-blue-600 rounded-[1.75rem] shadow-xl shadow-blue-500/20 active:scale-[0.98] transition-all group">
           <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mr-4">
             <ShieldCheck className="w-6 h-6 text-white" />
           </div>
