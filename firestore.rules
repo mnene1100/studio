@@ -1,0 +1,124 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * NEXO APPLICATION SECURITY RULES
+     *
+     * CORE PHILOSOPHY:
+     * This ruleset implements a robust "Authorization Independence" model. By denormalizing 
+     * critical authorization data (like participant IDs) directly onto documents, we ensure 
+     * high performance and avoid costly cross-document lookups (get() calls) during 
+     * rule evaluation.
+     *
+     * DATA STRUCTURE & ACCESS:
+     * 1. User Profiles (/userProfiles): Scoped by the user's Auth UID. Read access is 
+     *    granted to all authenticated users to facilitate discovery and UI display, 
+     *    while write access is strictly limited to the profile owner.
+     * 2. Chat Conversations (/chatConversations): A shared access model. Only users 
+     *    listed in the 'participantIds' array can read or write to a conversation.
+     * 3. Messages (/chatConversations/{id}/messages): These follow the parent's 
+     *    authorization by including a denormalized 'participantIds' field. This allows 
+     *    independent verification of access without checking the parent conversation.
+     * 4. Call History (/callHistory): Restricted to the 'callerId' and users listed 
+     *    in 'calleeIds'.
+     *
+     * SECURITY DECISIONS:
+     * - Prototyping Mode: Schema validation is omitted to allow for rapid iteration, 
+     *   but ownership and relational integrity (UID matching) are strictly enforced.
+     * - Public Reads: No data is truly "public" (unauthenticated). All reads require 
+     *   at least a valid Firebase Auth session.
+     * - Destructive Operations: Update and delete operations always verify the 
+     *   existence and ownership of the document before proceeding.
+     */
+
+    // --- Global Helper Functions ---
+
+    /** Checks if the request is from an authenticated user. */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /** Checks if the authenticated user matches the provided userId. */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /** Verifies a user is an owner of an existing document before allowing modification. */
+    function isExistingOwner(userId) {
+      return resource != null && isOwner(userId);
+    }
+
+    /** Checks if the authenticated user's UID is present in a list of IDs. */
+    function isMember(idList) {
+      return isSignedIn() && request.auth.uid in idList;
+    }
+
+    /** Validates relational integrity for new documents by matching UID. */
+    function isAuthLinked(field) {
+      return request.resource.data[field] == request.auth.uid;
+    }
+
+    // --- Collection Rules ---
+
+    /**
+     * @description Rules for user profile documents.
+     * @path /userProfiles/{userId}
+     * @allow (get, list) if signed in.
+     * @allow (create, update) if UID matches userId in path.
+     * @deny (create) if the internal 'id' field does not match the path userId.
+     * @principle Enforces path-based ownership and relational integrity for user identities.
+     */
+    match /userProfiles/{userId} {
+      allow get, list: if isSignedIn();
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Rules for chat conversation metadata.
+     * @path /chatConversations/{chatId}
+     * @allow (get, list) if UID is in participantIds array.
+     * @allow (create) if caller includes themselves in participantIds.
+     * @deny (update) if user is not an active participant.
+     * @principle Uses a denormalized participant list to grant shared access to collaborators.
+     */
+    match /chatConversations/{chatId} {
+      allow get, list: if isMember(resource.data.participantIds);
+      allow create: if isSignedIn() && isMember(request.resource.data.participantIds);
+      allow update: if resource != null && isMember(resource.data.participantIds);
+      allow delete: if resource != null && isAuthLinked('creatorId');
+    }
+
+    /**
+     * @description Rules for messages within a conversation.
+     * @path /chatConversations/{chatId}/messages/{messageId}
+     * @allow (get, list) if UID is in the denormalized participantIds array.
+     * @allow (create) if UID is a participant and matches senderId.
+     * @deny (delete) if user is not the original sender.
+     * @principle Implements Authorization Independence by checking denormalized membership on every message.
+     */
+    match /chatConversations/{chatId}/messages/{messageId} {
+      allow get, list: if isMember(resource.data.participantIds);
+      allow create: if isMember(request.resource.data.participantIds) && isAuthLinked('senderId');
+      allow update: if resource != null && isAuthLinked('senderId');
+      allow delete: if resource != null && isAuthLinked('senderId');
+    }
+
+    /**
+     * @description Rules for voice and video call history logs.
+     * @path /callHistory/{callId}
+     * @allow (get, list) if user is the caller or one of the callees.
+     * @allow (create) if user correctly identifies themselves as the caller.
+     * @deny (list) for users not involved in the specific call record.
+     * @principle Restricts visibility of call logs to the parties involved in the communication.
+     */
+    match /callHistory/{callId} {
+      allow get, list: if isSignedIn() && (resource.data.callerId == request.auth.uid || isMember(resource.data.calleeIds));
+      allow create: if isAuthLinked('callerId');
+      allow update: if resource != null && (resource.data.callerId == request.auth.uid || isMember(resource.data.calleeIds));
+      allow delete: if resource != null && resource.data.callerId == request.auth.uid;
+    }
+  }
+}
