@@ -1,10 +1,9 @@
-
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, XCircle, Loader2, ArrowRight } from "lucide-react";
+import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { useUser, useFirestore } from '@/firebase';
 import { doc, getDoc, setDoc, updateDoc, increment } from 'firebase/firestore';
 
@@ -39,6 +38,8 @@ export default function PaymentCallbackPage() {
         if (transSnap.exists() && transSnap.data().status === 'completed') {
           console.log("Transaction already completed, skipping credit.");
           setStatus('success');
+          // Automatic redirect after success
+          setTimeout(() => router.replace('/home/wallet'), 2000);
           return;
         }
 
@@ -65,6 +66,8 @@ export default function PaymentCallbackPage() {
         });
 
         setStatus('success');
+        // Automatic redirect after successful first-time credit
+        setTimeout(() => router.replace('/home/wallet'), 2000);
       } catch (error) {
         console.error("Payment confirmation error:", error);
         setStatus('failed');
@@ -74,7 +77,7 @@ export default function PaymentCallbackPage() {
     };
 
     verifyAndCredit();
-  }, [trackingId, user?.uid, db, coinsToCredit, merchantRef]);
+  }, [trackingId, user?.uid, db, coinsToCredit, merchantRef, router]);
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -97,30 +100,22 @@ export default function PaymentCallbackPage() {
               <CheckCircle2 className="w-10 h-10 text-white" />
             </div>
             <div className="space-y-2">
-              <h2 className="text-2xl font-black text-gray-900 uppercase italic tracking-tight">Payment Received</h2>
+              <h2 className="text-2xl font-black text-gray-900 uppercase italic tracking-tight">Success!</h2>
               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                {coinsToCredit} Coins added to balance
+                Coins added. Redirecting...
               </p>
             </div>
             
             <div className="bg-gray-50 p-6 rounded-[2rem] w-full border border-gray-100 text-left space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-[8px] font-black text-gray-300 uppercase">Reference</span>
-                <span className="text-[9px] font-black text-gray-900 truncate ml-4">#{merchantRef || trackingId?.substring(0,8)}</span>
+                <span className="text-[8px] font-black text-gray-300 uppercase">Coins</span>
+                <span className="text-[9px] font-black text-gray-900">{coinsToCredit}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-[8px] font-black text-gray-300 uppercase">Status</span>
-                <span className="text-[9px] font-black text-primary uppercase">Completed</span>
+                <span className="text-[9px] font-black text-primary uppercase">Credited</span>
               </div>
             </div>
-
-            <Button 
-              onClick={() => router.replace('/home/wallet')}
-              className="w-full h-14 bg-primary text-white rounded-full font-black uppercase tracking-[0.2em] text-[10px] shadow-xl shadow-primary/20 active:scale-95 transition-all"
-            >
-              Back to Recharge
-              <ArrowRight className="ml-2 w-4 h-4" />
-            </Button>
           </div>
         ) : (
           <div className="space-y-8 animate-in zoom-in duration-500 max-w-xs w-full">

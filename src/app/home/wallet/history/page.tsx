@@ -1,11 +1,9 @@
-
 "use client";
 
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Coins, ArrowUpRight, ArrowDownLeft, Clock } from "lucide-react";
 import { cn } from '@/lib/utils';
-import { useHomeData } from '../../layout';
 import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
 import { collection, query, where, orderBy, limit } from 'firebase/firestore';
 
@@ -18,6 +16,7 @@ function TransactionItem({ item }: { item: any }) {
         "w-12 h-12 rounded-2xl flex items-center justify-center mr-4",
         isRecharge ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-600"
       )}>
+        {/* Recharge arrow points UP, Deduction points DOWN */}
         {isRecharge ? <ArrowUpRight className="w-6 h-6" /> : <ArrowDownLeft className="w-6 h-6" />}
       </div>
       
