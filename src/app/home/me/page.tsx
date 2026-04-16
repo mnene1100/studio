@@ -55,8 +55,10 @@ export default function MePage() {
 
   if (!profile) return null;
 
-  // Safe initials extraction to prevent crash
-  const initials = profile.displayName ? profile.displayName[0] : '?';
+  // Extremely safe initials extraction to prevent crash
+  // Uses displayName from schema as per backend.json
+  const displayName = profile.displayName || profile.name || "";
+  const initials = displayName.length > 0 ? displayName[0].toUpperCase() : '?';
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-background">
@@ -77,7 +79,7 @@ export default function MePage() {
             <QrCode className="w-5 h-5 text-white" />
           </div>
         </div>
-        <h2 className="text-2xl font-bold text-white mb-1">{profile.displayName}</h2>
+        <h2 className="text-2xl font-bold text-white mb-1">{displayName}</h2>
         
         {/* NEXO ID Display */}
         <div 
@@ -86,7 +88,7 @@ export default function MePage() {
         >
           <span className="text-[10px] uppercase font-bold tracking-widest text-accent">NEXO ID</span>
           <span className="text-lg font-mono font-medium text-white tracking-wider">
-            {profile.numericId}
+            {profile.numericId || '--------'}
           </span>
           <Copy className="w-3.5 h-3.5 text-muted-foreground" />
         </div>
