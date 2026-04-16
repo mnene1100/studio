@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useRouter } from 'next/navigation';
@@ -47,61 +46,54 @@ export default function MePage() {
   return (
     <div className="flex flex-col min-h-screen bg-black pb-32">
       {/* Top Teal Section */}
-      <div className="bg-primary pt-14 pb-10 px-6 relative rounded-none shadow-lg">
-        {/* ID Pill */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2">
-           <div 
-            onClick={copyId}
-            className="flex items-center space-x-2 bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 cursor-pointer active:scale-95 transition-all"
-          >
-            <span className="text-[10px] font-black text-white uppercase tracking-wider">ID: {profile.numericId}</span>
-            <Copy className="w-3 h-3 text-white/70" />
-          </div>
-        </div>
-
-        {/* Visitors Button */}
-        <button className="absolute top-4 right-6 flex flex-col items-center space-y-1 group active:scale-95 transition-all">
+      <div className="bg-primary pt-12 pb-8 px-6 relative rounded-none shadow-lg flex flex-col items-center">
+        {/* Visitors Button (Top Right) */}
+        <button className="absolute top-6 right-6 flex flex-col items-center space-y-1 group active:scale-95 transition-all">
           <div className="p-2 bg-white/20 backdrop-blur-md rounded-full border border-white/30">
             <Eye className="w-4 h-4 text-white" />
           </div>
           <span className="text-[9px] font-black text-white/70 uppercase tracking-widest">Visitors</span>
         </button>
 
-        {/* Floating Cards - Now inside the teal part at the top */}
-        <div className="grid grid-cols-2 gap-4 mt-8 mb-8">
-          {/* Balance Card */}
-          <div className="bg-white/10 backdrop-blur-md rounded-[2rem] p-4 flex flex-col items-center text-center border border-white/20 shadow-sm active:scale-95 transition-all cursor-pointer">
-            <div className="p-2 bg-white/20 rounded-xl mb-2">
+        {/* Profile Avatar (Above ID) */}
+        <div className="relative mb-4 mt-4">
+          <Avatar className="w-24 h-24 border-4 border-white/20 ring-4 ring-black/5 shadow-2xl">
+            <AvatarImage src={profile.profilePictureUrl} />
+            <AvatarFallback className="bg-white/10 text-white text-3xl font-black">{initials}</AvatarFallback>
+          </Avatar>
+          <button className="absolute bottom-0 right-0 p-2 bg-[#1A1A1A] rounded-full border-2 border-primary shadow-xl active:scale-90 transition-transform">
+            <Pencil className="w-3 h-3 text-white" />
+          </button>
+        </div>
+        
+        <h2 className="text-xl font-black text-white mb-2 tracking-tight">{displayName}</h2>
+
+        {/* ID Pill (Below Avatar/Name) */}
+        <div 
+          onClick={copyId}
+          className="flex items-center space-x-2 bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 cursor-pointer active:scale-95 transition-all mb-8"
+        >
+          <span className="text-[10px] font-black text-white uppercase tracking-wider">ID: {profile.numericId}</span>
+          <Copy className="w-3 h-3 text-white/70" />
+        </div>
+
+        {/* Balance & Earnings Cards */}
+        <div className="grid grid-cols-2 gap-4 w-full">
+          <div className="bg-white/10 backdrop-blur-md rounded-[2rem] p-4 flex flex-col items-center text-center border border-white/20 shadow-sm active:scale-95 transition-all cursor-pointer h-24 justify-center">
+            <div className="p-2 bg-white/20 rounded-xl mb-1">
               <Coins className="w-4 h-4 text-white" />
             </div>
-            <p className="text-[8px] font-black text-white/70 uppercase tracking-widest mb-1">Balance</p>
+            <p className="text-[8px] font-black text-white/70 uppercase tracking-widest mb-0.5">Balance</p>
             <h3 className="text-xl font-black text-white">500</h3>
           </div>
 
-          {/* Earnings Card */}
-          <div className="bg-white/10 backdrop-blur-md rounded-[2rem] p-4 flex flex-col items-center text-center border border-white/20 shadow-sm active:scale-95 transition-all cursor-pointer">
-            <div className="p-2 bg-white/20 rounded-xl mb-2">
+          <div className="bg-white/10 backdrop-blur-md rounded-[2rem] p-4 flex flex-col items-center text-center border border-white/20 shadow-sm active:scale-95 transition-all cursor-pointer h-24 justify-center">
+            <div className="p-2 bg-white/20 rounded-xl mb-1">
               <Diamond className="w-4 h-4 text-white" />
             </div>
-            <p className="text-[8px] font-black text-white/70 uppercase tracking-widest mb-1">Earnings</p>
+            <p className="text-[8px] font-black text-white/70 uppercase tracking-widest mb-0.5">Earnings</p>
             <h3 className="text-xl font-black text-white">0</h3>
           </div>
-        </div>
-
-        {/* Profile Info */}
-        <div className="flex flex-col items-center">
-          <div className="relative mb-3">
-            <Avatar className="w-24 h-24 border-4 border-white/20 ring-4 ring-black/5 shadow-2xl">
-              <AvatarImage src={profile.profilePictureUrl} />
-              <AvatarFallback className="bg-white/10 text-white text-3xl font-black">{initials}</AvatarFallback>
-            </Avatar>
-            <button className="absolute bottom-0 right-0 p-2 bg-[#1A1A1A] rounded-full border-2 border-primary shadow-xl active:scale-90 transition-transform">
-              <Pencil className="w-3 h-3 text-white" />
-            </button>
-          </div>
-          
-          <h2 className="text-xl font-black text-white mb-0.5 tracking-tight">{displayName}</h2>
-          <p className="text-[8px] font-black text-white/60 uppercase tracking-[0.2em]">Verified Official Profile</p>
         </div>
       </div>
 
@@ -113,7 +105,6 @@ export default function MePage() {
         </div>
 
         <div className="space-y-3">
-          {/* Verify Profile */}
           <button className="w-full flex items-center p-4 bg-[#3B82F6] rounded-[1.75rem] shadow-xl shadow-blue-500/20 active:scale-[0.98] transition-all group">
             <div className="p-2.5 bg-white/20 rounded-xl mr-4">
               <ShieldCheck className="w-5 h-5 text-white" />
@@ -122,7 +113,6 @@ export default function MePage() {
             <ChevronRight className="w-5 h-5 text-white/60 group-active:translate-x-1 transition-transform" />
           </button>
 
-          {/* Customer Support */}
           <button className="w-full flex items-center p-4 bg-[#121212] rounded-[1.75rem] border border-white/5 active:scale-[0.98] transition-all group">
             <div className="p-2.5 bg-primary/10 rounded-xl mr-4">
               <Headset className="w-5 h-5 text-primary" />
@@ -131,7 +121,6 @@ export default function MePage() {
             <ChevronRight className="w-5 h-5 text-white/10 group-active:translate-x-1 transition-transform" />
           </button>
 
-          {/* Games Center */}
           <button className="w-full flex items-center p-4 bg-[#121212] rounded-[1.75rem] border border-white/5 active:scale-[0.98] transition-all group">
             <div className="p-2.5 bg-orange-500/10 rounded-xl mr-4">
               <Gamepad2 className="w-5 h-5 text-orange-500" />
@@ -140,7 +129,6 @@ export default function MePage() {
             <ChevronRight className="w-5 h-5 text-white/10 group-active:translate-x-1 transition-transform" />
           </button>
 
-          {/* Settings */}
           <button 
             onClick={() => router.push('/home/me/settings')}
             className="w-full flex items-center p-4 bg-[#121212] rounded-[1.75rem] border border-white/5 active:scale-[0.98] transition-all group"

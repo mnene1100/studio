@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -38,7 +37,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   );
 
   return (
-    <div className="min-h-screen pb-24 bg-background">
+    <div className="min-h-screen pb-16 bg-background">
       <main className="max-w-md mx-auto min-h-screen">
         {children}
       </main>
