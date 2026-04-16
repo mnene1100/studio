@@ -1,0 +1,22 @@
+
+{
+  "name": "NEXO Premium",
+  "short_name": "NEXO",
+  "description": "Seamless real-time communication ecosystem.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#28B4A4",
+  "icons": [
+    {
+      "src": "https://picsum.photos/seed/nexo/192/192",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://picsum.photos/seed/nexo/512/512",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
