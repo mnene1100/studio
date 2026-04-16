@@ -109,7 +109,7 @@ export default function CallPage() {
         }
 
         if (result.error || !result.token) {
-          throw new Error(result.error || 'Failed to generate access token');
+          throw new Error(result.error || 'Token generation failed');
         }
 
         setStatusMessage('Joining Channel...');
@@ -143,7 +143,7 @@ export default function CallPage() {
         toast({
           variant: "destructive",
           title: "Connection Error",
-          description: "Failed to establish a secure call. Please try again later.",
+          description: error.message || "Failed to establish a secure call. Please try again later.",
         });
         router.back();
       }
@@ -207,13 +207,13 @@ export default function CallPage() {
   if (configMissing) {
     return (
       <div className="fixed inset-0 bg-black z-[100] flex items-center justify-center p-8">
-        <Alert variant="destructive" className="bg-zinc-900 border-red-500/50 rounded-none p-8 shadow-2xl">
+        <Alert variant="destructive" className="bg-zinc-900 border-red-500/50 rounded-[2rem] p-8 shadow-2xl">
           <AlertCircle className="h-6 w-6 mb-4 text-red-500" />
           <AlertTitle className="text-xl font-black uppercase tracking-tight text-white">Agora ID Missing</AlertTitle>
           <AlertDescription className="text-[10px] font-medium text-white/50 leading-relaxed mt-2 uppercase tracking-widest">
             The calling engine has not been configured. Please add NEXT_PUBLIC_AGORA_APP_ID and AGORA_APP_CERTIFICATE to your environment variables. 
           </AlertDescription>
-          <Button onClick={() => router.back()} className="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] h-14 rounded-none">
+          <Button onClick={() => router.back()} className="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] h-14 rounded-full">
             Exit
           </Button>
         </Alert>
@@ -224,13 +224,13 @@ export default function CallPage() {
   if (hasPermission === false) {
     return (
       <div className="fixed inset-0 bg-black z-[100] flex items-center justify-center p-8">
-        <Alert variant="destructive" className="bg-zinc-900 border-red-500/50 rounded-none p-8 shadow-2xl">
+        <Alert variant="destructive" className="bg-zinc-900 border-red-500/50 rounded-[2rem] p-8 shadow-2xl">
           <AlertCircle className="h-6 w-6 mb-4 text-red-500" />
           <AlertTitle className="text-xl font-black uppercase tracking-tight text-white">Access Denied</AlertTitle>
           <AlertDescription className="text-[10px] font-medium text-white/50 leading-relaxed mt-2 uppercase tracking-widest">
             NEXO requires {callType === 'video' ? 'Camera & Mic' : 'Microphone'} access. Please check your browser settings.
           </AlertDescription>
-          <Button onClick={() => router.back()} className="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] h-14 rounded-none">
+          <Button onClick={() => router.back()} className="mt-8 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-[10px] h-14 rounded-full">
             Exit Session
           </Button>
         </Alert>
@@ -277,7 +277,7 @@ export default function CallPage() {
       {callType === 'video' && cameraOn && (
         <div 
           className={cn(
-            "absolute z-40 transition-all duration-500 rounded-none overflow-hidden border-2 border-white/20 shadow-2xl bg-black ring-4 ring-black/50",
+            "absolute z-40 transition-all duration-500 rounded-[2rem] overflow-hidden border-2 border-white/20 shadow-2xl bg-black ring-4 ring-black/50",
             isMinimized 
               ? "bottom-40 right-6 w-28 h-44" 
               : "top-20 right-6 w-32 h-48"
@@ -311,7 +311,7 @@ export default function CallPage() {
           <button 
             onClick={toggleMic}
             className={cn(
-              "w-16 h-16 rounded-none flex items-center justify-center border transition-all active:scale-90 shadow-2xl",
+              "w-16 h-16 rounded-full flex items-center justify-center border transition-all active:scale-90 shadow-2xl",
               micOn ? "bg-white/5 border-white/10 text-white" : "bg-red-500 border-red-500 text-white shadow-red-500/40"
             )}
           >
@@ -320,7 +320,7 @@ export default function CallPage() {
 
           <button 
             onClick={handleEndCall}
-            className="w-24 h-24 bg-red-500 rounded-none flex items-center justify-center shadow-[0_20px_60px_rgba(239,68,68,0.4)] active:scale-95 transition-all border-4 border-black ring-1 ring-white/10"
+            className="w-24 h-24 bg-red-500 rounded-full flex items-center justify-center shadow-[0_20px_60px_rgba(239,68,68,0.4)] active:scale-95 transition-all border-4 border-black ring-1 ring-white/10"
           >
             <PhoneOff className="w-10 h-10 text-white" />
           </button>
@@ -329,7 +329,7 @@ export default function CallPage() {
             <button 
               onClick={toggleCamera}
               className={cn(
-                "w-16 h-16 rounded-none flex items-center justify-center border transition-all active:scale-90 shadow-2xl",
+                "w-16 h-16 rounded-full flex items-center justify-center border transition-all active:scale-90 shadow-2xl",
                 cameraOn ? "bg-white/5 border-white/10 text-white" : "bg-red-500 border-red-500 text-white shadow-red-500/40"
               )}
             >
@@ -339,7 +339,7 @@ export default function CallPage() {
             <button 
               onClick={() => setSpeakerOn(!speakerOn)}
               className={cn(
-                "w-16 h-16 rounded-none flex items-center justify-center border transition-all active:scale-90 shadow-2xl",
+                "w-16 h-16 rounded-full flex items-center justify-center border transition-all active:scale-90 shadow-2xl",
                 speakerOn ? "bg-primary border-primary text-white shadow-primary/30" : "bg-white/5 border-white/10 text-white/40"
               )}
             >

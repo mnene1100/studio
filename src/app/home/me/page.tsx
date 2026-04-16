@@ -49,12 +49,36 @@ export default function MePage() {
           throw new Error("Clipboard API unavailable");
         }
       } catch (err) {
-        console.error('Failed to copy: ', err);
-        toast({
-          variant: "destructive",
-          title: "Copy Failed",
-          description: "Please manually copy your ID.",
-        });
+        // Fallback for non-secure contexts or restricted permissions
+        const textArea = document.createElement("textarea");
+        textArea.value = profile.numericId;
+        // Ensure it's not visible but part of the DOM
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        textArea.style.top = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+          const successful = document.execCommand('copy');
+          if (successful) {
+            toast({
+              title: "Copied ID",
+              description: `ID ${profile.numericId} is ready to share.`,
+            });
+          } else {
+            throw new Error('Copy command was unsuccessful');
+          }
+        } catch (copyErr) {
+          console.error('Fallback copy failed:', copyErr);
+          toast({
+            variant: "destructive",
+            title: "Copy Failed",
+            description: "Please manually copy your ID from the screen.",
+          });
+        }
+        document.body.removeChild(textArea);
       }
     }
   };
