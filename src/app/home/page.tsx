@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { RefreshCw, MessageSquare, UserCheck, Loader2 } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -16,7 +16,6 @@ export default function HomePage() {
   const [pageSize, setPageSize] = useState(6);
 
   // Screen-specific paginated listener
-  // Wait for user.uid to ensure the auth token is attached to the request
   const discoveryQuery = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
     return query(
@@ -27,10 +26,24 @@ export default function HomePage() {
   }, [db, user?.uid, pageSize]);
   
   const { data: allUsers, isLoading: isUsersLoading } = useCollection(discoveryQuery);
-  const discoveryUsers = allUsers?.filter(u => u.id !== user?.uid) || [];
+  
+  // Filter out the current user and memoize results
+  const discoveryUsers = useMemo(() => {
+    return allUsers?.filter(u => u.id !== user?.uid) || [];
+  }, [allUsers, user?.uid]);
+
+  // Determine if we have reached the end of the collection
+  const hasMore = useMemo(() => {
+    if (!allUsers) return false;
+    return allUsers.length === pageSize;
+  }, [allUsers, pageSize]);
 
   const handleLoadMore = () => {
     setPageSize(prev => prev + 6);
+  };
+
+  const handleRefresh = () => {
+    setPageSize(6);
   };
 
   return (
@@ -57,7 +70,7 @@ export default function HomePage() {
         <div className="flex items-center justify-between">
           <h3 className="text-[10px] font-black text-white tracking-widest uppercase italic opacity-90">Recommended</h3>
           <button 
-            onClick={() => setPageSize(6)}
+            onClick={handleRefresh}
             className="w-7 h-7 bg-white/10 flex items-center justify-center rounded-full active:rotate-180 transition-transform duration-700"
           >
             <RefreshCw className="w-3.5 h-3.5 text-white" />
@@ -131,14 +144,23 @@ export default function HomePage() {
         )}
 
         {discoveryUsers.length > 0 && !isUsersLoading && (
-          <div className="flex justify-center pb-10">
-            <Button 
-              variant="ghost" 
-              onClick={handleLoadMore}
-              className="text-[10px] font-black text-primary uppercase tracking-[0.3em] hover:bg-primary/5 rounded-full px-8 py-6 h-auto"
-            >
-              Load More
-            </Button>
+          <div className="flex flex-col items-center justify-center pb-16 pt-4">
+            {hasMore ? (
+              <Button 
+                variant="ghost" 
+                onClick={handleLoadMore}
+                className="text-[10px] font-black text-primary uppercase tracking-[0.3em] hover:bg-primary/5 rounded-full px-8 py-6 h-auto transition-all active:scale-95"
+              >
+                Load More
+              </Button>
+            ) : (
+              <div className="flex flex-col items-center space-y-2 opacity-30">
+                <div className="h-[1px] w-12 bg-gray-400 mb-2" />
+                <span className="text-[9px] font-black text-foreground uppercase tracking-[0.4em]">
+                  No more users
+                </span>
+              </div>
+            )}
           </div>
         )}
       </div>
