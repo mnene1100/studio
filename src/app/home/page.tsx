@@ -11,8 +11,8 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen pb-32 bg-white">
       {/* Top Teal Action Section - Tightened spacing */}
-      <div className="bg-primary pt-2 pb-6 px-6 rounded-b-[3.5rem] shadow-xl">
-        <div className="grid grid-cols-2 gap-5 mb-8">
+      <div className="bg-primary pt-2 pb-4 px-6 rounded-b-[3.5rem] shadow-xl">
+        <div className="grid grid-cols-2 gap-5 mb-6">
           <div className="bg-white/20 backdrop-blur-md rounded-[3rem] flex flex-col items-center justify-center p-6 border border-white/20 active:scale-95 transition-all cursor-pointer h-40 shadow-lg group">
             <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-[1.25rem] flex items-center justify-center mb-3 shadow-xl transform group-hover:rotate-6 transition-transform">
                <HelpCircle className="w-8 h-8 text-white" />
@@ -28,7 +28,7 @@ export default function HomePage() {
         </div>
 
         {/* Recommended Section Header - Integrated into teal background */}
-        <div className="flex items-center justify-between px-2 pb-2">
+        <div className="flex items-center justify-between px-2 pb-1">
           <h3 className="text-xs font-black text-white tracking-tighter uppercase italic">Recommended</h3>
           <button className="w-8 h-8 bg-white/10 flex items-center justify-center rounded-full active:rotate-180 transition-transform duration-700">
             <RefreshCw className="w-4 h-4 text-white" />
@@ -36,16 +36,16 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div className="px-6 space-y-6 pt-6">
+      <div className="px-6 pt-3">
         {/* Discovery Grid */}
         {isUsersLoading ? (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="aspect-[3/4.5] bg-muted rounded-[2rem] animate-pulse" />
+              <div key={i} className="aspect-[3/4] bg-muted rounded-[2rem] animate-pulse" />
             ))}
           </div>
         ) : discoveryUsers.length > 0 ? (
-          <div className="grid grid-cols-2 gap-4 pb-10">
+          <div className="grid grid-cols-2 gap-3 pb-6">
             {discoveryUsers.map((u) => (
               <Link 
                 key={u.id} 
@@ -67,7 +67,7 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                <div className="absolute bottom-6 left-4 right-4">
+                <div className="absolute bottom-5 left-4 right-4">
                   <h4 className="text-[13px] font-black text-white truncate drop-shadow-lg tracking-tight mb-2">
                     {u.displayName || 'Guest_User'}
                   </h4>

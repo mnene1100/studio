@@ -99,7 +99,7 @@ export default function MePage() {
       {/* Content Spacer */}
       <div className="h-32" />
 
-      {/* Settings & Support Section */}
+      {/* Support Section */}
       <div className="px-6 mt-12 space-y-4">
         <div className="flex items-center space-x-4 mb-2">
           <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] whitespace-nowrap">Account & Safety</h3>
@@ -121,7 +121,10 @@ export default function MePage() {
           <span className="flex-1 text-left font-black text-gray-900 text-base tracking-tight">Customer support</span>
           <ChevronRight className="w-5 h-5 text-gray-300" />
         </button>
+      </div>
 
+      {/* Settings at the very bottom */}
+      <div className="px-6 mt-12">
         <button 
           onClick={() => router.push('/home/me/settings')}
           className="w-full flex items-center p-5 bg-black rounded-[1.75rem] shadow-xl active:scale-[0.98] transition-all group"
