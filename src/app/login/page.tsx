@@ -236,9 +236,6 @@ export default function LoginPage() {
         <p className="text-[8px] font-black text-white/30 uppercase tracking-[0.1em] leading-relaxed max-w-xs">
           By signing up, you agree to our <span className="text-white/50 underline">Terms</span> and <span className="text-white/50 underline">Privacy Policy</span>.
         </p>
-        <div className="text-[9px] text-white/10 font-black tracking-[0.4em] uppercase">
-          Secure Ecosystem
-        </div>
       </div>
     </div>
   );
