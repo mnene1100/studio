@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from 'react';
@@ -31,7 +30,7 @@ export default function ChatDetailPage() {
   // 1. Get Target User Profile
   const targetUserRef = useMemoFirebase(() => {
     if (!db || !id) return null;
-    return doc(db, 'userProfiles', id);
+    return doc(db, 'users', id);
   }, [db, id]);
   const { data: profile } = useDoc(targetUserRef);
 

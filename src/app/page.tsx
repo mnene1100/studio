@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect } from 'react';
@@ -27,7 +26,7 @@ export default function EntryPage() {
         }
 
         try {
-          const userDoc = await getDoc(doc(db, 'userProfiles', user.uid));
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
           if (userDoc.exists()) {
             localStorage.setItem('nexo_profile_completed', 'true');
             router.replace('/home');

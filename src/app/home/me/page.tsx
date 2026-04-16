@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useMemo } from 'react';
@@ -23,7 +22,7 @@ export default function MePage() {
   const visitorsQuery = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
     return query(
-      collection(db, 'userProfiles', user.uid, 'visitors'),
+      collection(db, 'users', user.uid, 'visitors'),
       orderBy('visitedAt', 'desc'),
       limit(5)
     );

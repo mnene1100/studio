@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useRouter } from 'next/navigation';
@@ -57,7 +56,7 @@ export default function SettingsPage() {
   const handleDeleteAccount = async () => {
     if (!auth || !user || !db) return;
     try {
-      const userProfileRef = doc(db, 'userProfiles', user.uid);
+      const userProfileRef = doc(db, 'users', user.uid);
       await deleteDoc(userProfileRef);
       await deleteUser(user);
       

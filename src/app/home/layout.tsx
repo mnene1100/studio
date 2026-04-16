@@ -1,10 +1,9 @@
-
 "use client";
 
 import { useEffect, createContext, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { Navigation } from "@/components/navigation";
-import { useUser, useFirestore, useDoc, useMemoFirebase, updateDocumentNonBlocking } from '@/firebase';
+import { useUser, useFirestore, useDoc, useMemoFirebase, setDocumentNonBlocking } from '@/firebase';
 import { doc } from 'firebase/firestore';
 
 interface HomeDataContextType {
@@ -29,12 +28,13 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     if (!db || !user?.uid) return;
 
-    const userRef = doc(db, 'userProfiles', user.uid);
+    const userRef = doc(db, 'users', user.uid);
     
     const updatePresence = () => {
-      updateDocumentNonBlocking(userRef, {
+      // Use set with merge instead of update to handle non-existent docs safely during onboarding
+      setDocumentNonBlocking(userRef, {
         lastOnlineAt: new Date().toISOString()
-      });
+      }, { merge: true });
     };
 
     updatePresence();
@@ -45,7 +45,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   // Essential Global Listener: User Profile
   const profileRef = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
-    return doc(db, 'userProfiles', user.uid);
+    return doc(db, 'users', user.uid);
   }, [db, user?.uid]);
   const { data: profile, isLoading: isProfileLoading } = useDoc(profileRef);
 

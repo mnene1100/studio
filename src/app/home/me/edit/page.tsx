@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
@@ -117,7 +116,7 @@ export default function EditProfilePage() {
   const handleSave = () => {
     if (!db || !user?.uid) return;
 
-    const userRef = doc(db, 'userProfiles', user.uid);
+    const userRef = doc(db, 'users', user.uid);
     updateDocumentNonBlocking(userRef, formData);
 
     toast({

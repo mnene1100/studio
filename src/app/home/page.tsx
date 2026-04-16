@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -20,7 +19,7 @@ export default function HomePage() {
   const discoveryQuery = useMemoFirebase(() => {
     if (!db) return null;
     return query(
-      collection(db, 'userProfiles'), 
+      collection(db, 'users'), 
       orderBy('lastOnlineAt', 'desc'),
       limit(pageSize)
     );

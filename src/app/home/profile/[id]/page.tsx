@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useMemo, useEffect, useState } from 'react';
@@ -29,7 +28,7 @@ export default function UserProfilePage() {
 
   const userRef = useMemoFirebase(() => {
     if (!db || !id) return null;
-    return doc(db, 'userProfiles', id as string);
+    return doc(db, 'users', id as string);
   }, [db, id]);
 
   const { data: profile, isLoading } = useDoc(userRef);
@@ -38,7 +37,7 @@ export default function UserProfilePage() {
   useEffect(() => {
     if (!db || !currentUser || !id || currentUser.uid === id) return;
     
-    const visitorRef = doc(db, 'userProfiles', id as string, 'visitors', currentUser.uid);
+    const visitorRef = doc(db, 'users', id as string, 'visitors', currentUser.uid);
     setDocumentNonBlocking(visitorRef, {
       id: currentUser.uid,
       visitorId: currentUser.uid,

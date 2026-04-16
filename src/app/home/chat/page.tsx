@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from 'next/link';
@@ -15,7 +14,7 @@ function ChatListItem({ chat }: { chat: any }) {
   
   const targetUserRef = useMemoFirebase(() => {
     if (!db || !otherParticipantId) return null;
-    return doc(db, 'userProfiles', otherParticipantId);
+    return doc(db, 'users', otherParticipantId);
   }, [db, otherParticipantId]);
   
   const { data: profile } = useDoc(targetUserRef);

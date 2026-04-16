@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
@@ -110,7 +109,7 @@ export default function OnboardingPage() {
       isVerified: false,
     };
 
-    const userRef = doc(db, 'userProfiles', user.uid);
+    const userRef = doc(db, 'users', user.uid);
     setDocumentNonBlocking(userRef, profileData, { merge: true });
     localStorage.setItem('nexo_profile_completed', 'true');
     localStorage.setItem('nexo_session_active', 'true');

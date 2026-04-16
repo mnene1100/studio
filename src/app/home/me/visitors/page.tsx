@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect } from 'react';
@@ -16,7 +15,7 @@ function VisitorItem({ visitor }: { visitor: any }) {
   
   const visitorRef = useMemoFirebase(() => {
     if (!db || !visitor.id) return null;
-    return doc(db, 'userProfiles', visitor.id);
+    return doc(db, 'users', visitor.id);
   }, [db, visitor.id]);
   
   const { data: profile } = useDoc(visitorRef);
@@ -82,7 +81,7 @@ export default function VisitorsPage() {
   const visitorsQuery = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
     return query(
-      collection(db, 'userProfiles', user.uid, 'visitors'),
+      collection(db, 'users', user.uid, 'visitors'),
       orderBy('visitedAt', 'desc'),
       limit(20)
     );
@@ -92,7 +91,7 @@ export default function VisitorsPage() {
   // Clear notification dot by updating lastCheckedVisitorsAt
   useEffect(() => {
     if (!db || !user?.uid) return;
-    const userRef = doc(db, 'userProfiles', user.uid);
+    const userRef = doc(db, 'users', user.uid);
     updateDocumentNonBlocking(userRef, {
       lastCheckedVisitorsAt: new Date().toISOString()
     });

@@ -45,7 +45,7 @@ export default function PaymentCallbackPage() {
 
         // 2. Perform credit logic
         const amount = parseInt(coinsToCredit);
-        const userRef = doc(db, 'userProfiles', user.uid);
+        const userRef = doc(db, 'users', user.uid);
 
         // Record the transaction first to block other attempts
         await setDoc(transRef, {
