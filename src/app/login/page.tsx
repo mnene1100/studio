@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -19,6 +18,7 @@ export default function LoginPage() {
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
 
+  // Redirect if user is already logged in
   useEffect(() => {
     const isSessionActive = localStorage.getItem('nexo_session_active') === 'true';
     if (!isUserLoading && user && isSessionActive) {
@@ -29,7 +29,9 @@ export default function LoginPage() {
   const handleFastLogin = async () => {
     if (!auth) return;
     setIsLoading(true);
+    
     try {
+      // Check for existing anonymous session first
       if (auth.currentUser && auth.currentUser.isAnonymous) {
         localStorage.setItem('nexo_session_active', 'true');
         router.replace('/home');
@@ -42,10 +44,13 @@ export default function LoginPage() {
         router.replace('/onboarding');
       }
     } catch (error: any) {
+      console.error("Fast login error:", error);
       toast({
         variant: "destructive",
-        title: "Login failed",
-        description: error.message || "Could not sign in.",
+        title: "Connection Issue",
+        description: error.code === 'auth/network-request-failed' 
+          ? "Network error. Please check your connection and try again."
+          : (error.message || "Could not sign in anonymously."),
       });
     } finally {
       setIsLoading(false);
@@ -54,7 +59,7 @@ export default function LoginPage() {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password.trim()) {
+    if (!email.trim() || !password.trim() || !auth) {
       toast({
         variant: "destructive",
         title: "Missing fields",
@@ -67,11 +72,17 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       localStorage.setItem('nexo_session_active', 'true');
-      router.replace('/home');
+      // The useEffect will handle the redirect once the auth state is updated
     } catch (error: any) {
+      console.error("Sign in error:", error);
       let message = "Invalid email or password.";
-      if (error.code === 'auth/user-not-found') message = "No account found with this email.";
-      if (error.code === 'auth/wrong-password') message = "Incorrect password.";
+      if (error.code === 'auth/network-request-failed') {
+        message = "Network error. Please check your connection.";
+      } else if (error.code === 'auth/user-not-found') {
+        message = "No account found with this email.";
+      } else if (error.code === 'auth/wrong-password') {
+        message = "Incorrect password.";
+      }
       
       toast({
         variant: "destructive",
@@ -85,7 +96,7 @@ export default function LoginPage() {
 
   const handleSignUp = async (e: React.MouseEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password.trim()) {
+    if (!email.trim() || !password.trim() || !auth) {
       toast({
         variant: "destructive",
         title: "Missing fields",
@@ -107,12 +118,15 @@ export default function LoginPage() {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       localStorage.setItem('nexo_session_active', 'true');
-      // Direct redirect to onboarding for new accounts
+      // Direct redirect for new accounts to ensure they hit onboarding
       router.replace('/onboarding');
     } catch (error: any) {
+      console.error("Sign up error:", error);
       let message = "Could not create account.";
-      if (error.code === 'auth/email-already-in-use') {
-        message = "An account with this email already exists. Try signing in instead.";
+      if (error.code === 'auth/network-request-failed') {
+        message = "Network error. Please check your connection.";
+      } else if (error.code === 'auth/email-already-in-use') {
+        message = "An account with this email already exists.";
       }
       
       toast({
