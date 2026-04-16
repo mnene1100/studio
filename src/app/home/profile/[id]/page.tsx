@@ -1,13 +1,13 @@
 "use client";
 
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useFirestore, useDoc, useMemoFirebase, useUser, setDocumentNonBlocking } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { Button } from "@/components/ui/button";
 import { 
   ChevronLeft, MoreHorizontal, Copy, 
-  Calendar, Ban, Flag, MessageCircle 
+  Ban, Flag, MessageCircle, X 
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { differenceInYears, formatDistanceToNow } from 'date-fns';
@@ -17,13 +17,14 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/dropdown-menu";
 
 export default function UserProfilePage() {
   const { id } = useParams();
   const router = useRouter();
   const db = useFirestore();
   const { user: currentUser } = useUser();
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   const userRef = useMemoFirebase(() => {
     if (!db || !id) return null;
@@ -104,12 +105,37 @@ export default function UserProfilePage() {
 
   if (!profile) return null;
 
-  const hasInformation = profile.createdAt || profile.country || profile.gender;
-
   return (
     <div className="flex flex-col min-h-screen bg-white relative pb-40 overflow-x-hidden">
+      {/* Full Screen Image Overlay */}
+      {isFullScreen && (
+        <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center animate-in fade-in duration-300">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => setIsFullScreen(false)}
+            className="absolute top-10 right-6 w-12 h-12 bg-white/10 backdrop-blur-md rounded-full text-white border border-white/10 hover:bg-white/20 z-[110]"
+          >
+            <X className="w-6 h-6" />
+          </Button>
+          <div className="relative w-full h-full" onClick={() => setIsFullScreen(false)}>
+            <Image 
+              src={profile.profilePictureUrl || `https://picsum.photos/seed/${profile.id}/1200/1600`}
+              alt={profile.displayName || "User"}
+              fill
+              className="object-contain"
+              priority
+              sizes="100vw"
+            />
+          </div>
+        </div>
+      )}
+
       {/* Hero Image Section */}
-      <div className="relative w-full aspect-[1/1.15] overflow-hidden bg-muted">
+      <div 
+        className="relative w-full aspect-[1/1.15] overflow-hidden bg-muted cursor-zoom-in"
+        onClick={() => setIsFullScreen(true)}
+      >
         <Image 
           src={profile.profilePictureUrl || `https://picsum.photos/seed/${profile.id}/800/1000`}
           alt={profile.displayName || "User"}
@@ -128,7 +154,7 @@ export default function UserProfilePage() {
           <Button 
             variant="ghost" 
             size="icon" 
-            onClick={() => router.back()}
+            onClick={(e) => { e.stopPropagation(); router.back(); }}
             className="w-10 h-10 bg-black/20 backdrop-blur-md rounded-full text-white border border-white/10 hover:bg-black/40 active:scale-95 transition-all"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -139,6 +165,7 @@ export default function UserProfilePage() {
               <Button 
                 variant="ghost" 
                 size="icon" 
+                onClick={(e) => e.stopPropagation()}
                 className="w-10 h-10 bg-black/20 backdrop-blur-md rounded-full text-white border border-white/10 hover:bg-black/40 active:scale-95 transition-all"
               >
                 <MoreHorizontal className="w-5 h-5" />
@@ -199,34 +226,12 @@ export default function UserProfilePage() {
           <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest">{profile.country || "KENYA"}</span>
         </div>
 
-        <div className="mb-8">
+        <div className="mb-8 pb-20">
            <h3 className="text-[8px] font-black text-gray-300 uppercase tracking-[0.3em] mb-2.5">About Me</h3>
            <p className="text-gray-600 font-medium leading-relaxed text-[13px]">
              {profile.statusMessage || "Passionate traveler and coffee enthusiast. Let's connect and share stories!"}
            </p>
         </div>
-
-        {hasInformation && (
-          <div className="space-y-4 pb-20">
-            <h3 className="text-[8px] font-black text-gray-300 uppercase tracking-[0.3em]">Information</h3>
-            
-            <div className="grid grid-cols-1 gap-3">
-              {profile.createdAt && (
-                <div className="bg-white border border-gray-100 rounded-[2rem] p-4 flex items-center shadow-sm">
-                  <div className="w-10 h-10 bg-primary/5 rounded-xl flex items-center justify-center mr-4">
-                    <Calendar className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Member Since</p>
-                    <h4 className="text-sm font-black text-gray-900 tracking-tight">
-                      {new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()}
-                    </h4>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Floating Action Button */}
