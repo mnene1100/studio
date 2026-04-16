@@ -1,58 +1,20 @@
+
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from 'react';
-import { RefreshCw, UserCheck, Loader2, MessageCircle } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { RefreshCw, UserCheck, Loader2, MessageCircle } from "lucide-react";
 import { differenceInYears } from 'date-fns';
-import { useUser, useFirestore } from '@/firebase';
-import { collection, query, limit, orderBy, getDocs } from 'firebase/firestore';
-import { Button } from '@/components/ui/button';
+import { useHomeData } from './layout';
+import { cn } from '@/lib/utils';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function HomePage() {
   const router = useRouter();
-  const { user } = useUser();
-  const db = useFirestore();
-  
-  const [discoveryUsers, setDiscoveryUsers] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [pageSize, setPageSize] = useState(10);
-  const initialFetchedRef = useRef(false);
+  const { discoveryUsers, isDiscoveryLoading, refreshDiscovery } = useHomeData();
 
   const mysteryIcon = PlaceHolderImages.find(img => img.id === 'mystery-icon');
   const taskIcon = PlaceHolderImages.find(img => img.id === 'task-icon');
-
-  const fetchUsers = async (currentSize: number, silent = false) => {
-    if (!db || !user?.uid) return;
-    if (!silent) setIsLoading(true);
-    try {
-      const q = query(collection(db, 'users'), orderBy('lastOnlineAt', 'desc'), limit(currentSize + 20));
-      const snapshot = await getDocs(q);
-      const docs = snapshot.docs
-        .map(doc => ({ ...doc.data(), id: doc.id }))
-        .filter(u => u.id !== user.uid);
-      
-      setDiscoveryUsers(docs.slice(0, currentSize));
-    } catch (e) {
-      console.error("Discovery error:", e);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    // Only fetch once on mount if data is empty. 
-    // Further refreshes MUST be manual via button.
-    if (user?.uid && !initialFetchedRef.current && discoveryUsers.length === 0) {
-      initialFetchedRef.current = true;
-      fetchUsers(pageSize);
-    }
-  }, [user?.uid]);
-
-  const handleRefresh = () => {
-    fetchUsers(pageSize);
-  };
 
   return (
     <div className="flex flex-col min-h-screen pb-32 bg-background">
@@ -79,21 +41,21 @@ export default function HomePage() {
         <div className="flex items-center justify-between">
           <h3 className="text-[10px] font-black text-white tracking-widest uppercase italic">Recommended</h3>
           <button 
-            onClick={handleRefresh} 
-            disabled={isLoading}
+            onClick={refreshDiscovery} 
+            disabled={isDiscoveryLoading}
             className={cn(
               "w-7 h-7 bg-white/10 rounded-full flex items-center justify-center transition-all",
-              isLoading ? "opacity-50" : "active:scale-90"
+              isDiscoveryLoading ? "opacity-50" : "active:scale-90"
             )}
           >
-            <RefreshCw className={cn("w-3.5 h-3.5 text-white", isLoading && "animate-spin")} />
+            <RefreshCw className={cn("w-3.5 h-3.5 text-white", isDiscoveryLoading && "animate-spin")} />
           </button>
         </div>
       </div>
 
       {/* Discovery Grid */}
       <div className="px-3 pt-4 flex-1">
-        {isLoading && discoveryUsers.length === 0 ? (
+        {isDiscoveryLoading && discoveryUsers.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 className="w-8 h-8 text-primary animate-spin" />
             <p className="mt-4 text-[9px] font-black text-primary/40 uppercase tracking-[0.3em]">Finding matches...</p>
@@ -118,7 +80,7 @@ export default function HomePage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
                   
-                  {/* Chat Button - Top Right with Text + Icon */}
+                  {/* Chat Button */}
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
