@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -22,6 +23,8 @@ function ChatListItem({ chat }: { chat: any }) {
 
   const isOnline = profile?.lastOnlineAt ? (Date.now() - new Date(profile.lastOnlineAt).getTime() < 120000) : false;
 
+  const lastMessageTime = chat.lastMessageSentAt || chat.updatedAt;
+
   return (
     <Link 
       href={`/home/chat/${otherParticipantId}`}
@@ -43,7 +46,7 @@ function ChatListItem({ chat }: { chat: any }) {
         <div className="flex items-center justify-between mb-0.5">
           <h3 className="font-bold text-gray-900 text-sm tracking-tight">{profile?.displayName || 'Loading...'}</h3>
           <span className="text-[10px] font-bold text-gray-300">
-            {chat.updatedAt ? new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+            {lastMessageTime ? new Date(lastMessageTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
           </span>
         </div>
         <div className="flex items-center justify-between">
@@ -57,11 +60,14 @@ function ChatListItem({ chat }: { chat: any }) {
 export default function ChatListPage() {
   const { chats, isChatsLoading } = useHomeData();
 
-  const sortedChats = [...chats].sort((a, b) => {
-    const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
-    const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
-    return dateB - dateA;
-  });
+  // Filter to only show chats that have at least one message sent
+  const filteredAndSortedChats = [...(chats || [])]
+    .filter(chat => !!chat.lastMessageSentAt)
+    .sort((a, b) => {
+      const dateA = a.lastMessageSentAt ? new Date(a.lastMessageSentAt).getTime() : 0;
+      const dateB = b.lastMessageSentAt ? new Date(b.lastMessageSentAt).getTime() : 0;
+      return dateB - dateA;
+    });
 
   return (
     <div className="flex flex-col min-h-screen bg-white pb-32">
@@ -87,9 +93,9 @@ export default function ChatListPage() {
               </div>
             ))}
           </div>
-        ) : sortedChats.length > 0 ? (
+        ) : filteredAndSortedChats.length > 0 ? (
           <div className="space-y-0">
-            {sortedChats.map((chat) => (
+            {filteredAndSortedChats.map((chat) => (
               <ChatListItem key={chat.id} chat={chat} />
             ))}
           </div>

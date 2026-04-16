@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from 'react';
@@ -90,11 +91,12 @@ export default function ChatDetailPage() {
   const handleSendMessage = () => {
     if (!input.trim() || !chatId || !currentUser) return;
     
+    const now = new Date().toISOString();
     const messageData = {
       chatId: chatId,
       senderId: currentUser.uid,
       content: input,
-      sentAt: new Date().toISOString(),
+      sentAt: now,
       type: 'text'
     };
 
@@ -103,7 +105,8 @@ export default function ChatDetailPage() {
 
     const chatRef = doc(db, 'chatConversations', chatId);
     updateDocumentNonBlocking(chatRef, {
-      updatedAt: new Date().toISOString()
+      updatedAt: now,
+      lastMessageSentAt: now // Explicitly track that a message has been sent
     });
 
     setInput('');

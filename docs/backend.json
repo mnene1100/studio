@@ -99,6 +99,11 @@
           "type": "array",
           "items": { "type": "string" }
         },
+        "lastMessageSentAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the last sent message."
+        },
         "createdAt": {
           "type": "string",
           "format": "date-time"
