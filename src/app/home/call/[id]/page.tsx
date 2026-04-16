@@ -10,7 +10,7 @@ import {
   Volume2, VolumeX, Maximize2, Minimize2, AlertCircle, Loader2
 } from "lucide-react";
 import { useFirestore, useDoc, useMemoFirebase, useUser, setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase';
-import { doc, updateDoc, increment } from 'firebase/firestore';
+import { doc, updateDoc, increment, getDoc } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -54,15 +54,17 @@ export default function CallPage() {
     router.back();
   };
 
-  // Billing logic
+  // Billing logic: Caller only
   useEffect(() => {
     if (!joined || !currentUser || !db || !currentUserProfile) return;
 
     const costPerMin = callType === 'video' ? 160 : 80;
     
     const deductCoins = async () => {
-      // Check if user has enough coins for the current/next minute
-      const latestBalance = currentUserProfile.balance ?? 0;
+      // Refresh balance from DB to ensure accuracy
+      const userRef = doc(db, 'users', currentUser.uid);
+      const userSnap = await getDoc(userRef);
+      const latestBalance = userSnap.data()?.balance ?? 0;
       
       if (latestBalance < costPerMin) {
         toast({
@@ -75,7 +77,6 @@ export default function CallPage() {
       }
 
       // Perform deduction
-      const userRef = doc(db, 'users', currentUser.uid);
       try {
         await updateDoc(userRef, {
           balance: increment(-costPerMin)
@@ -104,6 +105,20 @@ export default function CallPage() {
       if (typeof window === 'undefined') return;
 
       try {
+        // Pre-initialization check: Ensure user can cover the FIRST minute
+        const costPerMin = callType === 'video' ? 160 : 80;
+        const currentBalance = currentUserProfile?.balance ?? 0;
+
+        if (currentBalance < costPerMin) {
+          toast({
+            variant: 'destructive',
+            title: 'Insufficient Balance',
+            description: 'Please recharge to start this call.',
+          });
+          handleEndCall();
+          return;
+        }
+
         const appId = process.env.NEXT_PUBLIC_AGORA_APP_ID;
         
         if (!appId) {
@@ -201,7 +216,7 @@ export default function CallPage() {
       }
     };
 
-    if (currentUser && targetUserId && db) {
+    if (currentUser && targetUserId && db && currentUserProfile) {
       initAgora();
     }
 
@@ -227,7 +242,7 @@ export default function CallPage() {
         agoraClientRef.current.leave();
       }
     };
-  }, [currentUser, targetUserId, callType, db]);
+  }, [currentUser, targetUserId, callType, db, currentUserProfile]);
 
   const toggleMic = async () => {
     if (localAudioTrackRef.current) {

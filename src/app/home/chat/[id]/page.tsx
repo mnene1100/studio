@@ -96,7 +96,7 @@ export default function ChatDetailPage() {
   const handleSendMessage = async () => {
     if (!input.trim() || !chatId || !currentUser || !db) return;
     
-    // Coin Deduction Logic: Male users pay 15 coins per text
+    // Coin Deduction Logic: Male users pay 15 coins per text, Female users pay 0
     if (currentUserProfile?.gender === 'Male') {
       const currentBalance = currentUserProfile.balance ?? 0;
       if (currentBalance < 15) {
@@ -152,6 +152,20 @@ export default function ChatDetailPage() {
   };
 
   const startCall = (type: 'video' | 'audio') => {
+    // Pre-call balance check
+    const costPerMin = type === 'video' ? 160 : 80;
+    const currentBalance = currentUserProfile?.balance ?? 0;
+
+    if (currentBalance < costPerMin) {
+      toast({
+        variant: 'destructive',
+        title: 'Insufficient Balance',
+        description: `You need at least ${costPerMin} coins to start a ${type} call.`,
+      });
+      router.push('/home/wallet');
+      return;
+    }
+
     router.push(`/home/call/${id}?type=${type}`);
   };
 
