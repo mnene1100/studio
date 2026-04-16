@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { 
   ChevronLeft, Camera, Check, 
-  GraduationCap, Star, Heart, MapPin, Calendar 
+  GraduationCap, Star, Heart, MapPin, Calendar, X
 } from "lucide-react";
 import { 
   Select, 
@@ -18,6 +18,14 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogFooter 
+} from "@/components/ui/dialog";
+import Cropper from 'react-easy-crop';
 import { useHomeData } from '../../layout';
 import { useFirestore, useUser, updateDocumentNonBlocking } from '@/firebase';
 import { doc } from 'firebase/firestore';
@@ -61,6 +69,7 @@ export default function EditProfilePage() {
   const { profile } = useHomeData();
   const { user } = useUser();
   const db = useFirestore();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
     displayName: '',
@@ -73,6 +82,13 @@ export default function EditProfilePage() {
     lookingFor: '',
     profilePictureUrl: ''
   });
+
+  // Cropping States
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+  const [isCropOpen, setIsCropOpen] = useState(false);
 
   const maxDate = useMemo(() => {
     const today = new Date();
@@ -106,20 +122,80 @@ export default function EditProfilePage() {
 
     toast({
       title: "Profile Updated",
-      description: "Your changes have been saved to the NEXO network.",
+      description: "Your changes have been saved successfully.",
     });
     router.back();
   };
 
-  const simulateGalleryAccess = () => {
-    const newSeed = Math.floor(Math.random() * 1000);
-    const newUrl = `https://picsum.photos/seed/${newSeed}/400/400`;
-    setFormData(prev => ({ ...prev, profilePictureUrl: newUrl }));
-    
-    toast({
-      title: "Photo Updated",
-      description: "Gallery access simulated. New photo selected.",
+  const onCropComplete = useCallback((_croppedArea: any, croppedAreaPixels: any) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImageToCrop(reader.result as string);
+        setIsCropOpen(true);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const createImage = (url: string): Promise<HTMLImageElement> =>
+    new Promise((resolve, reject) => {
+      const image = new Image();
+      image.addEventListener('load', () => resolve(image));
+      image.addEventListener('error', (error) => reject(error));
+      image.setAttribute('crossOrigin', 'anonymous');
+      image.src = url;
     });
+
+  const getCroppedImg = async (imageSrc: string, pixelCrop: any): Promise<string> => {
+    const image = await createImage(imageSrc);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) return '';
+
+    canvas.width = pixelCrop.width;
+    canvas.height = pixelCrop.height;
+
+    ctx.drawImage(
+      image,
+      pixelCrop.x,
+      pixelCrop.y,
+      pixelCrop.width,
+      pixelCrop.height,
+      0,
+      0,
+      pixelCrop.width,
+      pixelCrop.height
+    );
+
+    return canvas.toDataURL('image/jpeg');
+  };
+
+  const saveCroppedImage = async () => {
+    try {
+      if (!imageToCrop || !croppedAreaPixels) return;
+      const croppedImage = await getCroppedImg(imageToCrop, croppedAreaPixels);
+      setFormData(prev => ({ ...prev, profilePictureUrl: croppedImage }));
+      setIsCropOpen(false);
+      setImageToCrop(null);
+      toast({
+        title: "Avatar Ready",
+        description: "Your new photo has been cropped and applied.",
+      });
+    } catch (e) {
+      console.error(e);
+      toast({
+        variant: "destructive",
+        title: "Crop failed",
+        description: "Could not process the image.",
+      });
+    }
   };
 
   if (!profile) return null;
@@ -158,13 +234,20 @@ export default function EditProfilePage() {
               </AvatarFallback>
             </Avatar>
             <button 
-              onClick={simulateGalleryAccess}
+              onClick={() => fileInputRef.current?.click()}
               className="absolute bottom-0 right-0 p-3 bg-primary text-white rounded-full border-4 border-white shadow-xl active:scale-90 transition-all"
             >
               <Camera className="w-5 h-5" />
             </button>
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              className="hidden" 
+              accept="image/*" 
+              onChange={handleFileChange} 
+            />
           </div>
-          <p className="mt-4 text-[9px] font-black text-gray-300 uppercase tracking-widest italic">Tap camera to access gallery</p>
+          <p className="mt-4 text-[9px] font-black text-gray-300 uppercase tracking-widest italic">Tap camera to change avatar</p>
         </div>
 
         <div className="space-y-6">
@@ -288,6 +371,55 @@ export default function EditProfilePage() {
           Save Changes
         </Button>
       </div>
+
+      {/* Crop Dialog */}
+      <Dialog open={isCropOpen} onOpenChange={setIsCropOpen}>
+        <DialogContent className="max-w-[95vw] sm:max-w-md bg-black border-none rounded-[3rem] p-0 overflow-hidden h-[80vh] flex flex-col">
+          <DialogHeader className="p-6 shrink-0 bg-zinc-950 flex flex-row items-center justify-between">
+            <DialogTitle className="text-white font-black uppercase tracking-widest text-xs italic">Crop Avatar</DialogTitle>
+            <Button variant="ghost" size="icon" onClick={() => setIsCropOpen(false)} className="text-white">
+              <X className="w-5 h-5" />
+            </Button>
+          </DialogHeader>
+          
+          <div className="flex-1 relative bg-black">
+            {imageToCrop && (
+              <Cropper
+                image={imageToCrop}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                onCropChange={setCrop}
+                onCropComplete={onCropComplete}
+                onZoomChange={setZoom}
+                cropShape="round"
+                showGrid={false}
+              />
+            )}
+          </div>
+
+          <DialogFooter className="p-8 bg-zinc-950 shrink-0 flex flex-col space-y-4">
+            <div className="space-y-2">
+              <Label className="text-[9px] font-black text-white/40 uppercase tracking-widest">Zoom</Label>
+              <input 
+                type="range"
+                value={zoom}
+                min={1}
+                max={3}
+                step={0.1}
+                onChange={(e) => setZoom(Number(e.target.value))}
+                className="w-full accent-primary bg-white/10 rounded-lg h-2 appearance-none"
+              />
+            </div>
+            <Button 
+              onClick={saveCroppedImage}
+              className="w-full h-14 bg-primary text-white font-black rounded-2xl uppercase tracking-[0.2em] text-[10px]"
+            >
+              Apply Crop
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
