@@ -37,10 +37,11 @@ export default function CallPage() {
   const [statusMessage, setStatusMessage] = useState('Initializing Secure Line...');
 
   const localVideoRef = useRef<HTMLDivElement>(null);
-  const remoteVideoRef = useRef<HTMLDivElement>(null);
   const agoraClientRef = useRef<any>(null);
   const callIdRef = useRef<string | null>(null);
   const initializationStartedRef = useRef(false);
+  const billingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const isBilledForFirstMinRef = useRef(false);
   
   const localAudioTrackRef = useRef<any>(null);
   const localVideoTrackRef = useRef<any>(null);
@@ -55,9 +56,10 @@ export default function CallPage() {
     router.back();
   };
 
-  // Billing logic: Caller only - Isolated from the profile update trigger
+  // Billing logic: Only deduct when remote user connects (the call is "answered")
   useEffect(() => {
-    if (!joined || !currentUser || !db) return;
+    const isCallConnected = remoteUsers.length > 0;
+    if (!isCallConnected || !currentUser || !db || billingIntervalRef.current) return;
 
     const costPerMin = callType === 'video' ? 160 : 80;
     
@@ -78,6 +80,16 @@ export default function CallPage() {
 
       try {
         await updateDoc(userRef, { balance: increment(-costPerMin) });
+        // Record billing transaction
+        const billingId = `bill_${Date.now()}_${currentUser.uid}`;
+        setDocumentNonBlocking(doc(db, 'transactions', billingId), {
+          id: billingId,
+          userId: currentUser.uid,
+          type: 'call_billing',
+          coins: costPerMin,
+          callType: callType,
+          createdAt: new Date().toISOString()
+        }, { merge: true });
         return true;
       } catch (e) {
         handleEndCall();
@@ -85,14 +97,23 @@ export default function CallPage() {
       }
     };
 
-    deductCoins();
-    const billingInterval = setInterval(deductCoins, 60000);
+    // First minute deduction happens immediately upon remote user join
+    if (!isBilledForFirstMinRef.current) {
+      isBilledForFirstMinRef.current = true;
+      deductCoins();
+      // Then start the interval for subsequent minutes
+      billingIntervalRef.current = setInterval(deductCoins, 60000);
+    }
 
-    return () => clearInterval(billingInterval);
-  }, [joined, currentUser?.uid, db, callType]);
+    return () => {
+      if (billingIntervalRef.current) {
+        clearInterval(billingIntervalRef.current);
+        billingIntervalRef.current = null;
+      }
+    };
+  }, [remoteUsers.length > 0, currentUser?.uid, db, callType]);
 
   useEffect(() => {
-    // Only initialize ONCE to prevent UID_CONFLICT on balance updates
     if (initializationStartedRef.current || !currentUser || !targetUserId || !db || !currentUserProfile) return;
     initializationStartedRef.current = true;
 
@@ -103,11 +124,12 @@ export default function CallPage() {
         const costPerMin = callType === 'video' ? 160 : 80;
         const currentBalance = currentUserProfile?.balance ?? 0;
 
+        // Check if user has enough coins for at least the first minute before starting
         if (currentBalance < costPerMin) {
           toast({
             variant: 'destructive',
             title: 'Insufficient Balance',
-            description: 'Please recharge to start this call.',
+            description: `You need at least ${costPerMin} coins to start this call.`,
           });
           handleEndCall();
           return;
@@ -177,7 +199,7 @@ export default function CallPage() {
 
         if (tracks.length > 0) await agoraClientRef.current.publish(tracks);
         setJoined(true);
-        setStatusMessage('Connected');
+        setStatusMessage('Calling...');
       } catch (error: any) {
         setErrorMessage(error.message || 'CONNECTION_FAILED');
       }
@@ -203,8 +225,11 @@ export default function CallPage() {
       if (agoraClientRef.current) {
         agoraClientRef.current.leave();
       }
+      if (billingIntervalRef.current) {
+        clearInterval(billingIntervalRef.current);
+      }
     };
-  }, [currentUser?.uid, targetUserId, callType, db, currentUserProfile]); // Watch profile but ref prevents re-init
+  }, [currentUser?.uid, targetUserId, callType, db, currentUserProfile]);
 
   const toggleMic = async () => {
     if (localAudioTrackRef.current) {
@@ -263,7 +288,14 @@ export default function CallPage() {
     <div className="fixed inset-0 bg-black z-[100] flex flex-col overflow-hidden">
       <div className="absolute inset-0 z-0">
         {callType === 'video' && remoteUsers.length > 0 ? (
-          <div ref={remoteVideoRef} className="w-full h-full object-cover animate-in fade-in duration-700" />
+          <div 
+            ref={(node) => {
+              if (node && remoteUsers[0]?.videoTrack) {
+                remoteUsers[0].videoTrack.play(node);
+              }
+            }} 
+            className="w-full h-full object-cover animate-in fade-in duration-700" 
+          />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-950 premium-gradient">
             <div className="relative">
@@ -278,9 +310,9 @@ export default function CallPage() {
               <h2 className="text-3xl font-black text-white tracking-tighter mb-3 drop-shadow-2xl">{displayName}</h2>
               <div className="flex flex-col items-center space-y-4">
                 <p className="text-[11px] font-black text-primary uppercase tracking-[0.4em] animate-pulse">
-                  {statusMessage}
+                  {remoteUsers.length > 0 ? 'Connected' : statusMessage}
                 </p>
-                {callType === 'audio' && joined && (
+                {callType === 'audio' && remoteUsers.length > 0 && (
                   <div className="flex flex-col items-center animate-in slide-in-from-bottom-4 duration-500">
                     <div className="flex items-center space-x-2 bg-primary/10 px-5 py-2.5 rounded-full border border-primary/20 shadow-lg">
                       <Volume2 className="w-3 h-3 text-primary animate-bounce" />
@@ -288,7 +320,7 @@ export default function CallPage() {
                     </div>
                   </div>
                 )}
-                {!joined && !errorMessage && <Loader2 className="w-6 h-6 text-white/20 animate-spin mt-4" />}
+                {remoteUsers.length === 0 && !errorMessage && <Loader2 className="w-6 h-6 text-white/20 animate-spin mt-4" />}
               </div>
             </div>
           </div>
@@ -316,10 +348,10 @@ export default function CallPage() {
         <div className="bg-black/40 backdrop-blur-3xl px-6 py-3 rounded-full border border-white/10 flex items-center space-x-3 shadow-2xl">
           <div className={cn(
             "w-2 h-2 rounded-full shadow-[0_0_15px]",
-            joined ? "bg-green-500 shadow-green-500/50 animate-pulse" : "bg-orange-500 shadow-orange-500/50"
+            remoteUsers.length > 0 ? "bg-green-500 shadow-green-500/50 animate-pulse" : "bg-orange-500 shadow-orange-500/50"
           )} />
           <span className="text-[9px] font-black text-white uppercase tracking-[0.3em]">
-            {joined ? (callType === 'video' ? 'Live Encrypted' : 'Voice Secure') : 'Connecting...'}
+            {remoteUsers.length > 0 ? (callType === 'video' ? 'Live Encrypted' : 'Voice Secure') : 'Waiting...'}
           </span>
         </div>
         <div className="w-12 h-12" />
