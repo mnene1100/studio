@@ -1,12 +1,12 @@
+
 "use client";
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { 
   ChevronLeft, History, Globe, 
-  Users, UserPlus, Loader2, Coins, ArrowRight, Zap, Phone 
+  Users, UserPlus, Loader2, Coins, ArrowRight, Zap 
 } from "lucide-react";
 import { 
   Select, 
@@ -33,30 +33,21 @@ export default function WalletPage() {
   const router = useRouter();
   const { profile } = useHomeData();
   const [selectedPackage, setSelectedPackage] = useState<typeof PACKAGES[0] | null>(null);
-  const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePayment = async () => {
     if (!selectedPackage || !profile) return;
-
-    if (!phoneNumber.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Phone Number Required",
-        description: "Please enter your M-Pesa or payment phone number.",
-      });
-      return;
-    }
 
     setIsLoading(true);
     try {
       const coinAmount = selectedPackage.coins.replace(',', '');
       const callbackUrl = `${window.location.origin}/home/wallet/callback?coins=${coinAmount}`;
       
+      // Pass a placeholder number as PesaPal API requires one, but the user will enter their real one on the hosted page
       const result = await createPesapalOrder({
         amount: selectedPackage.price,
         email: profile.email || "guest@nexo.com",
-        phoneNumber: phoneNumber.trim(), 
+        phoneNumber: "0700000000", 
         firstName: profile.displayName || "Nexo",
         lastName: "User",
         description: `Recharge ${selectedPackage.coins} Nexo Coins`,
@@ -79,7 +70,7 @@ export default function WalletPage() {
     }
   };
 
-  const isFormValid = selectedPackage && phoneNumber.trim().length >= 10;
+  const isFormValid = !!selectedPackage;
 
   return (
     <div className="flex flex-col min-h-screen bg-white pb-24">
@@ -108,6 +99,7 @@ export default function WalletPage() {
       </header>
 
       <div className="p-4 space-y-6">
+        {/* Wallet Balance Card */}
         <div className="bg-gradient-to-br from-gray-900 to-black rounded-[2rem] p-6 text-white shadow-xl relative overflow-hidden group">
           <div className="absolute -right-6 -top-6 w-32 h-32 bg-primary/20 rounded-full blur-[50px]" />
           <div className="relative z-10">
@@ -126,39 +118,25 @@ export default function WalletPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-2 block px-1">Region</label>
-            <Select defaultValue="kenya">
-              <SelectTrigger className="w-full h-12 bg-gray-50 border-gray-100 rounded-2xl px-4 text-xs font-black text-gray-900 focus:ring-primary/10">
-                <div className="flex items-center space-x-2">
-                  <Globe className="w-3.5 h-3.5 text-primary" />
-                  <SelectValue />
-                </div>
-              </SelectTrigger>
-              <SelectContent className="bg-white rounded-2xl border border-gray-100 shadow-xl p-1">
-                <SelectItem value="kenya" className="py-3 font-black text-[10px] uppercase tracking-widest rounded-xl">Kenya (KES)</SelectItem>
-                <SelectItem value="uganda" className="py-3 font-black text-[10px] uppercase tracking-widest rounded-xl">Uganda (UGX)</SelectItem>
-                <SelectItem value="tanzania" className="py-3 font-black text-[10px] uppercase tracking-widest rounded-xl">Tanzania (TZS)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-2 block px-1">Phone Number</label>
-            <div className="relative">
-              <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-primary" />
-              <Input 
-                type="tel"
-                placeholder="0712..."
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                className="w-full h-12 bg-gray-50 border-gray-100 rounded-2xl pl-9 pr-4 text-xs font-black text-gray-900 focus:ring-primary/10"
-              />
-            </div>
-          </div>
+        {/* Region Selector */}
+        <div className="max-w-[50%]">
+          <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-2 block px-1">Region</label>
+          <Select defaultValue="kenya">
+            <SelectTrigger className="w-full h-12 bg-gray-50 border-gray-100 rounded-2xl px-4 text-xs font-black text-gray-900 focus:ring-primary/10">
+              <div className="flex items-center space-x-2">
+                <Globe className="w-3.5 h-3.5 text-primary" />
+                <SelectValue />
+              </div>
+            </SelectTrigger>
+            <SelectContent className="bg-white rounded-2xl border border-gray-100 shadow-xl p-1">
+              <SelectItem value="kenya" className="py-3 font-black text-[10px] uppercase tracking-widest rounded-xl">Kenya (KES)</SelectItem>
+              <SelectItem value="uganda" className="py-3 font-black text-[10px] uppercase tracking-widest rounded-xl">Uganda (UGX)</SelectItem>
+              <SelectItem value="tanzania" className="py-3 font-black text-[10px] uppercase tracking-widest rounded-xl">Tanzania (TZS)</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
+        {/* Packages Grid */}
         <div className="space-y-3">
           <div className="flex items-center justify-between px-1">
             <h3 className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Packages</h3>
@@ -204,6 +182,7 @@ export default function WalletPage() {
           </div>
         </div>
 
+        {/* Vendors Link */}
         <div className="bg-gray-50 rounded-[1.5rem] p-4 flex items-center justify-between border border-gray-100">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center">
@@ -225,6 +204,7 @@ export default function WalletPage() {
         </div>
       </div>
 
+      {/* Floating Recharge Button */}
       <div className="fixed bottom-6 left-4 right-4 z-50">
         <Button 
           onClick={handlePayment}
@@ -237,7 +217,7 @@ export default function WalletPage() {
           {isLoading ? (
             <Loader2 className="w-5 h-5 animate-spin" />
           ) : (
-            selectedPackage ? `Pay ${selectedPackage.label}` : "Select Package & Phone"
+            selectedPackage ? `Recharge ${selectedPackage.label}` : "Select a Package"
           )}
         </Button>
       </div>
