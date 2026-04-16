@@ -10,33 +10,33 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen pb-32 bg-white">
-      {/* Top Teal Action Section - Tightened spacing */}
-      <div className="bg-primary pt-4 pb-8 px-6 rounded-b-[3.5rem] shadow-xl">
-        <div className="grid grid-cols-2 gap-5">
-          <div className="bg-white/20 backdrop-blur-md rounded-[3rem] flex flex-col items-center justify-center p-6 border border-white/20 active:scale-95 transition-all cursor-pointer h-44 shadow-lg group">
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-[1.25rem] flex items-center justify-center mb-3 shadow-xl transform group-hover:rotate-6 transition-transform">
-               <HelpCircle className="w-10 h-10 text-white" />
+      {/* Top Teal Action Section - Extended to Recommended */}
+      <div className="bg-primary pt-2 pb-6 px-6 rounded-b-[3.5rem] shadow-xl">
+        <div className="grid grid-cols-2 gap-5 mb-8">
+          <div className="bg-white/20 backdrop-blur-md rounded-[3rem] flex flex-col items-center justify-center p-6 border border-white/20 active:scale-95 transition-all cursor-pointer h-40 shadow-lg group">
+            <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-[1.25rem] flex items-center justify-center mb-3 shadow-xl transform group-hover:rotate-6 transition-transform">
+               <HelpCircle className="w-8 h-8 text-white" />
             </div>
-            <span className="text-white font-black text-[10px] tracking-[0.15em] uppercase text-center">Mystery Note</span>
+            <span className="text-white font-black text-[9px] tracking-[0.15em] uppercase text-center">Mystery Note</span>
           </div>
-          <div className="bg-white/20 backdrop-blur-md rounded-[3rem] flex flex-col items-center justify-center p-6 border border-white/20 active:scale-95 transition-all cursor-pointer h-44 shadow-lg group">
-            <div className="w-16 h-16 bg-gradient-to-br from-orange-300 to-yellow-500 rounded-[1.25rem] flex items-center justify-center mb-3 shadow-xl transform group-hover:-rotate-6 transition-transform">
-              <ClipboardCheck className="w-10 h-10 text-white" />
+          <div className="bg-white/20 backdrop-blur-md rounded-[3rem] flex flex-col items-center justify-center p-6 border border-white/20 active:scale-95 transition-all cursor-pointer h-40 shadow-lg group">
+            <div className="w-14 h-14 bg-gradient-to-br from-orange-300 to-yellow-500 rounded-[1.25rem] flex items-center justify-center mb-3 shadow-xl transform group-hover:-rotate-6 transition-transform">
+              <ClipboardCheck className="w-8 h-8 text-white" />
             </div>
-            <span className="text-white font-black text-[10px] tracking-[0.15em] uppercase text-center">Task Center</span>
+            <span className="text-white font-black text-[9px] tracking-[0.15em] uppercase text-center">Task Center</span>
           </div>
+        </div>
+
+        {/* Recommended Section Header - Integrated into teal background */}
+        <div className="flex items-center justify-between px-2 pb-2">
+          <h3 className="text-xs font-black text-white tracking-tighter uppercase italic">Recommended</h3>
+          <button className="w-8 h-8 bg-white/10 flex items-center justify-center rounded-full active:rotate-180 transition-transform duration-700">
+            <RefreshCw className="w-4 h-4 text-white" />
+          </button>
         </div>
       </div>
 
-      {/* Recommended Section Header */}
-      <div className="px-6 py-4 flex items-center justify-between">
-        <h3 className="text-sm font-black text-primary tracking-tighter uppercase italic">Recommended</h3>
-        <button className="w-8 h-8 bg-primary/20 flex items-center justify-center rounded-full active:rotate-180 transition-transform duration-700">
-          <RefreshCw className="w-4 h-4 text-primary" />
-        </button>
-      </div>
-
-      <div className="px-6 space-y-6">
+      <div className="px-6 space-y-6 pt-6">
         {/* Discovery Grid */}
         {isUsersLoading ? (
           <div className="grid grid-cols-2 gap-4">

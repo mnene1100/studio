@@ -35,42 +35,42 @@ export default function MePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white pb-32">
-      {/* Top Teal Header Section - Increased padding to prevent button overlap */}
-      <div className="bg-primary pt-6 pb-36 px-6 relative flex flex-col items-center">
+      {/* Top Teal Header Section - Increased padding significantly to prevent card overlap */}
+      <div className="bg-primary pt-8 pb-48 px-6 relative flex flex-col items-center">
         {/* Visitors Button - Top Right */}
-        <button className="absolute top-4 right-6 flex flex-col items-center active:scale-95 transition-all z-10">
-          <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 mb-1">
+        <button className="absolute top-6 right-6 flex flex-col items-center active:scale-95 transition-all z-10">
+          <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 mb-1 shadow-lg">
             <Eye className="w-5 h-5 text-white" />
           </div>
           <span className="text-[9px] font-black text-white uppercase tracking-widest">Visitors</span>
         </button>
 
         {/* Profile Avatar */}
-        <div className="relative mb-6">
-          <Avatar className="w-32 h-32 ring-0 shadow-2xl rounded-full overflow-hidden">
+        <div className="relative mb-6 mt-4">
+          <Avatar className="w-32 h-32 ring-0 shadow-2xl rounded-full overflow-hidden bg-white/10">
             <AvatarImage src={profile.profilePictureUrl} className="object-cover" />
             <AvatarFallback className="bg-white/10 text-white text-3xl font-black">{initials}</AvatarFallback>
           </Avatar>
-          <button className="absolute bottom-1 right-1 p-2 bg-black/80 rounded-full border border-white/20 active:scale-90">
+          <button className="absolute bottom-1 right-1 p-2 bg-black/80 rounded-full border border-white/20 active:scale-90 shadow-xl">
             <Pencil className="w-4 h-4 text-white" />
           </button>
         </div>
         
-        <h2 className="text-3xl font-black text-white mb-2 tracking-tight">{displayName}</h2>
-        <p className="text-[10px] font-black text-white/70 uppercase tracking-[0.2em] mb-6">Verified Official Profile</p>
+        <h2 className="text-3xl font-black text-white mb-2 tracking-tight drop-shadow-sm">{displayName}</h2>
+        <p className="text-[10px] font-black text-white/70 uppercase tracking-[0.2em] mb-10">Verified Official Profile</p>
 
         {/* ID Pill - Positioned with safe space from floating cards */}
         <div 
           onClick={copyId}
-          className="flex items-center space-x-2 bg-white/20 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/10 cursor-pointer active:scale-95 transition-all group z-10"
+          className="flex items-center space-x-2 bg-white/20 backdrop-blur-md px-6 py-3 rounded-full border border-white/10 cursor-pointer active:scale-95 transition-all group z-30 shadow-lg"
         >
           <span className="text-xs font-black text-white tracking-widest uppercase">ID: {profile.numericId}</span>
           <Copy className="w-3.5 h-3.5 text-white/60 group-hover:text-white transition-colors" />
         </div>
 
-        {/* Floating White Balance Cards */}
-        <div className="absolute bottom-[-100px] left-0 right-0 px-6 grid grid-cols-2 gap-4 z-20">
-          <div className="bg-white rounded-[2.5rem] p-6 flex flex-col items-center shadow-xl border border-gray-50 group">
+        {/* Floating White Balance Cards - Offset to stay clear of ID Pill */}
+        <div className="absolute bottom-[-90px] left-0 right-0 px-6 grid grid-cols-2 gap-4 z-20">
+          <div className="bg-white rounded-[2.5rem] p-6 flex flex-col items-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-gray-50 group">
             <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
               <Coins className="w-6 h-6 text-primary" />
             </div>
@@ -81,7 +81,7 @@ export default function MePage() {
             </button>
           </div>
 
-          <div className="bg-white rounded-[2.5rem] p-6 flex flex-col items-center shadow-xl border border-gray-50 group">
+          <div className="bg-white rounded-[2.5rem] p-6 flex flex-col items-center shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-gray-50 group">
             <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-4">
               <Diamond className="w-6 h-6 text-blue-500" />
             </div>
