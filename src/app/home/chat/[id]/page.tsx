@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from 'react';
@@ -8,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { 
   ChevronLeft, Phone, Video, Send, 
-  Gift 
+  Gift, PhoneOutgoing, PhoneIncoming, PhoneMissed, Ban
 } from "lucide-react";
 import { useFirestore, useDoc, useCollection, useMemoFirebase, useUser, addDocumentNonBlocking, updateDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase';
 import { doc, collection, query, orderBy, limit, where, getDocs, updateDoc, increment } from 'firebase/firestore';
@@ -77,18 +76,33 @@ export default function ChatDetailPage() {
     return query(
       collection(db, 'chatRooms', chatId, 'messages'),
       orderBy('sentAt', 'asc'),
+      limit(100)
+    );
+  }, [db, chatId]);
+  const { data: messagesData } = useCollection(messagesQuery);
+
+  const callsQuery = useMemoFirebase(() => {
+    if (!db || !chatId) return null;
+    return query(
+      collection(db, 'calls'),
+      where('chatRoomId', '==', chatId),
+      orderBy('startTime', 'asc'),
       limit(50)
     );
   }, [db, chatId]);
-  
-  const { data: messagesData } = useCollection(messagesQuery);
-  const messages = messagesData || [];
+  const { data: callsData } = useCollection(callsQuery);
+
+  const combinedFeed = useMemo(() => {
+    const msgs = (messagesData || []).map(m => ({ ...m, feedType: 'message', sortTime: new Date(m.sentAt).getTime() }));
+    const calls = (callsData || []).map(c => ({ ...c, feedType: 'call', sortTime: new Date(c.startTime).getTime() }));
+    return [...msgs, ...calls].sort((a, b) => a.sortTime - b.sortTime);
+  }, [messagesData, callsData]);
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [combinedFeed]);
 
   const handleSendMessage = async () => {
     if (!input.trim() || !chatId || !currentUser || !db) return;
@@ -111,7 +125,6 @@ export default function ChatDetailPage() {
         balance: increment(-15)
       });
 
-      // Record transaction
       const transId = `msg_${Date.now()}_${currentUser.uid}`;
       setDocumentNonBlocking(doc(db, 'transactions', transId), {
         id: transId,
@@ -148,10 +161,10 @@ export default function ChatDetailPage() {
   };
 
   const handleGetSuggestions = async () => {
-    if (!messages.length) return;
+    if (!messagesData?.length) return;
     try {
       const result = await aiSuggestedConversationStarters({ 
-        chatHistory: messages.map(m => ({ sender: m.senderId === currentUser?.uid ? 'Me' : 'Contact', message: m.content }))
+        chatHistory: messagesData.map(m => ({ sender: m.senderId === currentUser?.uid ? 'Me' : 'Contact', message: m.content }))
       });
       setSuggestions(result.suggestions);
     } catch (e) {
@@ -176,6 +189,13 @@ export default function ChatDetailPage() {
     router.push(`/home/call/${id}?type=${type}`);
   };
 
+  const formatDuration = (seconds: number) => {
+    if (!seconds) return '[00:00]';
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `[${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}]`;
+  };
+
   const isOnline = useMemo(() => {
     if (!profile?.lastOnlineAt) return false;
     const lastOnline = new Date(profile.lastOnlineAt).getTime();
@@ -195,8 +215,6 @@ export default function ChatDetailPage() {
 
   const displayName = profile?.displayName || "Loading...";
   const initials = displayName.substring(0, 2).toUpperCase();
-
-  const isInputEmpty = !input.trim();
 
   return (
     <div className="fixed inset-0 h-[100dvh] flex flex-col bg-background overflow-hidden">
@@ -255,18 +273,54 @@ export default function ChatDetailPage() {
         ref={scrollRef}
         style={{ WebkitOverflowScrolling: 'touch' }}
       >
-        {messages.map((msg: any, i: number) => {
-          const isMe = msg.senderId === currentUser?.uid;
-          return (
-            <div key={i} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-              <div className={isMe ? 'chat-bubble-user' : 'chat-bubble-contact'}>
-                <p className="text-[14px] font-medium">{msg.content}</p>
+        {combinedFeed.map((item: any, i: number) => {
+          if (item.feedType === 'message') {
+            const isMe = item.senderId === currentUser?.uid;
+            return (
+              <div key={`msg-${item.id}`} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                <div className={isMe ? 'chat-bubble-user' : 'chat-bubble-contact'}>
+                  <p className="text-[14px] font-medium">{item.content}</p>
+                </div>
+                <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mt-1 mx-2">
+                  {item.sentAt ? new Date(item.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                </span>
               </div>
-              <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mt-1 mx-2">
-                {msg.sentAt ? new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
-              </span>
-            </div>
-          );
+            );
+          } else {
+            const isCaller = item.callerId === currentUser?.uid;
+            const statusText = item.status === 'cancelled' ? '[Cancelled]' : 
+                             item.status === 'rejected' ? '[Rejected]' : 
+                             item.status === 'missed' ? '[Missed]' : 
+                             item.status === 'ongoing' ? '[Ongoing]' : 
+                             `Duration ${formatDuration(item.durationSeconds)}`;
+            
+            return (
+              <div key={`call-${item.id}`} className="flex justify-center w-full py-2">
+                <div className="bg-muted/30 border border-border/50 rounded-2xl px-6 py-3 flex items-center space-x-3 shadow-sm">
+                  {item.status === 'cancelled' || item.status === 'rejected' ? (
+                    <Ban className="w-4 h-4 text-red-500" />
+                  ) : item.status === 'missed' ? (
+                    <PhoneMissed className="w-4 h-4 text-red-500" />
+                  ) : isCaller ? (
+                    <PhoneOutgoing className="w-4 h-4 text-primary" />
+                  ) : (
+                    <PhoneIncoming className="w-4 h-4 text-green-500" />
+                  )}
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-foreground">
+                      {item.type === 'video' ? 'Video Call' : 'Voice Call'}
+                    </span>
+                    <span className={cn(
+                      "text-[9px] font-bold uppercase",
+                      (item.status === 'rejected' || item.status === 'cancelled' || item.status === 'missed') ? "text-red-500" : "text-muted-foreground"
+                    )}>
+                      {statusText}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          }
         })}
       </div>
 
@@ -308,12 +362,12 @@ export default function ChatDetailPage() {
                 size="icon" 
                 className={cn(
                   "absolute right-1.5 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full shadow-sm transition-all duration-300 overflow-hidden",
-                  isInputEmpty 
+                  !input.trim() 
                     ? "bg-primary/20 text-white/50 cursor-not-allowed" 
                     : "bg-primary text-white shadow-lg active:scale-90"
                 )}
                 onClick={handleSendMessage}
-                disabled={isInputEmpty}
+                disabled={!input.trim()}
               >
                 <Send className="w-4 h-4" />
               </Button>

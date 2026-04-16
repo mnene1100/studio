@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { RefreshCw, UserCheck, Loader2, MessageCircle } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -17,15 +16,16 @@ export default function HomePage() {
   const db = useFirestore();
   
   const [discoveryUsers, setDiscoveryUsers] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [pageSize, setPageSize] = useState(10);
+  const initialFetchedRef = useRef(false);
 
   const mysteryIcon = PlaceHolderImages.find(img => img.id === 'mystery-icon');
   const taskIcon = PlaceHolderImages.find(img => img.id === 'task-icon');
 
-  const fetchUsers = async (currentSize: number) => {
+  const fetchUsers = async (currentSize: number, silent = false) => {
     if (!db || !user?.uid) return;
-    setIsLoading(true);
+    if (!silent) setIsLoading(true);
     try {
       const q = query(collection(db, 'users'), orderBy('lastOnlineAt', 'desc'), limit(currentSize + 20));
       const snapshot = await getDocs(q);
@@ -42,8 +42,17 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-    if (user?.uid) fetchUsers(pageSize);
-  }, [user?.uid, pageSize]);
+    // Only fetch once on mount if data is empty. 
+    // Further refreshes MUST be manual via button.
+    if (user?.uid && !initialFetchedRef.current && discoveryUsers.length === 0) {
+      initialFetchedRef.current = true;
+      fetchUsers(pageSize);
+    }
+  }, [user?.uid]);
+
+  const handleRefresh = () => {
+    fetchUsers(pageSize);
+  };
 
   return (
     <div className="flex flex-col min-h-screen pb-32 bg-background">
@@ -69,8 +78,15 @@ export default function HomePage() {
       <div className="sticky top-0 z-40 bg-primary px-5 py-4">
         <div className="flex items-center justify-between">
           <h3 className="text-[10px] font-black text-white tracking-widest uppercase italic">Recommended</h3>
-          <button onClick={() => fetchUsers(pageSize)} className="w-7 h-7 bg-white/10 rounded-full flex items-center justify-center">
-            <RefreshCw className="w-3.5 h-3.5 text-white" />
+          <button 
+            onClick={handleRefresh} 
+            disabled={isLoading}
+            className={cn(
+              "w-7 h-7 bg-white/10 rounded-full flex items-center justify-center transition-all",
+              isLoading ? "opacity-50" : "active:scale-90"
+            )}
+          >
+            <RefreshCw className={cn("w-3.5 h-3.5 text-white", isLoading && "animate-spin")} />
           </button>
         </div>
       </div>

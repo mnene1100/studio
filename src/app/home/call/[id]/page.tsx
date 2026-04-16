@@ -12,7 +12,6 @@ import { useFirestore, useDoc, useMemoFirebase, useUser, setDocumentNonBlocking,
 import { doc, updateDoc, increment, getDoc, onSnapshot } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getAgoraToken } from '@/app/actions/agora';
 import { useHomeData } from '../../layout';
 
@@ -38,6 +37,7 @@ export default function CallPage() {
   const localVideoRef = useRef<HTMLDivElement>(null);
   const agoraClientRef = useRef<any>(null);
   const callIdRef = useRef<string | null>(null);
+  const startTimeRef = useRef<number | null>(null);
   const initializationStartedRef = useRef(false);
   const billingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const isBilledForFirstMinRef = useRef(false);
@@ -53,12 +53,20 @@ export default function CallPage() {
   const { data: targetProfile } = useDoc(targetUserRef);
 
   const handleEndCall = (finalStatus?: string) => {
-    const status = finalStatus || (isConnectedRef.current ? 'ended' : 'cancelled');
+    const isConnected = isConnectedRef.current;
+    const status = finalStatus || (isConnected ? 'ended' : 'cancelled');
+    const endTime = Date.now();
+    let durationSeconds = 0;
+    
+    if (startTimeRef.current && isConnected) {
+      durationSeconds = Math.floor((endTime - startTimeRef.current) / 1000);
+    }
     
     if (callIdRef.current && db) {
       updateDocumentNonBlocking(doc(db, 'calls', callIdRef.current), {
         status: status,
-        endTime: new Date().toISOString()
+        endTime: new Date(endTime).toISOString(),
+        durationSeconds: durationSeconds
       });
     }
     router.back();
@@ -85,7 +93,12 @@ export default function CallPage() {
 
   useEffect(() => {
     const isCallConnected = remoteUsers.length > 0;
-    if (isCallConnected) isConnectedRef.current = true;
+    
+    if (isCallConnected && !isConnectedRef.current) {
+      isConnectedRef.current = true;
+      startTimeRef.current = Date.now();
+      setStatusMessage('Connected');
+    }
 
     if (!isCallConnected || !currentUser || !db || billingIntervalRef.current) return;
 
@@ -102,7 +115,7 @@ export default function CallPage() {
           title: "Insufficient Balance",
           description: "Call ended due to low balance.",
         });
-        handleEndCall();
+        handleEndCall('insufficient_balance');
         return false;
       }
 
@@ -122,7 +135,7 @@ export default function CallPage() {
 
         return true;
       } catch (e) {
-        handleEndCall();
+        handleEndCall('billing_error');
         return false;
       }
     };
@@ -209,6 +222,7 @@ export default function CallPage() {
           id: callId,
           callerId: currentUser.uid,
           participantIds: [currentUser.uid, targetUserId],
+          chatRoomId: channelName,
           type: callType,
           startTime: new Date().toISOString(),
           status: 'ongoing'
@@ -343,7 +357,7 @@ export default function CallPage() {
               <h2 className="text-3xl font-black text-white tracking-tighter mb-3 drop-shadow-2xl">{displayName}</h2>
               <div className="flex flex-col items-center space-y-4">
                 <p className="text-[11px] font-black text-primary uppercase tracking-[0.4em] animate-pulse">
-                  {remoteUsers.length > 0 ? 'Connected' : statusMessage}
+                  {statusMessage}
                 </p>
               </div>
             </div>
