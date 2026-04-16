@@ -85,7 +85,9 @@ export default function ChatDetailPage() {
       limit(50)
     );
   }, [db, chatId]);
-  const { data: messages = [] } = useCollection(messagesQuery);
+  
+  const { data: messagesData } = useCollection(messagesQuery);
+  const messages = messagesData || [];
 
   useEffect(() => {
     if (scrollRef.current) {

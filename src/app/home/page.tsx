@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useHomeData } from './layout';
@@ -13,7 +12,7 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen pb-32 bg-background">
-      {/* Top Section - Removed rounded-b-[2rem] */}
+      {/* Top Section - Sharp corners for a structural feel */}
       <div className="bg-primary safe-top px-5 pb-8 pt-2 shadow-lg">
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-white/20 backdrop-blur-md rounded-[1.75rem] flex flex-col items-center justify-center p-5 border border-white/20 transition-all cursor-pointer h-36 shadow-lg group active:scale-95">
