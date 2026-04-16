@@ -24,6 +24,11 @@
           "type": "string",
           "description": "The name chosen by the user."
         },
+        "gender": {
+          "type": "string",
+          "description": "The user's gender.",
+          "enum": ["Male", "Female"]
+        },
         "dob": {
           "type": "string",
           "description": "Date of birth.",
@@ -58,6 +63,7 @@
         "numericId",
         "email",
         "displayName",
+        "gender",
         "dob",
         "country",
         "createdAt"

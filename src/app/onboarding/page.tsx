@@ -15,11 +15,12 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { User, Camera, ArrowRight, Calendar } from "lucide-react";
+import { User, Camera, ArrowRight, Check } from "lucide-react";
 import { useFirestore, useUser } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { generateNexoId } from "@/app/lib/store";
+import { cn } from "@/lib/utils";
 
 const EAST_AFRICAN_COUNTRIES = [
   "Burundi",
@@ -34,11 +35,14 @@ const EAST_AFRICAN_COUNTRIES = [
   "Uganda"
 ];
 
+const RANDOM_NAMES = ["SilverFox", "DesertStar", "NeoWave", "SkyWalker", "NexoGuest", "SwiftWind", "DeepBlue", "SolarFlare"];
+
 export default function OnboardingPage() {
   const { user, isUserLoading } = useUser();
   const [name, setName] = useState('');
   const [dob, setDob] = useState('');
   const [country, setCountry] = useState('');
+  const [gender, setGender] = useState<'Male' | 'Female' | ''>('');
   const router = useRouter();
   const db = useFirestore();
 
@@ -49,14 +53,34 @@ export default function OnboardingPage() {
   }, [user, isUserLoading, router]);
 
   const handleCompleteOnboarding = () => {
-    if (!user || !name || !dob || !country) return;
+    if (!user || !country || !gender) return;
+
+    // For anonymous users, we generate random name and DOB > 18
+    let finalName = name;
+    let finalDob = dob;
+
+    if (user.isAnonymous) {
+      const randomName = RANDOM_NAMES[Math.floor(Math.random() * RANDOM_NAMES.length)] + "_" + Math.floor(Math.random() * 1000);
+      finalName = randomName;
+      
+      // Generate DOB at least 18 years ago
+      const currentYear = new Date().getFullYear();
+      const birthYear = currentYear - 18 - Math.floor(Math.random() * 30);
+      const birthMonth = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+      const birthDay = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
+      finalDob = `${birthYear}-${birthMonth}-${birthDay}`;
+    } else if (!name || !dob) {
+      // Email users must have these filled
+      return;
+    }
 
     const profileData = {
       id: user.uid,
       numericId: generateNexoId(),
-      email: user.email || '',
-      displayName: name,
-      dob: dob,
+      email: user.email || (user.isAnonymous ? 'guest@nexo.com' : ''),
+      displayName: finalName,
+      gender: gender,
+      dob: finalDob,
       country: country,
       profilePictureUrl: `https://picsum.photos/seed/${user.uid}/200/200`,
       createdAt: new Date().toISOString(),
@@ -84,14 +108,21 @@ export default function OnboardingPage() {
     );
   }
 
-  const isFormComplete = name.trim() && dob && country;
+  const isAnonymous = user.isAnonymous;
+  const isFormComplete = isAnonymous 
+    ? (gender && country) 
+    : (name.trim() && dob && country && gender);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-black premium-gradient">
       <Card className="w-full max-w-sm border-white/5 bg-black/40 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl">
         <CardHeader className="text-center pb-2">
-          <CardTitle className="text-2xl font-black text-white tracking-tight">Setup Profile</CardTitle>
-          <CardDescription className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Secure Identity</CardDescription>
+          <CardTitle className="text-2xl font-black text-white tracking-tight">
+            {isAnonymous ? "Fast Setup" : "Setup Profile"}
+          </CardTitle>
+          <CardDescription className="text-xs font-medium text-muted-foreground uppercase tracking-widest">
+            {isAnonymous ? "Just two steps" : "Secure Identity"}
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 pt-2">
           <div className="flex flex-col items-center space-y-3">
@@ -109,26 +140,60 @@ export default function OnboardingPage() {
           </div>
 
           <div className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="display-name" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Full Name</Label>
-              <Input 
-                id="display-name" 
-                placeholder="Name" 
-                className="bg-white/5 border-white/5 h-12 rounded-2xl focus:ring-primary/20"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
+            {!isAnonymous && (
+              <>
+                <div className="space-y-1.5">
+                  <Label htmlFor="display-name" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Full Name</Label>
+                  <Input 
+                    id="display-name" 
+                    placeholder="Name" 
+                    className="bg-white/5 border-white/5 h-12 rounded-2xl focus:ring-primary/20"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="dob" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Birth Date</Label>
+                  <Input 
+                    id="dob" 
+                    type="date"
+                    className="bg-white/5 border-white/5 h-12 rounded-2xl focus:ring-primary/20 text-white"
+                    value={dob}
+                    onChange={(e) => setDob(e.target.value)}
+                  />
+                </div>
+              </>
+            )}
 
             <div className="space-y-1.5">
-              <Label htmlFor="dob" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Birth Date</Label>
-              <Input 
-                id="dob" 
-                type="date"
-                className="bg-white/5 border-white/5 h-12 rounded-2xl focus:ring-primary/20 text-white"
-                value={dob}
-                onChange={(e) => setDob(e.target.value)}
-              />
+              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Gender</Label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => setGender('Male')}
+                  className={cn(
+                    "h-12 rounded-2xl border flex items-center justify-center space-x-2 transition-all font-black text-xs uppercase tracking-widest",
+                    gender === 'Male' 
+                      ? "bg-primary border-primary text-white shadow-lg shadow-primary/20" 
+                      : "bg-white/5 border-white/5 text-muted-foreground hover:bg-white/10"
+                  )}
+                >
+                  {gender === 'Male' && <Check className="w-3 h-3" />}
+                  <span>Male</span>
+                </button>
+                <button
+                  onClick={() => setGender('Female')}
+                  className={cn(
+                    "h-12 rounded-2xl border flex items-center justify-center space-x-2 transition-all font-black text-xs uppercase tracking-widest",
+                    gender === 'Female' 
+                      ? "bg-primary border-primary text-white shadow-lg shadow-primary/20" 
+                      : "bg-white/5 border-white/5 text-muted-foreground hover:bg-white/10"
+                  )}
+                >
+                  {gender === 'Female' && <Check className="w-3 h-3" />}
+                  <span>Female</span>
+                </button>
+              </div>
             </div>
 
             <div className="space-y-1.5">
