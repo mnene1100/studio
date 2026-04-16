@@ -32,8 +32,8 @@ function ChatListItem({ chat }: { chat: any }) {
       className="flex items-center px-4 py-4 rounded-none active:bg-gray-50 transition-all group border border-transparent"
     >
       <div className="relative">
-        <Avatar className="w-14 h-14 rounded-full ring-2 ring-gray-50 shadow-sm">
-          <AvatarImage src={profile?.profilePictureUrl} />
+        <Avatar className="w-14 h-14 rounded-full ring-2 ring-gray-50 shadow-sm overflow-hidden">
+          <AvatarImage src={profile?.profilePictureUrl} className="object-cover" />
           <AvatarFallback className="bg-gray-100 text-lg font-bold rounded-full">
             <MessageCircle className="w-6 h-6 text-primary" />
           </AvatarFallback>

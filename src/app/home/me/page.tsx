@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo } from 'react';
@@ -35,16 +36,25 @@ export default function MePage() {
     return visitors.some(v => new Date(v.visitedAt).getTime() > lastChecked);
   }, [profile, visitors]);
 
-  const copyId = () => {
+  const copyId = async () => {
     if (profile?.numericId) {
       try {
-        navigator.clipboard.writeText(profile.numericId);
-        toast({
-          title: "Copied ID",
-          description: `ID ${profile.numericId} is ready to share.`,
-        });
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(profile.numericId);
+          toast({
+            title: "Copied ID",
+            description: `ID ${profile.numericId} is ready to share.`,
+          });
+        } else {
+          throw new Error("Clipboard API unavailable");
+        }
       } catch (err) {
         console.error('Failed to copy: ', err);
+        toast({
+          variant: "destructive",
+          title: "Copy Failed",
+          description: "Please manually copy your ID.",
+        });
       }
     }
   };
@@ -71,7 +81,7 @@ export default function MePage() {
         </button>
 
         <div className="relative mb-4 mt-6">
-          <div className="w-28 h-28 relative rounded-full overflow-hidden shadow-2xl bg-white/10">
+          <div className="w-28 h-28 relative rounded-full overflow-hidden shadow-2xl bg-white/10 border-4 border-white/10">
             {profile.profilePictureUrl ? (
               <Image 
                 src={profile.profilePictureUrl} 

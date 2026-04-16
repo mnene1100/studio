@@ -74,13 +74,25 @@ export default function UserProfilePage() {
     }
   }, [isOnline, profile?.lastOnlineAt]);
 
-  const copyId = () => {
+  const copyId = async () => {
     if (profile?.numericId) {
-      navigator.clipboard.writeText(profile.numericId);
-      toast({
-        title: "ID Copied",
-        description: "User ID has been copied to your clipboard.",
-      });
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(profile.numericId);
+          toast({
+            title: "ID Copied",
+            description: "User ID has been copied to your clipboard.",
+          });
+        } else {
+          throw new Error("Clipboard unavailable");
+        }
+      } catch (err) {
+        toast({
+          variant: "destructive",
+          title: "Copy Failed",
+          description: "Permission denied for clipboard.",
+        });
+      }
     }
   };
 

@@ -64,7 +64,8 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
       return;
     }
 
-    if (!isProfileLoading && !profile) {
+    // Only redirect to onboarding if we are sure the profile doesn't exist
+    if (!isProfileLoading && !profile && !isAuthLoading) {
       const localProfileCompleted = localStorage.getItem('nexo_profile_completed') === 'true';
       if (!localProfileCompleted) {
         router.replace('/onboarding');
@@ -72,7 +73,11 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     }
   }, [user, isAuthLoading, profile, isProfileLoading, router]);
 
-  if (isAuthLoading || (isProfileLoading && !profile && localStorage.getItem('nexo_profile_completed') !== 'true')) {
+  // Improved loading guard: Don't show the spinner if we already have the profile data,
+  // even if a background re-validation is happening.
+  const shouldShowLoader = isAuthLoading || (isProfileLoading && !profile && localStorage.getItem('nexo_profile_completed') !== 'true');
+
+  if (shouldShowLoader) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -86,7 +91,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
       isProfileLoading
     }}>
       <div className="min-h-screen bg-background relative">
-        <main className="max-w-md mx-auto min-h-screen">
+        <main className="max-w-md mx-auto min-h-screen pb-safe">
           {children}
         </main>
         <Navigation />
