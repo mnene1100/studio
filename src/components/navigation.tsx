@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -30,7 +31,7 @@ export function Navigation() {
   ];
 
   return (
-    <nav className="glass-nav px-6 pb-4 pt-2 safe-area-bottom h-16">
+    <nav className="glass-nav px-6 pb-2 pt-2 safe-area-bottom h-14">
       <div className="max-w-md mx-auto flex justify-around items-center h-full">
         {navItems.map((item) => {
           const isActive = item.href === '/home' 
@@ -47,7 +48,7 @@ export function Navigation() {
               )}
             >
               <item.icon 
-                className={cn("w-6 h-6", isActive && "fill-current")} 
+                className={cn("w-5 h-5", isActive && "fill-current")} 
                 strokeWidth={isActive ? 3 : 2} 
               />
               <span className={cn(
