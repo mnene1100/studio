@@ -4,26 +4,48 @@
 
 @layer base {
   :root {
-    --background: 210 8% 6%;
-    --foreground: 0 0% 100%;
-    --card: 210 8% 8%;
-    --card-foreground: 0 0% 100%;
-    --popover: 210 8% 8%;
-    --popover-foreground: 0 0% 100%;
-    --primary: 205 52% 36%;
+    --background: 190 60% 98%;
+    --foreground: 210 8% 6%;
+    --card: 0 0% 100%;
+    --card-foreground: 210 8% 6%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 8% 6%;
+    --primary: 172 66% 45%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 8% 12%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 210 8% 15%;
-    --muted-foreground: 210 5% 70%;
-    --accent: 190 78% 65%;
-    --accent-foreground: 210 8% 6%;
+    --secondary: 172 40% 92%;
+    --secondary-foreground: 172 66% 25%;
+    --muted: 210 8% 95%;
+    --muted-foreground: 210 5% 45%;
+    --accent: 172 66% 45%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 210 8% 15%;
-    --input: 210 8% 15%;
-    --ring: 190 78% 65%;
-    --radius: 1.25rem;
+    --border: 210 8% 90%;
+    --input: 210 8% 90%;
+    --ring: 172 66% 45%;
+    --radius: 1.5rem;
+  }
+
+  .dark {
+    --background: 190 60% 4%;
+    --foreground: 0 0% 100%;
+    --card: 190 60% 6%;
+    --card-foreground: 0 0% 100%;
+    --popover: 190 60% 6%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 172 66% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 190 60% 10%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 190 60% 15%;
+    --muted-foreground: 190 20% 70%;
+    --accent: 172 66% 45%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 190 60% 15%;
+    --input: 190 60% 15%;
+    --ring: 172 66% 45%;
   }
 }
 
@@ -38,7 +60,6 @@
     overscroll-behavior-y: none;
   }
   
-  /* Hide scrollbars for a native feel */
   ::-webkit-scrollbar {
     display: none;
   }
@@ -49,21 +70,25 @@
 }
 
 .glass-header {
-  @apply sticky top-0 z-30 bg-background/70 backdrop-blur-xl border-b border-white/5;
+  @apply sticky top-0 z-30 bg-primary/90 backdrop-blur-xl border-b border-white/10;
 }
 
 .glass-nav {
-  @apply fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-2xl border-t border-white/5;
+  @apply fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-2xl border-t border-border/50;
 }
 
 .native-card {
-  @apply bg-card/40 border border-white/5 rounded-[2rem] transition-all active:scale-[0.98];
+  @apply bg-card border border-border/50 rounded-[2rem] transition-all active:scale-[0.98];
 }
 
 .chat-bubble-user {
-  @apply bg-primary text-white rounded-[1.5rem] rounded-tr-none px-4 py-2.5 max-w-[85%] shadow-lg shadow-primary/10;
+  @apply bg-primary text-white rounded-[1.5rem] rounded-tr-none px-4 py-2.5 max-w-[85%];
 }
 
 .chat-bubble-contact {
-  @apply bg-secondary text-white rounded-[1.5rem] rounded-tl-none px-4 py-2.5 max-w-[85%] border border-white/5;
+  @apply bg-secondary text-secondary-foreground rounded-[1.5rem] rounded-tl-none px-4 py-2.5 max-w-[85%] border border-border/50;
+}
+
+.teal-gradient {
+  background: linear-gradient(180deg, hsl(172, 66%, 45%) 0%, hsl(172, 66%, 40%) 100%);
 }

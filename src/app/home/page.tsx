@@ -1,9 +1,9 @@
 "use client";
 
-import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase } from '@/firebase';
-import { doc, collection, query, limit } from 'firebase/firestore';
+import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { collection, query, limit } from 'firebase/firestore';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Users } from "lucide-react";
+import { HelpCircle, ClipboardCheck, RefreshCw, MessageSquare } from "lucide-react";
 import Link from 'next/link';
 
 export default function HomePage() {
@@ -20,53 +20,91 @@ export default function HomePage() {
   const discoveryUsers = allUsers?.filter(u => u.id !== user?.uid) || [];
 
   return (
-    <div className="flex flex-col min-h-screen pb-32 bg-background pt-12">
-      <div className="px-6 space-y-8">
-        {/* Discover People Grid */}
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-black uppercase tracking-[0.3em] text-accent flex items-center">
-              <Users className="w-4 h-4 mr-2" />
-              Discover People
-            </h3>
+    <div className="flex flex-col min-h-screen pb-32 bg-background">
+      {/* Top Teal Section */}
+      <div className="teal-gradient pt-16 pb-12 px-6 rounded-b-[3rem] shadow-2xl">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-white/20 backdrop-blur-md rounded-[2.5rem] aspect-square flex flex-col items-center justify-center p-6 border border-white/20 active:scale-95 transition-all cursor-pointer">
+            <div className="w-16 h-16 bg-white/30 rounded-3xl flex items-center justify-center mb-4 shadow-inner">
+              <HelpCircle className="w-10 h-10 text-white" />
+            </div>
+            <span className="text-white font-black text-[10px] tracking-[0.2em] uppercase text-center">Mystery Note</span>
           </div>
-
-          {isUsersLoading ? (
-            <div className="grid grid-cols-2 gap-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-48 bg-card/40 rounded-[2rem] animate-pulse" />
-              ))}
+          <div className="bg-white/20 backdrop-blur-md rounded-[2.5rem] aspect-square flex flex-col items-center justify-center p-6 border border-white/20 active:scale-95 transition-all cursor-pointer">
+            <div className="w-16 h-16 bg-white/30 rounded-3xl flex items-center justify-center mb-4 shadow-inner">
+              <ClipboardCheck className="w-10 h-10 text-white" />
             </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-4">
-              {discoveryUsers.length > 0 ? (
-                discoveryUsers.map((u) => (
-                  <Link 
-                    key={u.id} 
-                    href={`/home/chat/${u.id}`}
-                    className="native-card flex flex-col items-center p-6 bg-card/30"
-                  >
-                    <div className="relative mb-4">
-                      <Avatar className="w-20 h-20 ring-2 ring-accent/10 group-active:ring-accent transition-all">
-                        <AvatarImage src={u.profilePictureUrl} />
-                        <AvatarFallback className="bg-secondary text-xl font-bold">{u.displayName?.[0]}</AvatarFallback>
-                      </Avatar>
-                      <div className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 border-2 border-background rounded-full shadow-lg"></div>
-                    </div>
-                    <h4 className="text-sm font-bold text-white text-center line-clamp-1">{u.displayName}</h4>
-                    <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-widest font-bold opacity-60">
-                      {u.country || 'Global'}
-                    </p>
-                  </Link>
-                ))
-              ) : (
-                <div className="col-span-2 p-12 text-center bg-card/20 rounded-[2rem] border border-dashed border-white/10">
-                  <p className="text-sm text-muted-foreground font-medium">Network is quiet today.</p>
-                </div>
-              )}
-            </div>
-          )}
+            <span className="text-white font-black text-[10px] tracking-[0.2em] uppercase text-center">Task Center</span>
+          </div>
         </div>
+      </div>
+
+      <div className="px-6 mt-8 space-y-6">
+        {/* Recommended Header */}
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-black text-foreground/80 tracking-tight">Recommended</h3>
+          <button className="p-2.5 bg-primary/10 text-primary rounded-full active:rotate-180 transition-transform duration-500">
+            <RefreshCw className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Discovery Grid */}
+        {isUsersLoading ? (
+          <div className="grid grid-cols-2 gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="aspect-[3/4] bg-muted rounded-[2.5rem] animate-pulse" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4 pb-10">
+            {discoveryUsers.length > 0 ? (
+              discoveryUsers.map((u) => (
+                <Link 
+                  key={u.id} 
+                  href={`/home/chat/${u.id}`}
+                  className="group relative aspect-[3/4] overflow-hidden rounded-[2.5rem] shadow-xl active:scale-[0.98] transition-all"
+                >
+                  {/* Card Background Image */}
+                  <img 
+                    src={`https://picsum.photos/seed/${u.id}/400/600`} 
+                    alt={u.displayName}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    data-ai-hint="portrait"
+                  />
+                  
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
+
+                  {/* Top Right Action */}
+                  <div className="absolute top-4 right-4">
+                    <div className="p-2.5 bg-white/20 backdrop-blur-md border border-white/30 rounded-full">
+                      <MessageSquare className="w-4 h-4 text-white" />
+                    </div>
+                  </div>
+
+                  {/* Bottom Info */}
+                  <div className="absolute bottom-5 left-5 right-5 space-y-2">
+                    <h4 className="text-sm font-black text-white truncate drop-shadow-md">
+                      {u.displayName || 'Stranger'}
+                    </h4>
+                    <div className="flex items-center space-x-2">
+                      <div className="px-2.5 py-1 bg-black/40 backdrop-blur-sm rounded-full border border-white/10">
+                        <span className="text-[10px] font-black text-white">26</span>
+                      </div>
+                      <div className="px-3 py-1 bg-primary text-white rounded-full shadow-lg shadow-primary/20">
+                        <span className="text-[9px] font-black uppercase tracking-wider">{u.country || 'KENYA'}</span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <div className="col-span-2 p-12 text-center bg-muted/50 rounded-[2.5rem] border border-dashed border-border">
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">No users found nearby</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

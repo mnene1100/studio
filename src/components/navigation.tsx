@@ -10,12 +10,12 @@ export function Navigation() {
 
   const navItems = [
     { label: 'Home', icon: Home, href: '/home' },
-    { label: 'Chat', icon: MessageSquare, href: '/home/chat' },
-    { label: 'Me', icon: User, href: '/home/me' },
+    { label: 'Chats', icon: MessageSquare, href: '/home/chat' },
+    { label: 'You', icon: User, href: '/home/me' },
   ];
 
   return (
-    <nav className="glass-nav px-6 pb-8 pt-3 safe-area-bottom">
+    <nav className="glass-nav px-6 pb-10 pt-4 safe-area-bottom">
       <div className="max-w-md mx-auto flex justify-around items-center">
         {navItems.map((item) => {
           const isActive = item.href === '/home' 
@@ -27,19 +27,19 @@ export function Navigation() {
               key={item.href} 
               href={item.href}
               className={cn(
-                "flex flex-col items-center space-y-1 group transition-all duration-300 active:scale-90",
-                isActive ? "text-accent" : "text-muted-foreground"
+                "flex flex-col items-center space-y-1.5 group transition-all duration-300 active:scale-90",
+                isActive ? "text-primary" : "text-muted-foreground/60"
               )}
             >
               <div className={cn(
-                "p-2.5 rounded-[1.25rem] transition-all duration-300",
-                isActive ? "bg-accent/10" : "group-hover:bg-white/5"
+                "transition-all duration-300",
+                isActive ? "scale-110" : ""
               )}>
-                <item.icon className={cn("w-6 h-6", isActive && "fill-accent/20")} />
+                <item.icon className={cn("w-6 h-6", isActive && "fill-primary/20")} strokeWidth={isActive ? 3 : 2} />
               </div>
               <span className={cn(
-                "text-[10px] font-bold tracking-tight uppercase",
-                isActive ? "opacity-100" : "opacity-60"
+                "text-[11px] font-black tracking-tight",
+                isActive ? "opacity-100" : "opacity-70"
               )}>
                 {item.label}
               </span>

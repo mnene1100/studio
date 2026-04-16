@@ -1,22 +1,21 @@
-
 {
   "placeholderImages": [
     {
       "id": "user-avatar-1",
       "description": "A portrait of a professional woman",
-      "imageUrl": "https://picsum.photos/seed/65/200/200",
+      "imageUrl": "https://picsum.photos/seed/65/400/600",
       "imageHint": "woman portrait"
     },
     {
       "id": "user-avatar-2",
       "description": "A portrait of a smiling man",
-      "imageUrl": "https://picsum.photos/seed/32/200/200",
+      "imageUrl": "https://picsum.photos/seed/32/400/600",
       "imageHint": "man portrait"
     },
     {
       "id": "user-avatar-3",
       "description": "A portrait of a young person",
-      "imageUrl": "https://picsum.photos/seed/12/200/200",
+      "imageUrl": "https://picsum.photos/seed/12/400/600",
       "imageHint": "person portrait"
     },
     {
