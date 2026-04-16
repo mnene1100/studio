@@ -68,7 +68,7 @@ export default function WalletPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white pb-32">
-      {/* Header - Seamless with status bar */}
+      {/* Header - Seamless with status bar, NO shadows or borders */}
       <header className="bg-primary safe-top sticky top-0 z-50">
         <div className="px-4 h-20 flex items-center justify-between">
           <Button 
@@ -85,6 +85,7 @@ export default function WalletPage() {
           <Button 
             variant="ghost" 
             size="icon" 
+            onClick={() => router.push('/home/wallet/history')}
             className="w-10 h-10 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/10"
           >
             <History className="w-5 h-5" />
