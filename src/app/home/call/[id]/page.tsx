@@ -1,18 +1,19 @@
 
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { 
   PhoneOff, Mic, MicOff, Video, VideoOff, 
-  Volume2, VolumeX, Maximize2, Minimize2 
+  Volume2, VolumeX, Maximize2, Minimize2, AlertCircle
 } from "lucide-react";
 import { useFirestore, useDoc, useMemoFirebase, useUser } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function CallPage() {
   const { id: targetUserId } = useParams();
@@ -30,6 +31,7 @@ export default function CallPage() {
   const [cameraOn, setCameraOn] = useState(callType === 'video');
   const [speakerOn, setSpeakerOn] = useState(true);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
 
   const localVideoRef = useRef<HTMLDivElement>(null);
   const remoteVideoRef = useRef<HTMLDivElement>(null);
@@ -76,18 +78,33 @@ export default function CallPage() {
         setRemoteUsers((prev) => prev.filter((u) => u.uid !== user.uid));
       });
 
-      // Join Channel
+      // Join Channel and Request Permissions
       try {
         const channelName = [currentUser?.uid, targetUserId].sort().join('_');
+        
+        // Request Permissions based on call type
+        let audioTrack;
+        let videoTrack;
+
+        try {
+          audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+          setLocalAudioTrack(audioTrack);
+
+          if (callType === 'video') {
+            videoTrack = await AgoraRTC.createCameraVideoTrack();
+            setLocalVideoTrack(videoTrack);
+          }
+          setHasPermission(true);
+        } catch (permError) {
+          console.error("Permission error:", permError);
+          setHasPermission(false);
+          return;
+        }
+
         await agoraClientRef.current.join(appId, channelName, null, currentUser?.uid);
 
-        // Create and Publish Tracks
-        const audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
-        setLocalAudioTrack(audioTrack);
-
-        if (callType === 'video') {
-          const videoTrack = await AgoraRTC.createCameraVideoTrack();
-          setLocalVideoTrack(videoTrack);
+        // Publish Tracks
+        if (callType === 'video' && videoTrack) {
           await agoraClientRef.current.publish([audioTrack, videoTrack]);
           if (localVideoRef.current) {
             videoTrack.play(localVideoRef.current);
@@ -113,7 +130,9 @@ export default function CallPage() {
 
     return () => {
       // Cleanup
+      localVideoTrack?.stop();
       localVideoTrack?.close();
+      localAudioTrack?.stop();
       localAudioTrack?.close();
       agoraClientRef.current?.leave();
     };
@@ -147,6 +166,23 @@ export default function CallPage() {
   const displayName = profile?.displayName || "Contact";
   const initials = displayName.substring(0, 2).toUpperCase();
 
+  if (hasPermission === false) {
+    return (
+      <div className="fixed inset-0 bg-black z-[100] flex items-center justify-center p-8">
+        <Alert variant="destructive" className="bg-zinc-900 border-red-500/50">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Permission Denied</AlertTitle>
+          <AlertDescription>
+            NEXO needs access to your {callType === 'video' ? 'camera and microphone' : 'microphone'} to start the call. Please enable them in your browser settings.
+          </AlertDescription>
+          <Button onClick={() => router.back()} className="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-widest text-[10px]">
+            Back to Chat
+          </Button>
+        </Alert>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 bg-black z-[100] flex flex-col overflow-hidden">
       {/* Background/Remote Video View */}
@@ -165,8 +201,13 @@ export default function CallPage() {
             <div className="mt-12 text-center">
               <h2 className="text-2xl font-black text-white tracking-tight mb-2">{displayName}</h2>
               <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em] animate-pulse">
-                {joined ? 'Secure Line' : 'Calling...'}
+                {joined ? 'Secure HD Line' : 'Connecting...'}
               </p>
+              {callType === 'audio' && joined && (
+                <p className="text-[9px] font-bold text-primary mt-4 uppercase tracking-widest bg-primary/10 px-4 py-1.5 rounded-full inline-block">
+                  Handset Mode Active
+                </p>
+              )}
             </div>
           </div>
         )}
@@ -176,7 +217,7 @@ export default function CallPage() {
       {callType === 'video' && cameraOn && (
         <div 
           className={cn(
-            "absolute z-20 transition-all duration-500 rounded-[2rem] overflow-hidden border-2 border-white/10 shadow-2xl",
+            "absolute z-20 transition-all duration-500 rounded-[2rem] overflow-hidden border-2 border-white/10 shadow-2xl bg-black",
             isMinimized 
               ? "bottom-32 right-6 w-24 h-36" 
               : "top-12 right-6 w-32 h-48"
@@ -189,20 +230,18 @@ export default function CallPage() {
       {/* Top Header Controls */}
       <div className="absolute top-0 left-0 right-0 safe-top p-6 z-30 flex items-center justify-between">
         <button 
-          onClick={handleEndCall}
+          onClick={() => setIsMinimized(!isMinimized)}
           className="w-10 h-10 bg-white/10 backdrop-blur-xl rounded-full flex items-center justify-center border border-white/10"
         >
-          <Minimize2 className="w-5 h-5 text-white" />
+          {isMinimized ? <Maximize2 className="w-5 h-5 text-white" /> : <Minimize2 className="w-5 h-5 text-white" />}
         </button>
         <div className="bg-black/20 backdrop-blur-xl px-4 py-2 rounded-full border border-white/5 flex items-center space-x-2">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
           <span className="text-[9px] font-black text-white uppercase tracking-widest">
-            {callType === 'video' ? 'Video HD' : 'Audio HD'}
+            {callType === 'video' ? 'Video Encrypted' : 'Voice Encrypted'}
           </span>
         </div>
-        <button className="w-10 h-10 bg-white/10 backdrop-blur-xl rounded-full flex items-center justify-center border border-white/10">
-          <Maximize2 className="w-5 h-5 text-white" />
-        </button>
+        <div className="w-10 h-10" /> {/* Spacer */}
       </div>
 
       {/* Bottom Main Controls */}
