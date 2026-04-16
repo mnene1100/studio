@@ -43,7 +43,7 @@ function ChatListItem({ chat }: { chat: any }) {
         )}
       </div>
       
-      <div className="ml-4 flex-1 border-b border-gray-50 pb-2">
+      <div className="ml-4 flex-1">
         <div className="flex items-center justify-between mb-0.5">
           <h3 className="font-bold text-gray-900 text-sm tracking-tight">{profile?.displayName || 'Loading...'}</h3>
           <span className="text-[10px] font-bold text-gray-300">
