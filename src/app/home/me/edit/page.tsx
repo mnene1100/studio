@@ -38,6 +38,18 @@ const LOOKING_FOR = [
   "Just Chatting"
 ];
 
+const EDUCATION_OPTIONS = [
+  "Secondary School",
+  "Certificate",
+  "Diploma",
+  "Undergraduate Degree",
+  "Postgraduate Degree",
+  "Master's Degree",
+  "Doctorate / PhD",
+  "Professional Certification",
+  "Other"
+];
+
 const EAST_AFRICAN_COUNTRIES = [
   "Burundi", "Djibouti", "Eritrea", "Ethiopia", 
   "Kenya", "Rwanda", "Somalia", "South Sudan", 
@@ -221,13 +233,15 @@ export default function EditProfilePage() {
           <div className="space-y-1.5">
             <Label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Education</Label>
             <div className="relative">
-              <Input 
-                value={formData.education}
-                onChange={(e) => setFormData(prev => ({ ...prev, education: e.target.value }))}
-                placeholder="College, University or Profession"
-                className="h-12 bg-gray-50 border-none rounded-2xl px-10 text-sm font-bold"
-              />
-              <GraduationCap className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-40" />
+              <Select value={formData.education} onValueChange={(val) => setFormData(prev => ({ ...prev, education: val }))}>
+                <SelectTrigger className="h-12 bg-gray-50 border-none rounded-2xl px-10 text-xs font-bold w-full">
+                  <SelectValue placeholder="Select Education Level" />
+                </SelectTrigger>
+                <SelectContent className="rounded-2xl border-none shadow-2xl">
+                  {EDUCATION_OPTIONS.map(opt => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <GraduationCap className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-40 z-10" />
             </div>
           </div>
 

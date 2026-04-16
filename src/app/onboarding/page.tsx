@@ -15,7 +15,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { User, Camera, ArrowRight, Check } from "lucide-react";
+import { User, Camera, ArrowRight, Check, GraduationCap } from "lucide-react";
 import { useFirestore, useUser } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
@@ -35,6 +35,18 @@ const EAST_AFRICAN_COUNTRIES = [
   "Uganda"
 ];
 
+const EDUCATION_OPTIONS = [
+  "Secondary School",
+  "Certificate",
+  "Diploma",
+  "Undergraduate Degree",
+  "Postgraduate Degree",
+  "Master's Degree",
+  "Doctorate / PhD",
+  "Professional Certification",
+  "Other"
+];
+
 const RANDOM_NAMES = ["SilverFox", "DesertStar", "NeoWave", "SkyWalker", "NexoGuest", "SwiftWind", "DeepBlue", "SolarFlare"];
 
 export default function OnboardingPage() {
@@ -42,6 +54,7 @@ export default function OnboardingPage() {
   const [name, setName] = useState('');
   const [dob, setDob] = useState('');
   const [country, setCountry] = useState('');
+  const [education, setEducation] = useState('');
   const [gender, setGender] = useState<'Male' | 'Female' | ''>('');
   const router = useRouter();
   const db = useFirestore();
@@ -87,6 +100,7 @@ export default function OnboardingPage() {
       gender: gender,
       dob: finalDob,
       country: country,
+      education: education,
       profilePictureUrl: `https://picsum.photos/seed/${user.uid}/200/200`,
       createdAt: new Date().toISOString(),
       lastOnlineAt: new Date().toISOString(),
@@ -113,11 +127,11 @@ export default function OnboardingPage() {
   const isAnonymous = user.isAnonymous;
   const isFormComplete = isAnonymous 
     ? (gender && country) 
-    : (name.trim() && dob && country && gender);
+    : (name.trim() && dob && country && gender && education);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-black premium-gradient">
-      <Card className="w-full max-w-sm border-white/5 bg-black/40 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl">
+      <Card className="w-full max-w-sm border-white/5 bg-black/40 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl overflow-hidden">
         <CardHeader className="text-center pb-2">
           <CardTitle className="text-2xl font-black text-white tracking-tight">
             {isAnonymous ? "Fast Setup" : "Setup Profile"}
@@ -126,7 +140,7 @@ export default function OnboardingPage() {
             {isAnonymous ? "Just two steps" : "Secure Identity"}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6 pt-2">
+        <CardContent className="space-y-6 pt-2 max-h-[70vh] overflow-y-auto no-scrollbar pb-10">
           <div className="flex flex-col items-center space-y-3">
             <div className="relative group">
               <Avatar className="w-20 h-20 border-none ring-0 transition-transform group-hover:scale-105">
@@ -219,6 +233,28 @@ export default function OnboardingPage() {
                 </SelectContent>
               </Select>
             </div>
+
+            {!isAnonymous && (
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Education</Label>
+                <Select onValueChange={setEducation} value={education}>
+                  <SelectTrigger className="bg-white/5 border-white/5 h-12 rounded-2xl focus:ring-primary/20 text-white">
+                    <SelectValue placeholder="Select Education" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1a1a1a] border-white/10 text-white rounded-2xl shadow-2xl">
+                    {EDUCATION_OPTIONS.map((opt) => (
+                      <SelectItem 
+                        key={opt} 
+                        value={opt} 
+                        className="py-3 px-4 focus:bg-primary/20 focus:text-primary cursor-pointer rounded-xl font-medium"
+                      >
+                        {opt}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <Button 
               className="w-full bg-primary hover:bg-primary/90 text-white font-black h-14 rounded-2xl transition-all shadow-xl shadow-primary/20 mt-4 uppercase tracking-widest text-xs"
