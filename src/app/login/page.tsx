@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Zap, Mail, UserPlus, Loader2 } from "lucide-react";
 import { useAuth, useUser, useFirestore } from '@/firebase';
-import { signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword, User as FirebaseUser } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import { toast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
@@ -22,13 +22,14 @@ export default function LoginPage() {
   const { user, isUserLoading } = useUser();
 
   useEffect(() => {
-    if (!isUserLoading && user) {
+    if (!isUserLoading && user && db) {
       const checkProfile = async () => {
-        if (!db) return;
         const userRef = doc(db, 'users', user.uid);
         const userDoc = await getDoc(userRef);
         if (userDoc.exists()) {
           router.replace('/home');
+        } else {
+          router.replace('/onboarding');
         }
       };
       checkProfile();
@@ -61,11 +62,18 @@ export default function LoginPage() {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password.trim() || !auth) return;
+    if (!email.trim() || !password.trim() || !auth || !db) return;
     setIsLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      router.replace('/home');
+      const credential = await signInWithEmailAndPassword(auth, email, password);
+      const userRef = doc(db, 'users', credential.user.uid);
+      const userDoc = await getDoc(userRef);
+      
+      if (userDoc.exists()) {
+        router.replace('/home');
+      } else {
+        router.replace('/onboarding');
+      }
     } catch (error: any) {
       toast({ variant: "destructive", title: "Sign in failed", description: "Check credentials and connection." });
     } finally {

@@ -73,7 +73,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     return () => clearInterval(interval);
   }, [db, user?.uid]);
 
-  // Initial Discovery Fetch - Only once per session mount (app "open")
+  // Initial Discovery Fetch
   useEffect(() => {
     if (user?.uid && !initialDiscoveryFetchedRef.current && db) {
       initialDiscoveryFetchedRef.current = true;
@@ -85,8 +85,11 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     if (isAuthLoading || isProfileLoading) return;
     if (!user) {
       router.replace('/login');
+    } else if (!profile) {
+      // Authenticated but no Firestore profile exists - send to setup
+      router.replace('/onboarding');
     }
-  }, [user, isAuthLoading, isProfileLoading, router]);
+  }, [user, profile, isAuthLoading, isProfileLoading, router]);
 
   if (isAuthLoading || isProfileLoading) {
     return (

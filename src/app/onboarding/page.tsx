@@ -18,7 +18,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { useUser, useFirestore } from '@/firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { toast } from '@/hooks/use-toast';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
@@ -53,16 +53,23 @@ export default function OnboardingPage() {
     return `${year}-${month}-${day}`;
   }, []);
 
+  // Protect the onboarding screen from existing users
   useEffect(() => {
-    if (!isUserLoading && !user) {
-      router.replace('/login');
-    }
-  }, [user, isUserLoading, router]);
+    if (isUserLoading || !user || !db) return;
+
+    const checkExisting = async () => {
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        router.replace('/home');
+      }
+    };
+    checkExisting();
+  }, [user, isUserLoading, db, router]);
 
   const handleComplete = async () => {
     if (!db || !user?.uid) return;
     
-    // For email login, validate display name
     if (!isFastLogin && !formData.displayName.trim()) {
       toast({ variant: "destructive", title: "Missing Name", description: "Please enter your display name." });
       return;
