@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useRouter } from 'next/navigation';
@@ -19,7 +18,7 @@ export default function WalletHistoryPage() {
   return (
     <div className="flex flex-col min-h-screen bg-white">
       <header className="bg-primary safe-top sticky top-0 z-50">
-        <div className="px-4 h-20 flex items-center justify-between">
+        <div className="px-4 h-16 flex items-center justify-between">
           <Button 
             variant="ghost" 
             size="icon" 
@@ -29,17 +28,17 @@ export default function WalletHistoryPage() {
             <ChevronLeft className="w-6 h-6" />
           </Button>
           <h1 className="text-base font-black text-white tracking-[0.2em] uppercase italic">History</h1>
-          <div className="w-10 h-10" /> {/* Spacer */}
+          <div className="w-10 h-10" />
         </div>
       </header>
 
-      <div className="flex-1 px-6 py-8">
+      <div className="flex-1 px-6 py-8 bg-white">
         {MOCK_HISTORY.length > 0 ? (
           <div className="space-y-4">
             {MOCK_HISTORY.map((item) => (
               <div 
                 key={item.id}
-                className="bg-gray-50 rounded-[2rem] p-5 flex items-center border border-gray-100 shadow-sm"
+                className="bg-gray-50 rounded-[2rem] p-5 flex items-center border border-gray-50 shadow-sm"
               >
                 <div className={cn(
                   "w-12 h-12 rounded-2xl flex items-center justify-center mr-4",

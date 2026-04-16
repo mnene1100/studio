@@ -8,7 +8,7 @@
 interface PesapalOrderInput {
   amount: number;
   email: string;
-  phoneNumber?: string; // Made optional
+  phoneNumber?: string;
   firstName: string;
   lastName: string;
   description: string;
@@ -18,7 +18,6 @@ interface PesapalOrderInput {
 export async function createPesapalOrder(input: PesapalOrderInput) {
   const consumerKey = process.env.PESAPAL_CONSUMER_KEY;
   const consumerSecret = process.env.PESAPAL_CONSUMER_SECRET;
-  // Use production URL by default if not specified in env
   const baseUrl = process.env.PESAPAL_BASE_URL || 'https://pay.pesapal.com/v3';
 
   if (!consumerKey || !consumerSecret) {
@@ -82,7 +81,7 @@ export async function createPesapalOrder(input: PesapalOrderInput) {
         notification_id: ipnId,
         billing_address: {
           email_address: input.email,
-          phone_number: input.phoneNumber || "", // Leave blank if not provided to let user enter on PesaPal page
+          phone_number: input.phoneNumber || "", // Removed hardcoded fallback so PesaPal prompts user
           country_code: 'KE',
           first_name: input.firstName,
           last_name: input.lastName,
