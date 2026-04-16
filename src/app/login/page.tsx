@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Zap, Mail, UserPlus, Loader2 } from "lucide-react";
 import { useAuth, useUser, useFirestore } from '@/firebase';
-import { signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword, User } from 'firebase/auth';
+import { signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword, User as FirebaseUser } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { toast } from "@/hooks/use-toast";
 import { generateNexoId } from "@/app/lib/store";
@@ -30,13 +30,26 @@ export default function LoginPage() {
     }
   }, [user, isUserLoading, router]);
 
-  const ensureUserProfile = async (firebaseUser: User) => {
+  const detectCountry = async (): Promise<string> => {
+    try {
+      const response = await fetch('https://ipapi.co/json/');
+      const data = await response.json();
+      return data.country_name || 'Kenya';
+    } catch (e) {
+      console.warn("Location detection failed, defaulting to Kenya");
+      return 'Kenya';
+    }
+  };
+
+  const ensureUserProfile = async (firebaseUser: FirebaseUser) => {
     if (!db) return;
     const userRef = doc(db, 'users', firebaseUser.uid);
     const userDoc = await getDoc(userRef);
 
     if (!userDoc.exists()) {
+      const detectedCountry = await detectCountry();
       const randomName = RANDOM_NAMES[Math.floor(Math.random() * RANDOM_NAMES.length)] + "_" + Math.floor(Math.random() * 1000);
+      
       const defaultProfile = {
         id: firebaseUser.uid,
         numericId: generateNexoId(),
@@ -44,7 +57,7 @@ export default function LoginPage() {
         displayName: randomName,
         gender: 'Other',
         dob: '2000-01-01',
-        country: 'Kenya',
+        country: detectedCountry,
         education: 'N/A',
         profilePictureUrl: `https://picsum.photos/seed/${firebaseUser.uid}/200/200`,
         createdAt: new Date().toISOString(),

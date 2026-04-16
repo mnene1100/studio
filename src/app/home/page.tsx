@@ -18,8 +18,7 @@ export default function HomePage() {
   
   const [discoveryUsers, setDiscoveryUsers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [pageSize, setPageSize] = useState(6);
-  const [hasMore, setHasMore] = useState(true);
+  const [pageSize, setPageSize] = useState(10);
 
   const mysteryIcon = PlaceHolderImages.find(img => img.id === 'mystery-icon');
   const taskIcon = PlaceHolderImages.find(img => img.id === 'task-icon');
@@ -28,11 +27,13 @@ export default function HomePage() {
     if (!db || !user?.uid) return;
     setIsLoading(true);
     try {
-      const q = query(collection(db, 'users'), orderBy('lastOnlineAt', 'desc'), limit(currentSize + 1));
+      const q = query(collection(db, 'users'), orderBy('lastOnlineAt', 'desc'), limit(currentSize + 20));
       const snapshot = await getDocs(q);
-      const docs = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })).filter(u => u.id !== user.uid);
+      const docs = snapshot.docs
+        .map(doc => ({ ...doc.data(), id: doc.id }))
+        .filter(u => u.id !== user.uid);
+      
       setDiscoveryUsers(docs.slice(0, currentSize));
-      setHasMore(docs.length > currentSize);
     } catch (e) {
       console.error("Discovery error:", e);
     } finally {
@@ -66,7 +67,7 @@ export default function HomePage() {
       <div className="sticky top-0 z-40 bg-primary px-5 py-4">
         <div className="flex items-center justify-between">
           <h3 className="text-[10px] font-black text-white tracking-widest uppercase italic">Recommended</h3>
-          <button onClick={() => { setPageSize(6); fetchUsers(6); }} className="w-7 h-7 bg-white/10 rounded-full flex items-center justify-center">
+          <button onClick={() => fetchUsers(pageSize)} className="w-7 h-7 bg-white/10 rounded-full flex items-center justify-center">
             <RefreshCw className="w-3.5 h-3.5 text-white" />
           </button>
         </div>
@@ -83,18 +84,28 @@ export default function HomePage() {
             {discoveryUsers.map((u, i) => {
               const age = u.dob ? differenceInYears(new Date(), new Date(u.dob)) : 20;
               return (
-                <div key={u.id} onClick={() => router.push(`/home/profile/${u.id}`)} className="relative aspect-[1/1.25] overflow-hidden rounded-[2rem] shadow-xl bg-card active:scale-[0.98] border border-white/5">
+                <div key={u.id} onClick={() => router.push(`/home/profile/${u.id}`)} className="relative aspect-[1/1.25] overflow-hidden rounded-[2rem] shadow-xl bg-card active:scale-[0.98] border border-white/5 group">
                   <Image src={u.profilePictureUrl || `https://picsum.photos/seed/${u.id}/600/750`} alt={u.displayName || 'User'} fill className="object-cover" sizes="50vw" priority={i < 4} />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+                  
                   <div className="absolute bottom-4 left-4 right-4">
                     <div className="flex items-center space-x-1.5 mb-2">
                       <h4 className="text-[14px] font-black text-white truncate tracking-tight">{u.displayName?.toLowerCase() || 'guest'}</h4>
                       {u.isVerified && <UserCheck className="w-3.5 h-3.5 text-primary fill-primary" />}
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center justify-between">
                       <div className="h-5 px-2 bg-primary/30 backdrop-blur-md rounded-full border border-primary/40 flex items-center">
                         <span className="text-[9px] font-black text-white uppercase">{u.gender === 'Female' ? '♀' : '♂'} {age}</span>
                       </div>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/home/chat/${u.id}`);
+                        }}
+                        className="w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-all border border-white/20"
+                      >
+                        <MessageCircle className="w-4 h-4 text-white fill-white" />
+                      </button>
                     </div>
                   </div>
                 </div>

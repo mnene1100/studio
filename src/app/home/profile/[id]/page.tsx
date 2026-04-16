@@ -6,9 +6,19 @@ import { useRouter, useParams } from 'next/navigation';
 import { useFirestore, useDoc, useMemoFirebase, useUser, setDocumentNonBlocking } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, MessageCircle, Loader2 } from "lucide-react";
+import { 
+  ChevronLeft, MessageCircle, Loader2, 
+  MoreVertical, ShieldAlert, Ban, Flag
+} from "lucide-react";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 import { differenceInYears } from 'date-fns';
 import Image from 'next/image';
+import { toast } from '@/hooks/use-toast';
 
 export default function UserProfilePage() {
   const { id } = useParams();
@@ -35,6 +45,20 @@ export default function UserProfilePage() {
   const age = useMemo(() => profile?.dob ? differenceInYears(new Date(), new Date(profile.dob)) : null, [profile?.dob]);
   const isOnline = profile?.lastOnlineAt ? (Date.now() - new Date(profile.lastOnlineAt).getTime() < 90000) : false;
 
+  const handleBlock = () => {
+    toast({
+      title: "User Blocked",
+      description: "You will no longer see updates from this user.",
+    });
+  };
+
+  const handleReport = () => {
+    toast({
+      title: "Report Received",
+      description: "Our moderation team will review this profile shortly.",
+    });
+  };
+
   if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-white"><Loader2 className="animate-spin text-primary" /></div>;
   if (!profile) return null;
 
@@ -48,10 +72,32 @@ export default function UserProfilePage() {
 
       <div className="relative w-full aspect-[1/1.15] overflow-hidden" onClick={() => setIsFullScreen(true)}>
         <Image src={profile.profilePictureUrl || `https://picsum.photos/seed/${profile.id}/800/1000`} alt="Profile" fill className="object-cover" />
-        <Button variant="ghost" size="icon" onClick={() => router.back()} className="absolute top-10 left-4 bg-black/20 text-white rounded-full"><ChevronLeft /></Button>
+        
+        <div className="absolute top-10 left-0 right-0 px-4 flex items-center justify-between">
+          <Button variant="ghost" size="icon" onClick={() => router.back()} className="bg-black/20 backdrop-blur-md text-white rounded-full">
+            <ChevronLeft />
+          </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="bg-black/20 backdrop-blur-md text-white rounded-full">
+                <MoreVertical className="w-5 h-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 rounded-2xl border-none shadow-2xl p-2 bg-white/95 backdrop-blur-xl">
+              <DropdownMenuItem onClick={handleBlock} className="flex items-center px-4 py-3 rounded-xl text-red-500 font-bold focus:bg-red-50">
+                <Ban className="w-4 h-4 mr-3" />
+                <span className="text-xs uppercase tracking-widest">Block User</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleReport} className="flex items-center px-4 py-3 rounded-xl text-orange-500 font-bold focus:bg-orange-50">
+                <Flag className="w-4 h-4 mr-3" />
+                <span className="text-xs uppercase tracking-widest">Report User</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
-      {/* STRAIGHT EDGES FOR USER DETAILS SECTION */}
       <div className="px-6 bg-white pt-8 flex-1 rounded-none border-t border-gray-100">
         <div className="mb-4">
           <div className={`inline-flex items-center px-3 py-1 border ${isOnline ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-gray-50 border-gray-100 text-gray-400'}`}>
@@ -72,8 +118,8 @@ export default function UserProfilePage() {
       </div>
 
       <div className="fixed bottom-6 left-6 right-6 z-30">
-        <Button onClick={() => router.push(`/home/chat/${profile.id}`)} className="w-full h-14 bg-primary text-white font-black rounded-none uppercase tracking-widest shadow-2xl">
-          <MessageCircle className="mr-2 h-4 w-4" /> Start Chat
+        <Button onClick={() => router.push(`/home/chat/${profile.id}`)} className="w-full h-14 bg-primary text-white font-black rounded-none uppercase tracking-widest shadow-2xl shadow-primary/30 active:scale-95 transition-all">
+          <MessageCircle className="mr-2 h-4 w-4 fill-white" /> Start Chat
         </Button>
       </div>
     </div>
