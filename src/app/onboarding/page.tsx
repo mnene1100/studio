@@ -16,7 +16,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { User, Camera, ArrowRight, Calendar } from "lucide-react";
-import { useAuth, useFirestore, useUser } from '@/firebase';
+import { useFirestore, useUser } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { generateNexoId } from "@/app/lib/store";
@@ -69,16 +69,16 @@ export default function OnboardingPage() {
     // Save to Firestore
     setDocumentNonBlocking(userRef, profileData, { merge: true });
     
-    // Save to local storage for instant UI updates (optional, but entry check will handle Firestore)
-    localStorage.setItem('nexo_profile', JSON.stringify(profileData));
+    // Set persistence flag immediately to stop redirect loop
+    localStorage.setItem('nexo_profile_completed', 'true');
     
     // Navigate home
-    router.push('/home/chat');
+    router.push('/home');
   };
 
   if (isUserLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
@@ -87,63 +87,59 @@ export default function OnboardingPage() {
   const isFormComplete = name.trim() && dob && country;
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-background premium-gradient">
-      <Card className="w-full max-w-md border-white/10 glass-panel shadow-2xl">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-white">Complete Your Profile</CardTitle>
-          <CardDescription className="text-muted-foreground">Join the NEXO secure network</CardDescription>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-black premium-gradient">
+      <Card className="w-full max-w-sm border-white/5 bg-black/40 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl">
+        <CardHeader className="text-center pb-2">
+          <CardTitle className="text-2xl font-black text-white tracking-tight">Setup Profile</CardTitle>
+          <CardDescription className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Secure Identity</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pt-2">
           <div className="flex flex-col items-center space-y-3">
-            <div className="relative group cursor-pointer">
-              <Avatar className="w-24 h-24 border-2 border-accent ring-4 ring-accent/10 transition-transform group-hover:scale-105">
+            <div className="relative group">
+              <Avatar className="w-20 h-20 border-none ring-0 transition-transform group-hover:scale-105">
                 <AvatarImage src={`https://picsum.photos/seed/${user.uid}/200/200`} />
-                <AvatarFallback className="bg-secondary text-2xl">
-                  <User className="w-10 h-10" />
+                <AvatarFallback className="bg-white/5 text-xl font-black text-white">
+                  <User className="w-8 h-8" />
                 </AvatarFallback>
               </Avatar>
-              <div className="absolute bottom-0 right-0 p-2 bg-accent rounded-full border-2 border-background shadow-lg">
-                <Camera className="w-4 h-4 text-accent-foreground" />
+              <div className="absolute bottom-0 right-0 p-1.5 bg-primary rounded-full border-2 border-black shadow-lg">
+                <Camera className="w-3 h-3 text-white" />
               </div>
             </div>
-            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Avatar Generated</p>
           </div>
 
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="display-name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Full Name</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="display-name" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Full Name</Label>
               <Input 
                 id="display-name" 
-                placeholder="Enter your name" 
-                className="bg-white/5 border-white/10 h-12 rounded-xl focus:ring-accent/20"
+                placeholder="Name" 
+                className="bg-white/5 border-white/5 h-12 rounded-2xl focus:ring-primary/20"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="dob" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Date of Birth</Label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                <Input 
-                  id="dob" 
-                  type="date"
-                  className="bg-white/5 border-white/10 h-12 pl-10 rounded-xl focus:ring-accent/20"
-                  value={dob}
-                  onChange={(e) => setDob(e.target.value)}
-                />
-              </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="dob" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Birth Date</Label>
+              <Input 
+                id="dob" 
+                type="date"
+                className="bg-white/5 border-white/5 h-12 rounded-2xl focus:ring-primary/20 text-white"
+                value={dob}
+                onChange={(e) => setDob(e.target.value)}
+              />
             </div>
 
-            <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Country (East Africa)</Label>
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Region</Label>
               <Select onValueChange={setCountry} value={country}>
-                <SelectTrigger className="bg-white/5 border-white/10 h-12 rounded-xl focus:ring-accent/20">
-                  <SelectValue placeholder="Select your country" />
+                <SelectTrigger className="bg-white/5 border-white/5 h-12 rounded-2xl focus:ring-primary/20 text-white">
+                  <SelectValue placeholder="Select Country" />
                 </SelectTrigger>
-                <SelectContent className="bg-card border-white/10 text-white">
+                <SelectContent className="bg-card border-white/10 text-white rounded-2xl">
                   {EAST_AFRICAN_COUNTRIES.map((c) => (
-                    <SelectItem key={c} value={c} className="focus:bg-accent/10 focus:text-accent cursor-pointer">
+                    <SelectItem key={c} value={c} className="focus:bg-primary/20 focus:text-primary cursor-pointer rounded-xl">
                       {c}
                     </SelectItem>
                   ))}
@@ -152,12 +148,12 @@ export default function OnboardingPage() {
             </div>
 
             <Button 
-              className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold h-14 rounded-2xl transition-all shadow-lg shadow-accent/20 mt-4"
+              className="w-full bg-primary hover:bg-primary/90 text-white font-black h-14 rounded-2xl transition-all shadow-xl shadow-primary/20 mt-4 uppercase tracking-widest text-xs"
               disabled={!isFormComplete}
               onClick={handleCompleteOnboarding}
             >
-              Finish Setup
-              <ArrowRight className="ml-2 w-5 h-5" />
+              Enter Nexo
+              <ArrowRight className="ml-2 w-4 h-4" />
             </Button>
           </div>
         </CardContent>

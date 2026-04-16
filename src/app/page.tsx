@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect } from 'react';
@@ -17,11 +18,17 @@ export default function EntryPage() {
       router.push('/login');
     } else {
       const checkProfile = async () => {
+        // Optimistic check: if we have a local flag, assume they are good to go
+        const localFlag = localStorage.getItem('nexo_profile_completed');
+        if (localFlag) {
+          router.push('/home');
+          return;
+        }
+
         const userDoc = await getDoc(doc(db, 'userProfiles', user.uid));
         if (userDoc.exists()) {
-          const profile = userDoc.data();
-          localStorage.setItem('nexo_profile', JSON.stringify(profile));
-          router.push('/home'); // Redirect to Home dashboard
+          localStorage.setItem('nexo_profile_completed', 'true');
+          router.push('/home');
         } else {
           router.push('/onboarding');
         }
@@ -33,8 +40,8 @@ export default function EntryPage() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-background premium-gradient">
       <div className="flex flex-col items-center space-y-4">
-        <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-[10px] text-accent font-bold uppercase tracking-[0.4em] animate-pulse">Initializing NEXO</p>
+        <div className="w-10 h-10 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-[10px] text-accent font-black uppercase tracking-[0.4em] animate-pulse">NEXO</p>
       </div>
     </div>
   );
