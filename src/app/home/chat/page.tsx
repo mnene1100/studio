@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef } from 'react';
@@ -139,17 +140,23 @@ export default function ChatListPage() {
 
   const filteredAndSortedChats = (chats || [])
     .filter(chat => {
-      if (!chat.lastMessageSentAt) return false;
+      // Show chats with either messages OR recent call activity
+      const hasActivity = chat.lastMessageSentAt || chat.updatedAt;
+      if (!hasActivity) return false;
       
       const hideTime = chat.hiddenBy?.[user?.uid || ''];
       if (hideTime) {
-        const lastMsgTime = new Date(chat.lastMessageSentAt).getTime();
+        const lastActivityTime = new Date(chat.lastMessageSentAt || chat.updatedAt).getTime();
         const hideTimestamp = new Date(hideTime).getTime();
-        return lastMsgTime > hideTimestamp;
+        return lastActivityTime > hideTimestamp;
       }
       return true;
     })
-    .sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime());
+    .sort((a, b) => {
+      const timeA = new Date(a.lastMessageSentAt || a.updatedAt || 0).getTime();
+      const timeB = new Date(b.lastMessageSentAt || b.updatedAt || 0).getTime();
+      return timeB - timeA;
+    });
 
   return (
     <div className="flex flex-col min-h-screen bg-background pb-32">

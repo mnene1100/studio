@@ -219,16 +219,31 @@ export default function CallPage() {
 
         await agoraClientRef.current.join(appId, channelName, result.token, currentUser.uid);
 
+        const now = new Date().toISOString();
         const callId = `${currentUser.uid}_${targetUserId}_${Date.now()}`;
         callIdRef.current = callId;
+
+        // 1. Create Call Document
         setDocumentNonBlocking(doc(db, 'calls', callId), {
           id: callId,
           callerId: currentUser.uid,
           participantIds: [currentUser.uid, targetUserId],
           chatRoomId: channelName,
           type: callType,
-          startTime: new Date().toISOString(),
+          startTime: now,
           status: 'ongoing'
+        }, { merge: true });
+
+        // 2. Update Chat Room to show activity in list
+        const chatRef = doc(db, 'chatRooms', channelName);
+        setDocumentNonBlocking(chatRef, {
+          id: channelName,
+          type: 'private',
+          participantIds: [currentUser.uid, targetUserId as string],
+          updatedAt: now,
+          lastMessageSentAt: now,
+          lastMessageContent: callType === 'video' ? 'Video Call initiated' : 'Voice Call initiated',
+          hiddenBy: {}
         }, { merge: true });
 
         const tracks = [];
