@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview An AI agent that compares a profile picture with a live capture for verification.
@@ -73,16 +74,19 @@ const verifyProfilePhotoFlow = ai.defineFlow(
   },
   async (input) => {
     try {
+      // Explicitly using the model reference to avoid v1beta 404s
       const {output} = await verifyProfilePhotoPrompt(input);
       if (!output) throw new Error('AI failed to produce a response');
       return output;
     } catch (error: any) {
       console.error('Verification Flow Error:', error);
-      // Return a safe failure object instead of throwing to prevent Next.js render errors
+      
+      // If still getting 404, the API might be rejecting the model name format
+      // Return a safe failure object that the UI can display nicely
       return {
         isMatch: false,
         confidence: 0,
-        reasoning: `Analysis interrupted: ${error.message || 'The AI service is temporarily unavailable.'}`
+        reasoning: `The AI service reported an error: ${error.message || 'Model connection failed.'}. Please check your API key and region settings.`
       };
     }
   }
