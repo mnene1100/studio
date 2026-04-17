@@ -5,7 +5,8 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   ShieldCheck, Headset, ChevronRight, Copy, 
-  Eye, Pencil, Coins, Diamond, Settings, UserCheck
+  Eye, Pencil, Coins, Diamond, Settings, UserCheck,
+  Gift, Users
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useHomeData } from '../layout';
@@ -49,10 +50,8 @@ export default function MePage() {
           throw new Error("Clipboard API unavailable");
         }
       } catch (err) {
-        // Fallback for non-secure contexts or restricted permissions
         const textArea = document.createElement("textarea");
         textArea.value = profile.numericId;
-        // Ensure it's not visible but part of the DOM
         textArea.style.position = "fixed";
         textArea.style.left = "-9999px";
         textArea.style.top = "0";
@@ -175,7 +174,41 @@ export default function MePage() {
 
       <div className="h-24 shrink-0" />
 
-      <div className="px-6 mt-8 space-y-4">
+      {/* Privileged Controls */}
+      {(profile.isAdmin || profile.isCoinSeller) && (
+        <div className="px-6 mt-8 space-y-4">
+          <div className="flex items-center space-x-4 mb-2">
+            <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] whitespace-nowrap">Management</h3>
+            <div className="h-[1px] w-full bg-border" />
+          </div>
+
+          <button 
+            onClick={() => router.push('/home/me/admin/award-coins')}
+            className="w-full flex items-center p-5 bg-card border border-border rounded-[1.75rem] shadow-sm active:scale-[0.98] transition-all group"
+          >
+            <div className="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center mr-4">
+              <Gift className="w-6 h-6 text-amber-500" />
+            </div>
+            <span className="flex-1 text-left font-black text-foreground text-base tracking-tight">Award Coins</span>
+            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+          </button>
+
+          {profile.isAdmin && (
+            <button 
+              onClick={() => router.push('/home/me/admin/manage-roles')}
+              className="w-full flex items-center p-5 bg-card border border-border rounded-[1.75rem] shadow-sm active:scale-[0.98] transition-all group"
+            >
+              <div className="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center mr-4">
+                <Users className="w-6 h-6 text-indigo-500" />
+              </div>
+              <span className="flex-1 text-left font-black text-foreground text-base tracking-tight">Manage Roles</span>
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </button>
+          )}
+        </div>
+      )}
+
+      <div className="px-6 mt-12 space-y-4">
         <div className="flex items-center space-x-4 mb-2">
           <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] whitespace-nowrap">Service & Support</h3>
           <div className="h-[1px] w-full bg-border" />
