@@ -10,7 +10,7 @@ import { getTransactionStatus } from '@/app/actions/pesapal';
 export async function GET(req: Request) {
   const authHeader = req.headers.get("authorization");
 
-  // 1. Security check for the Cron secret using the requested pattern
+  // 1. Security check for the Cron secret using the exact pattern requested
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return new Response(JSON.stringify({ message: "Unauthorized" }), {
       status: 401,
