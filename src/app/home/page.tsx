@@ -21,13 +21,16 @@ export default function HomePage() {
       {/* Header with quick links */}
       <div className="bg-primary safe-top px-5 pb-8 pt-20">
         <div className="grid grid-cols-2 gap-4 mt-6">
-          <div className="bg-white/20 backdrop-blur-md rounded-[1.75rem] h-36 flex flex-col items-center justify-center p-5 border border-white/20 active:scale-95 transition-all cursor-pointer shadow-lg">
+          {/* Mystery Note - Purple/Indigo Background */}
+          <div className="bg-indigo-500/30 backdrop-blur-2xl rounded-[1.75rem] h-36 flex flex-col items-center justify-center p-5 border border-white/20 active:scale-95 transition-all cursor-pointer shadow-2xl shadow-indigo-900/20">
             <div className="w-16 h-16 relative mb-2">
                <Image src={mysteryIcon?.imageUrl || "/mystery.png"} alt="Mystery" fill className="object-contain" />
             </div>
             <span className="text-white font-black text-[8px] uppercase tracking-widest">Mystery Note</span>
           </div>
-          <div className="bg-white/20 backdrop-blur-md rounded-[1.75rem] h-36 flex flex-col items-center justify-center p-5 border border-white/20 active:scale-95 transition-all cursor-pointer shadow-lg">
+          
+          {/* Task Center - Amber/Orange Background */}
+          <div className="bg-amber-500/30 backdrop-blur-2xl rounded-[1.75rem] h-36 flex flex-col items-center justify-center p-5 border border-white/20 active:scale-95 transition-all cursor-pointer shadow-2xl shadow-amber-900/20">
             <div className="w-16 h-16 relative mb-2">
               <Image src={taskIcon?.imageUrl || "/task.png"} alt="Tasks" fill className="object-contain" />
             </div>
