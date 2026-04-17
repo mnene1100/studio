@@ -82,13 +82,15 @@ export default function ChatDetailPage() {
   const { data: messagesData } = useCollection(messagesQuery);
 
   const callsQuery = useMemoFirebase(() => {
-    if (!db || !chatId) return null;
+    if (!db || !chatId || !currentUser?.uid) return null;
+    // Security Fix: Must filter by participantIds to satisfy security rules for 'list'
     return query(
       collection(db, 'calls'),
       where('chatRoomId', '==', chatId),
+      where('participantIds', 'array-contains', currentUser.uid),
       limit(50)
     );
-  }, [db, chatId]);
+  }, [db, chatId, currentUser?.uid]);
   const { data: callsData } = useCollection(callsQuery);
 
   const combinedFeed = useMemo(() => {

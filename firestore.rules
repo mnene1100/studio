@@ -34,8 +34,11 @@ service cloud.firestore {
     }
 
     match /calls/{callId} {
+      // Robust read rule: Users can only see calls where they are listed as participants
       allow read: if request.auth != null && request.auth.uid in resource.data.participantIds;
-      allow write: if request.auth != null;
+      // Allow creation by any authenticated user, and updates only by participants
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && request.auth.uid in resource.data.participantIds;
     }
 
     match /transactions/{transId} {
