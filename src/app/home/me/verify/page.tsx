@@ -31,10 +31,18 @@ export default function VerifyProfilePage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    let stream: MediaStream | null = null;
+
     if (showCamera) {
       const getCameraPermission = async () => {
         try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+          stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { 
+              facingMode: 'user',
+              width: { ideal: 640 },
+              height: { ideal: 480 }
+            } 
+          });
           setHasCameraPermission(true);
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
@@ -45,29 +53,46 @@ export default function VerifyProfilePage() {
           toast({
             variant: 'destructive',
             title: 'Camera Access Denied',
-            description: 'Please enable camera permissions in your browser settings to verify your identity.',
+            description: 'Please enable camera permissions to verify your identity.',
           });
         }
       };
       getCameraPermission();
-    } else {
-      // Stop stream when camera is closed
-      if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
+    }
+
+    return () => {
+      if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
-    }
+    };
   }, [showCamera]);
+
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+    }
+  };
 
   const handleCapture = () => {
     if (videoRef.current && canvasRef.current) {
       const context = canvasRef.current.getContext('2d');
       if (context) {
-        canvasRef.current.width = videoRef.current.videoWidth;
-        canvasRef.current.height = videoRef.current.videoHeight;
-        context.drawImage(videoRef.current, 0, 0);
-        const dataUri = canvasRef.current.toDataURL('image/jpeg');
+        // Set fixed dimensions for AI analysis to keep payload small
+        canvasRef.current.width = 480;
+        canvasRef.current.height = 640;
+
+        // Mirror the canvas context to match mirrored preview if we want mirrored output
+        // Standard (non-mirrored) is usually better for AI, but mirrored is what user sees.
+        // We'll capture standard to help Gemini's comparison logic.
+        context.drawImage(videoRef.current, 0, 0, 480, 640);
+        
+        // Lower quality to stay within Server Action payload limits (0.6 quality is enough for AI)
+        const dataUri = canvasRef.current.toDataURL('image/jpeg', 0.6);
         setCapturedPhoto(dataUri);
+        
+        stopCamera();
         setShowCamera(false);
       }
     }
@@ -98,15 +123,15 @@ export default function VerifyProfilePage() {
         toast({
           variant: "destructive",
           title: "Verification Failed",
-          description: result.reasoning || "The live photo does not match your profile picture. Please try again with a clearer photo.",
+          description: result.reasoning || "Face match failed. Please try again with better lighting.",
         });
       }
-    } catch (e) {
-      console.error(e);
+    } catch (e: any) {
+      console.error('Verify Error:', e);
       toast({
         variant: "destructive",
         title: "System Error",
-        description: "An error occurred during AI analysis. Please try again later.",
+        description: e.message || "An error occurred during AI analysis. Please try again.",
       });
     } finally {
       setIsVerifying(false);
@@ -128,14 +153,21 @@ export default function VerifyProfilePage() {
 
         <div className="flex-1 flex flex-col items-center justify-center px-8">
           <div className="relative w-full aspect-[3/4] max-w-sm rounded-[3rem] overflow-hidden bg-zinc-900 border-4 border-white/10 shadow-2xl">
-            <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
+            {/* Mirror mode applied with scale-x-[-1] */}
+            <video 
+              ref={videoRef} 
+              className="w-full h-full object-cover scale-x-[-1]" 
+              autoPlay 
+              muted 
+              playsInline 
+            />
             <div className="absolute inset-0 pointer-events-none border-[40px] border-black/40 flex items-center justify-center">
                <div className="w-full h-full border-2 border-primary/50 rounded-full opacity-30 animate-pulse" />
             </div>
             {hasCameraPermission === false && (
               <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-black/80">
                 <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-                <p className="text-white font-bold text-sm uppercase tracking-widest">Camera access required to verify your identity</p>
+                <p className="text-white font-bold text-sm uppercase tracking-widest">Camera access required</p>
                 <Button variant="outline" onClick={() => setShowCamera(false)} className="mt-6 border-white/20 text-white rounded-full uppercase tracking-widest text-[10px]">Go Back</Button>
               </div>
             )}
@@ -175,7 +207,7 @@ export default function VerifyProfilePage() {
 
       <div className="flex-1 flex flex-col items-center justify-center px-8 text-center space-y-10 py-10">
         <div className="relative">
-          <div className="w-32 h-32 bg-primary/10 rounded-[3.5rem] flex items-center justify-center border-4 border-primary/20 relative shadow-2xl">
+          <div className="w-32 h-32 bg-primary/10 rounded-[3.5rem] flex items-center justify-center border-4 border-primary/20 relative shadow-2xl overflow-hidden">
             {capturedPhoto ? (
               <img src={capturedPhoto} alt="Live Capture" className="w-full h-full object-cover rounded-[3rem]" />
             ) : (
