@@ -39,9 +39,9 @@ export default function OnboardingPage() {
   const [isCheckingProfile, setIsCheckingProfile] = useState(true);
   const [formData, setFormData] = useState({
     displayName: '',
-    gender: 'Female',
-    dob: '2000-01-01',
-    country: 'Kenya'
+    gender: '', // No default
+    dob: '',    // No default
+    country: '' // No default
   });
 
   const isFastLogin = user?.isAnonymous;
@@ -82,6 +82,21 @@ export default function OnboardingPage() {
     
     if (!isFastLogin && !formData.displayName.trim()) {
       toast({ variant: "destructive", title: "Missing Name", description: "Please enter your display name." });
+      return;
+    }
+
+    if (!formData.gender) {
+      toast({ variant: "destructive", title: "Selection Required", description: "Please select your gender." });
+      return;
+    }
+
+    if (!formData.dob) {
+      toast({ variant: "destructive", title: "Selection Required", description: "Please enter your date of birth." });
+      return;
+    }
+
+    if (!formData.country) {
+      toast({ variant: "destructive", title: "Selection Required", description: "Please select your region." });
       return;
     }
 
@@ -194,7 +209,7 @@ export default function OnboardingPage() {
             <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Gender</Label>
             <Select value={formData.gender} onValueChange={(val) => setFormData(prev => ({ ...prev, gender: val }))}>
               <SelectTrigger className="h-14 bg-muted border-none rounded-[1.5rem] px-5 text-sm font-bold">
-                <SelectValue />
+                <SelectValue placeholder="Select Gender" />
               </SelectTrigger>
               <SelectContent className="rounded-2xl border-none shadow-2xl">
                 {GENDERS.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
@@ -208,7 +223,7 @@ export default function OnboardingPage() {
               <SelectTrigger className="h-14 bg-muted border-none rounded-[1.5rem] px-5 text-sm font-bold">
                 <div className="flex items-center space-x-2">
                   <MapPin className="w-4 h-4 text-primary" />
-                  <SelectValue />
+                  <SelectValue placeholder="Select Region" />
                 </div>
               </SelectTrigger>
               <SelectContent className="rounded-2xl border-none shadow-2xl">
