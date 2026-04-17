@@ -29,9 +29,28 @@ export async function verifyProfilePhoto(input: VerifyProfileInput): Promise<Ver
 
 const verifyProfilePhotoPrompt = ai.definePrompt({
   name: 'verifyProfilePhotoPrompt',
-  model: 'googleai/gemini-1.5-flash',
   input: {schema: VerifyProfileInputSchema},
   output: {schema: VerifyProfileOutputSchema},
+  config: {
+    safetySettings: [
+      {
+        category: 'HARM_CATEGORY_HATE_SPEECH',
+        threshold: 'BLOCK_NONE',
+      },
+      {
+        category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+        threshold: 'BLOCK_NONE',
+      },
+      {
+        category: 'HARM_CATEGORY_HARASSMENT',
+        threshold: 'BLOCK_NONE',
+      },
+      {
+        category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+        threshold: 'BLOCK_NONE',
+      },
+    ],
+  },
   prompt: `You are an expert identity verification assistant. 
 Compare the person in these two photos and determine if they are the same individual.
 
@@ -59,7 +78,12 @@ const verifyProfilePhotoFlow = ai.defineFlow(
       return output;
     } catch (error: any) {
       console.error('Verification Flow Error:', error);
-      throw new Error(`AI Analysis failed: ${error.message}`);
+      // Return a safe failure object instead of throwing to prevent Next.js render errors
+      return {
+        isMatch: false,
+        confidence: 0,
+        reasoning: `Analysis interrupted: ${error.message || 'The AI service is temporarily unavailable.'}`
+      };
     }
   }
 );
