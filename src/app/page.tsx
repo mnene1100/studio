@@ -1,41 +1,19 @@
 
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUser, useFirestore } from '@/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { useUser } from '@/firebase';
 
 export default function EntryPage() {
   const router = useRouter();
-  const { user, isUserLoading } = useUser();
-  const db = useFirestore();
-  const [isRedirecting, setIsRedirecting] = useState(false);
+  const { isUserLoading } = useUser();
 
   useEffect(() => {
-    if (isUserLoading || !db || isRedirecting) return;
-
-    const checkNavigation = async () => {
-      setIsRedirecting(true);
-      if (!user) {
-        router.replace('/login');
-      } else {
-        try {
-          const userRef = doc(db, 'users', user.uid);
-          const userSnap = await getDoc(userRef);
-          if (userSnap.exists()) {
-            router.replace('/home');
-          } else {
-            router.replace('/onboarding');
-          }
-        } catch (e) {
-          router.replace('/home');
-        }
-      }
-    };
-
-    checkNavigation();
-  }, [user, isUserLoading, router, db, isRedirecting]);
+    if (isUserLoading) return;
+    // Always go to login first to stop "auto-login" and fix blinking
+    router.replace('/login');
+  }, [isUserLoading, router]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-primary">

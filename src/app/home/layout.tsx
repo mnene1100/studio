@@ -40,13 +40,14 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   const { data: profile, isLoading: isProfileLoading } = useDoc(profileRef);
 
   const fetchDiscovery = useCallback(async (silent = false) => {
-    if (!db || !user?.uid || !profile?.gender) return;
+    if (!db || !user?.uid || !profile?.gender) {
+      console.log("Skipping discovery: profile or gender missing", { hasProfile: !!profile, gender: profile?.gender });
+      return;
+    }
     if (!silent) setIsDiscoveryLoading(true);
     try {
-      // Filter for the opposite gender
       const oppositeGender = profile.gender === 'Male' ? 'Female' : 'Male';
       
-      // Removed orderBy from query to prevent Index requirement which causes empty results
       const q = query(
         collection(db, 'users'), 
         where('gender', '==', oppositeGender),
@@ -57,7 +58,6 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
       const docs = snapshot.docs
         .map(doc => ({ ...doc.data(), id: doc.id }))
         .filter(u => u.id !== user.uid)
-        // Sort in memory instead of Firestore to avoid composite index requirement
         .sort((a: any, b: any) => {
           const timeA = new Date(a.lastOnlineAt || 0).getTime();
           const timeB = new Date(b.lastOnlineAt || 0).getTime();
@@ -73,7 +73,6 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     }
   }, [db, user?.uid, profile?.gender]);
 
-  // Presence Tracking
   useEffect(() => {
     if (!db || !user?.uid) return;
     const userRef = doc(db, 'users', user.uid);
@@ -85,7 +84,6 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     return () => clearInterval(interval);
   }, [db, user?.uid]);
 
-  // Initial Discovery Fetch - Triggered once profile gender is known
   useEffect(() => {
     if (user?.uid && profile?.gender && !initialDiscoveryFetchedRef.current && db) {
       initialDiscoveryFetchedRef.current = true;

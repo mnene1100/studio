@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRouter } from 'next/navigation';
@@ -115,12 +116,12 @@ export default function HomePage() {
                     </div>
                     
                     <div className="flex items-center gap-1.5">
-                      <div className="h-5 w-fit px-2 bg-primary/60 backdrop-blur-md rounded-full border border-white/10 flex items-center shadow-sm">
+                      <div className="h-5 w-fit px-2 bg-primary/80 backdrop-blur-md rounded-full border border-white/10 flex items-center shadow-sm">
                         <span className="text-[8px] font-black text-white uppercase tracking-widest whitespace-nowrap">
                           {u.gender === 'Female' ? '♀' : '♂'} {age}
                         </span>
                       </div>
-                      <div className="h-5 w-fit px-2 bg-black/60 backdrop-blur-md rounded-full border border-white/10 flex items-center shadow-sm">
+                      <div className="h-5 w-fit px-2 bg-black/80 backdrop-blur-md rounded-full border border-white/10 flex items-center shadow-sm">
                         <span className="text-[8px] font-black text-white uppercase tracking-widest whitespace-nowrap">
                           {countryCode}
                         </span>

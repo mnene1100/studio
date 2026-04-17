@@ -1,14 +1,15 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Zap, Mail, UserPlus, Loader2 } from "lucide-react";
+import { Zap, Mail, UserPlus, Loader2, ArrowRight } from "lucide-react";
 import { useAuth, useUser, useFirestore } from '@/firebase';
 import { signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { toast } from "@/hooks/use-toast";
+import { doc, getDoc } from 'firebase/firestore';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -18,13 +19,31 @@ export default function LoginPage() {
   const router = useRouter();
   const auth = useAuth();
   const db = useFirestore();
+  const { user } = useUser();
+
+  // If already logged in, we show a "Continue" button instead of auto-redirecting
+  const [hasCheckedProfile, setHasCheckedProfile] = useState(false);
+  const [isProfileComplete, setIsProfileComplete] = useState(false);
+
+  useEffect(() => {
+    if (user && db && !hasCheckedProfile) {
+      const checkProfile = async () => {
+        const docRef = doc(db, 'users', user.uid);
+        const snap = await getDoc(docRef);
+        setIsProfileComplete(snap.exists());
+        setHasCheckedProfile(true);
+      };
+      checkProfile();
+    }
+  }, [user, db, hasCheckedProfile]);
 
   const handleFastLogin = async () => {
     if (!auth || !db) return;
     setIsLoading(true);
     try {
       await signInAnonymously(auth);
-      router.replace('/');
+      // After login, we explicitly check where to go
+      router.replace('/onboarding');
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -58,7 +77,7 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      router.replace('/');
+      router.replace('/onboarding');
     } catch (error: any) {
       toast({ 
         variant: "destructive", 
@@ -66,6 +85,14 @@ export default function LoginPage() {
         description: error.message 
       });
       setIsLoading(false);
+    }
+  };
+
+  const handleContinue = () => {
+    if (isProfileComplete) {
+      router.replace('/home');
+    } else {
+      router.replace('/onboarding');
     }
   };
 
@@ -92,8 +119,17 @@ export default function LoginPage() {
             <p className="text-white/40 font-black tracking-[0.4em] uppercase text-[9px]">Premium Communication</p>
           </div>
         </div>
+
         <div className="space-y-5">
-          {!isEmailVisible ? (
+          {user && hasCheckedProfile ? (
+            <div className="space-y-4 animate-in slide-in-from-bottom-4">
+              <p className="text-white/60 text-[10px] font-black uppercase tracking-widest mb-2">Logged in as {user.email || 'Guest'}</p>
+              <Button onClick={handleContinue} className="w-full h-16 bg-primary text-white font-black rounded-2xl uppercase tracking-widest shadow-xl active:scale-95 transition-all">
+                Continue to App <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+              <Button variant="ghost" onClick={() => auth?.signOut().then(() => setHasCheckedProfile(false))} className="text-white/40 text-[10px] uppercase tracking-widest">Switch Account</Button>
+            </div>
+          ) : !isEmailVisible ? (
             <div className="space-y-4">
               <Button onClick={() => setIsEmailVisible(true)} className="w-full h-16 bg-white text-black font-black rounded-2xl uppercase tracking-widest shadow-xl active:scale-95 transition-all">
                 <Mail className="mr-3 h-5 w-5" /> Continue With Email
