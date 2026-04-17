@@ -235,7 +235,14 @@ export default function ChatDetailPage() {
               <ChevronLeft className="w-5 h-5" />
             </Button>
             
-            <div className="flex items-center space-x-3">
+            <div 
+              className={cn("flex items-center space-x-3", !profile?.isSupport && "cursor-pointer active:opacity-70")}
+              onClick={() => {
+                if (profile && !profile.isSupport) {
+                  router.push(`/home/profile/${id}`);
+                }
+              }}
+            >
               <div className="relative">
                 <Avatar className="w-9 h-9 border border-white/20 rounded-full overflow-hidden">
                   <AvatarImage src={profile?.profilePictureUrl} className="object-cover rounded-full" />
@@ -246,7 +253,9 @@ export default function ChatDetailPage() {
                 )}
               </div>
               <div className="flex flex-col">
-                <h3 className="text-sm font-black text-white leading-tight tracking-tight">{displayName}</h3>
+                <h3 className="text-sm font-black text-white leading-tight tracking-tight">
+                  {profile?.isSupport ? "Customer Support" : displayName}
+                </h3>
                 <span className="text-[8px] font-black text-white/70 uppercase tracking-widest">{lastSeenText}</span>
               </div>
             </div>
