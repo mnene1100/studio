@@ -163,7 +163,10 @@ export default function MePage() {
             </div>
             <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-0.5">Earnings</p>
             <h3 className="text-xl font-black text-foreground mb-4 tracking-tight">{profile.earnings ?? 0}</h3>
-            <button className="w-full h-12 bg-foreground text-background rounded-full text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg">
+            <button 
+              onClick={() => router.push('/home/me/income')}
+              className="w-full h-12 bg-foreground text-background rounded-full text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-lg"
+            >
               Income
             </button>
           </div>
