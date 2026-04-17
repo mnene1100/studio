@@ -9,15 +9,16 @@ import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebas
 import { collection, query, where, limit } from 'firebase/firestore';
 
 function TransactionItem({ item }: { item: any }) {
-  const isRecharge = item.type === 'recharge';
+  // Define which types represent coins being ADDED to the wallet
+  const isAddition = ['recharge', 'income_exchange', 'check_in_bonus'].includes(item.type);
   
   return (
     <div className="bg-card rounded-[2rem] p-5 flex items-center border border-border shadow-sm">
       <div className={cn(
         "w-12 h-12 rounded-2xl flex items-center justify-center mr-4",
-        isRecharge ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-600"
+        isAddition ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-600"
       )}>
-        {isRecharge ? <ArrowUpRight className="w-6 h-6" /> : <ArrowDownLeft className="w-6 h-6" />}
+        {isAddition ? <ArrowUpRight className="w-6 h-6" /> : <ArrowDownLeft className="w-6 h-6" />}
       </div>
       
       <div className="flex-1">
@@ -29,15 +30,15 @@ function TransactionItem({ item }: { item: any }) {
             <Coins className="w-3 h-3 text-primary" />
             <span className={cn(
               "text-sm font-black tracking-tight",
-              isRecharge ? "text-green-600" : "text-red-600"
+              isAddition ? "text-green-600" : "text-red-600"
             )}>
-              {isRecharge ? '+' : '-'}{item.coins}
+              {isAddition ? '+' : '-'}{item.coins}
             </span>
           </div>
         </div>
         <div className="flex items-center justify-between">
           <p className="text-[10px] font-medium text-muted-foreground">
-            {item.description || (isRecharge ? 'Wallet Top-up' : 'Platform Deduction')}
+            {item.description || (isAddition ? 'Wallet Top-up' : 'Platform Deduction')}
           </p>
           <div className="flex items-center space-x-1 text-muted-foreground/30">
             <Clock className="w-2.5 h-2.5" />
