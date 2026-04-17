@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
@@ -80,7 +79,8 @@ export default function EditProfilePage() {
     education: '',
     horoscope: '',
     lookingFor: '',
-    profilePictureUrl: ''
+    profilePictureUrl: '',
+    isVerified: false
   });
 
   // Cropping States
@@ -109,7 +109,8 @@ export default function EditProfilePage() {
         education: profile.education || '',
         horoscope: profile.horoscope || '',
         lookingFor: profile.lookingFor || '',
-        profilePictureUrl: profile.profilePictureUrl || ''
+        profilePictureUrl: profile.profilePictureUrl || '',
+        isVerified: profile.isVerified || false
       });
     }
   }, [profile]);
@@ -117,8 +118,18 @@ export default function EditProfilePage() {
   const handleSave = () => {
     if (!db || !user?.uid) return;
 
+    // If profile picture changed and user was verified, revoke verification
+    const updateData: any = { ...formData };
+    if (profile?.isVerified && formData.profilePictureUrl !== profile.profilePictureUrl) {
+      updateData.isVerified = false;
+      toast({
+        title: "Verification Revoked",
+        description: "Profile picture change requires new identity verification.",
+      });
+    }
+
     const userRef = doc(db, 'users', user.uid);
-    updateDocumentNonBlocking(userRef, formData);
+    updateDocumentNonBlocking(userRef, updateData);
 
     toast({
       title: "Profile Updated",
@@ -181,12 +192,19 @@ export default function EditProfilePage() {
     try {
       if (!imageToCrop || !croppedAreaPixels) return;
       const croppedImage = await getCroppedImg(imageToCrop, croppedAreaPixels);
-      setFormData(prev => ({ ...prev, profilePictureUrl: croppedImage }));
+      
+      // Revoke verification immediately in local state if image is changed
+      setFormData(prev => ({ 
+        ...prev, 
+        profilePictureUrl: croppedImage,
+        isVerified: false 
+      }));
+
       setIsCropOpen(false);
       setImageToCrop(null);
       toast({
         title: "Avatar Ready",
-        description: "Your new photo has been cropped and applied.",
+        description: "New photo applied. Verification will be revoked on save.",
       });
     } catch (e) {
       console.error(e);
@@ -227,8 +245,8 @@ export default function EditProfilePage() {
       <div className="flex-1 overflow-y-auto px-6 py-8 pb-32 space-y-8">
         <div className="flex flex-col items-center">
           <div className="relative group">
-            <Avatar className="w-32 h-32 border-4 border-card shadow-2xl">
-              <AvatarImage src={formData.profilePictureUrl} className="object-cover" />
+            <Avatar className="w-32 h-32 border-4 border-card shadow-2xl overflow-hidden rounded-full">
+              <AvatarImage src={formData.profilePictureUrl} className="object-cover rounded-full" />
               <AvatarFallback className="bg-primary/10 text-primary font-black text-2xl">
                 {formData.displayName?.substring(0, 2).toUpperCase()}
               </AvatarFallback>
@@ -247,7 +265,9 @@ export default function EditProfilePage() {
               onChange={handleFileChange} 
             />
           </div>
-          <p className="mt-4 text-[9px] font-black text-muted-foreground uppercase tracking-widest italic">Tap camera to change avatar</p>
+          <p className="mt-4 text-[9px] font-black text-muted-foreground uppercase tracking-widest italic">
+            {formData.isVerified ? "Changing photo revokes verification" : "Tap camera to change avatar"}
+          </p>
         </div>
 
         <div className="space-y-6">
