@@ -39,9 +39,9 @@ export default function OnboardingPage() {
   const [isCheckingProfile, setIsCheckingProfile] = useState(true);
   const [formData, setFormData] = useState({
     displayName: '',
-    gender: '', // No default
-    dob: '',    // No default
-    country: '' // No default
+    gender: '', 
+    dob: '',    
+    country: '' 
   });
 
   const isFastLogin = user?.isAnonymous;
@@ -80,18 +80,21 @@ export default function OnboardingPage() {
   const handleComplete = async () => {
     if (!db || !user?.uid) return;
     
-    if (!isFastLogin && !formData.displayName.trim()) {
-      toast({ variant: "destructive", title: "Missing Name", description: "Please enter your display name." });
-      return;
+    // Validation for Email Login
+    if (!isFastLogin) {
+      if (!formData.displayName.trim()) {
+        toast({ variant: "destructive", title: "Missing Name", description: "Please enter your display name." });
+        return;
+      }
+      if (!formData.dob) {
+        toast({ variant: "destructive", title: "Selection Required", description: "Please enter your date of birth." });
+        return;
+      }
     }
 
+    // Common Validation
     if (!formData.gender) {
       toast({ variant: "destructive", title: "Selection Required", description: "Please select your gender." });
-      return;
-    }
-
-    if (!formData.dob) {
-      toast({ variant: "destructive", title: "Selection Required", description: "Please enter your date of birth." });
       return;
     }
 
@@ -109,10 +112,20 @@ export default function OnboardingPage() {
         ? `Guest_${numericId.substring(0, 4)}` 
         : formData.displayName.trim();
 
+      // Generate random DOB for Fast Login (18-40 years old)
+      const finalDob = isFastLogin 
+        ? (() => {
+            const year = new Date().getFullYear() - 18 - Math.floor(Math.random() * 22);
+            const month = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+            const day = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+          })()
+        : formData.dob;
+
       const profileData = {
         displayName: finalDisplayName,
         gender: formData.gender,
-        dob: formData.dob,
+        dob: finalDob,
         country: formData.country,
         id: user.uid,
         numericId,
