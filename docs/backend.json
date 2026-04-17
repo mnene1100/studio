@@ -15,13 +15,13 @@
           "type": "string",
           "description": "A unique 7-9 digit numeric ID assigned to the user during onboarding, displayed on their 'Me' screen."
         },
-        "username": {
+        "displayName": {
           "type": "string",
           "description": "The user's chosen display name or alias within the application."
         },
         "email": {
           "type": "string",
-          "description": "The user's email address, used for identification and contact purposes (not for storing authentication system passwords).",
+          "description": "The user's email address, used for identification and contact purposes.",
           "format": "email"
         },
         "profilePictureUrl": {
@@ -29,46 +29,51 @@
           "description": "URL to the user's profile image or avatar.",
           "format": "uri"
         },
-        "bio": {
+        "statusMessage": {
           "type": "string",
           "description": "A short biographical description provided by the user."
         },
-        "status": {
+        "gender": {
           "type": "string",
-          "description": "The user's current online presence status (e.g., 'online', 'away', 'do not disturb')."
+          "enum": ["Male", "Female"]
         },
-        "lastActiveAt": {
+        "dob": {
           "type": "string",
-          "description": "Timestamp indicating the last time the user was active in the application.",
+          "format": "date"
+        },
+        "country": {
+          "type": "string"
+        },
+        "balance": {
+          "type": "number",
+          "description": "Current NX coin balance."
+        },
+        "earnings": {
+          "type": "number",
+          "description": "Current diamond earnings."
+        },
+        "lastOnlineAt": {
+          "type": "string",
           "format": "date-time"
         },
         "createdAt": {
           "type": "string",
-          "description": "Timestamp when the user profile was initially created.",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp when the user profile was last updated.",
           "format": "date-time"
         },
         "isAdmin": {
-          "type": "boolean",
-          "description": "Indicates if the user has administrative privileges."
+          "type": "boolean"
         },
         "isCoinSeller": {
-          "type": "boolean",
-          "description": "Indicates if the user is an authorized coin vendor."
+          "type": "boolean"
         },
         "isSupport": {
-          "type": "boolean",
-          "description": "Indicates if the user is a customer support representative."
+          "type": "boolean"
         }
       },
       "required": [
         "id",
         "numericId",
-        "username",
+        "displayName",
         "email",
         "createdAt"
       ]
@@ -77,48 +82,37 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "ChatRoom",
       "type": "object",
-      "description": "Represents a single conversation thread, which can be a one-on-one direct message or a group chat.",
+      "description": "Represents a single conversation thread.",
       "properties": {
         "id": {
-          "type": "string",
-          "description": "Unique identifier for the ChatRoom entity."
+          "type": "string"
         },
         "type": {
           "type": "string",
-          "description": "The type of chat room (e.g., 'oneOnOne' for direct messages, 'group' for multiple participants)."
+          "enum": ["private", "group"]
         },
-        "name": {
-          "type": "string",
-          "description": "The name of the chat room (e.g., group chat name). Optional for one-on-one chats."
-        },
-        "memberIds": {
+        "participantIds": {
           "type": "array",
-          "description": "References to UserProfile IDs who are members of this chat room. (Relationship: UserProfile N:N ChatRoom)",
           "items": {
             "type": "string"
           }
         },
+        "lastMessageContent": {
+          "type": "string"
+        },
         "lastMessageSentAt": {
           "type": "string",
-          "description": "Timestamp of the most recent message sent in this chat room.",
-          "format": "date-time"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp when the chat room was initially created.",
           "format": "date-time"
         },
         "updatedAt": {
           "type": "string",
-          "description": "Timestamp when the chat room's metadata was last updated (e.g., last message activity).",
           "format": "date-time"
         }
       },
       "required": [
         "id",
         "type",
-        "memberIds",
-        "createdAt"
+        "participantIds"
       ]
     },
     "Message": {
@@ -128,44 +122,30 @@
       "description": "Represents a single message sent within a ChatRoom.",
       "properties": {
         "id": {
-          "type": "string",
-          "description": "Unique identifier for the Message entity."
+          "type": "string"
         },
-        "chatRoomId": {
-          "type": "string",
-          "description": "Reference to the ChatRoom where this message was sent. (Relationship: ChatRoom 1:N Message)"
+        "chatId": {
+          "type": "string"
         },
         "senderId": {
-          "type": "string",
-          "description": "Reference to the UserProfile who sent this message. (Relationship: UserProfile 1:N Message)"
+          "type": "string"
         },
         "content": {
-          "type": "string",
-          "description": "The actual text content of the message."
-        },
-        "type": {
-          "type": "string",
-          "description": "The type of content in the message (e.g., 'text', 'image', 'video', 'voice', 'system')."
+          "type": "string"
         },
         "sentAt": {
           "type": "string",
-          "description": "Timestamp when the message was sent.",
           "format": "date-time"
         },
-        "readByMemberIds": {
-          "type": "array",
-          "description": "References to UserProfile IDs who have read this message. Applicable for group chats or read receipts.",
-          "items": {
-            "type": "string"
-          }
+        "type": {
+          "type": "string",
+          "enum": ["text", "image", "voice"]
         }
       },
       "required": [
-        "id",
-        "chatRoomId",
+        "chatId",
         "senderId",
         "content",
-        "type",
         "sentAt"
       ]
     },
@@ -173,105 +153,44 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Call",
       "type": "object",
-      "description": "Represents a record of a voice or video call initiated within the NEXO application.",
+      "description": "Represents a record of a voice or video call.",
       "properties": {
         "id": {
-          "type": "string",
-          "description": "Unique identifier for the Call entity."
-        },
-        "chatRoomId": {
-          "type": "string",
-          "description": "Reference to the ChatRoom associated with this call, if initiated from one. (Relationship: ChatRoom 1:N Call)"
+          "type": "string"
         },
         "callerId": {
-          "type": "string",
-          "description": "Reference to the UserProfile who initiated the call. (Relationship: UserProfile 1:N Call)"
+          "type": "string"
         },
         "participantIds": {
           "type": "array",
-          "description": "References to UserProfile IDs who participated in this call. (Relationship: UserProfile N:N Call)",
           "items": {
             "type": "string"
           }
         },
         "type": {
           "type": "string",
-          "description": "The type of call (e.g., 'voice' or 'video')."
+          "enum": ["voice", "video"]
         },
         "startTime": {
           "type": "string",
-          "description": "Timestamp when the call started.",
           "format": "date-time"
         },
         "endTime": {
           "type": "string",
-          "description": "Timestamp when the call ended. Null if the call is ongoing or was missed/declined.",
           "format": "date-time"
         },
-        "durationSeconds": {
-          "type": "number",
-          "description": "The duration of the call in seconds."
-        },
         "status": {
-          "type": "string",
-          "description": "The current status or final outcome of the call (e.g., 'ringing', 'ongoing', 'ended', 'missed', 'declined')."
+          "type": "string"
+        },
+        "durationSeconds": {
+          "type": "number"
         }
       },
       "required": [
-        "id",
         "callerId",
         "participantIds",
         "type",
-        "startTime",
-        "status"
-      ]
-    },
-    "AIRecommendation": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "AIRecommendation",
-      "type": "object",
-      "description": "Stores intelligent suggestions generated by the AI assistant, based on chat history, to enhance user interaction.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the AIRecommendation entity."
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to the UserProfile for whom this recommendation is generated. (Relationship: UserProfile 1:N AIRecommendation)"
-        },
-        "chatRoomId": {
-          "type": "string",
-          "description": "Optional reference to the ChatRoom this recommendation is associated with, if it's chat-specific. (Relationship: ChatRoom 1:N AIRecommendation)"
-        },
-        "type": {
-          "type": "string",
-          "description": "The category of the recommendation (e.g., 'conversationStarter', 'importantMessageHighlight', 'contactSuggestion')."
-        },
-        "content": {
-          "type": "string",
-          "description": "The actual suggested text or action provided by the AI assistant."
-        },
-        "relatedMessageId": {
-          "type": "string",
-          "description": "Optional reference to a specific Message that prompted or is related to this recommendation. (Relationship: Message 1:N AIRecommendation)"
-        },
-        "suggestedAt": {
-          "type": "string",
-          "description": "Timestamp when the AI recommendation was generated.",
-          "format": "date-time"
-        },
-        "isDismissed": {
-          "type": "boolean",
-          "description": "Indicates whether the user has dismissed or acted upon this recommendation."
-        }
-      },
-      "required": [
-        "id",
-        "userId",
-        "type",
-        "content",
-        "suggestedAt"
+        "startTime"
       ]
     }
   },
@@ -290,13 +209,7 @@
           "schema": {
             "$ref": "#/backend/entities/UserProfile"
           },
-          "description": "Stores individual user profiles. Access is restricted to the user whose ID matches `userId` in the path. The document's 'id' field is expected to match 'userId' and 'request.auth.uid'.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique ID of the user, matching 'request.auth.uid'."
-            }
-          ]
+          "description": "Stores individual user profiles."
         }
       },
       {
@@ -306,13 +219,7 @@
           "schema": {
             "$ref": "#/backend/entities/ChatRoom"
           },
-          "description": "Represents individual chat conversations (one-on-one or group). Access is restricted to members of the chat. The document includes a denormalized 'members' map (e.g., `{userId1: true, userId2: true}`) derived from 'memberIds' for authorization independence and efficient querying by current user's membership.",
-          "params": [
-            {
-              "name": "chatRoomId",
-              "description": "The unique ID of the chat room."
-            }
-          ]
+          "description": "Represents individual chat conversations."
         }
       },
       {
@@ -322,17 +229,7 @@
           "schema": {
             "$ref": "#/backend/entities/Message"
           },
-          "description": "Stores individual messages within a specific chat room. Access is restricted to members of the parent chat room. Each message document must include a denormalized 'members' map (copied from the parent `ChatRoom` document) for authorization independence.",
-          "params": [
-            {
-              "name": "chatRoomId",
-              "description": "The unique ID of the parent chat room."
-            },
-            {
-              "name": "messageId",
-              "description": "The unique ID of the message."
-            }
-          ]
+          "description": "Stores individual messages within a specific chat room."
         }
       },
       {
@@ -342,36 +239,26 @@
           "schema": {
             "$ref": "#/backend/entities/Call"
           },
-          "description": "Records details of voice or video calls. Access is restricted to participants of the call. The document includes a denormalized 'participants' map (e.g., `{userId1: true, userId2: true}`) derived from 'participantIds' for authorization independence and efficient querying by current user's participation.",
-          "params": [
-            {
-              "name": "callId",
-              "description": "The unique ID of the call record."
-            }
-          ]
+          "description": "Records details of voice or video calls."
         }
       },
       {
-        "path": "/users/{userId}/aiRecommendations/{recommendationId}",
+        "path": "/transactions/{transId}",
         "definition": {
-          "entityName": "AIRecommendation",
+          "entityName": "Transaction",
           "schema": {
-            "$ref": "#/backend/entities/AIRecommendation"
-          },
-          "description": "Stores AI-generated recommendations specific to a user. Access is restricted solely to the user identified by 'userId' in the path. The document's 'userId' field is expected to match the path's 'userId' for data integrity.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique ID of the user to whom the recommendation belongs."
-            },
-            {
-              "name": "recommendationId",
-              "description": "The unique ID of the AI recommendation."
+            "type": "object",
+            "properties": {
+              "userId": { "type": "string" },
+              "coins": { "type": "number" },
+              "type": { "type": "string" },
+              "status": { "type": "string" },
+              "createdAt": { "type": "string", "format": "date-time" }
             }
-          ]
+          },
+          "description": "Stores financial transactions for wallet tracking."
         }
       }
-    ],
-    "reasoning": "The recommended Firestore structure for the NEXO application prioritizes Authorization Independence, Structural Segregation, and Access Modeling to ensure robust security rules, scalability, and debuggability. All data related to a user's private space (profile, AI recommendations) is nested under `/users/{userId}`. Collaborative data like chat rooms and calls are placed in top-level collections (`/chatRooms`, `/calls`) to allow for flexible queries across users, with necessary authorization context denormalized directly into the documents.\n\n**Authorization Independence:** This is achieved by explicitly including authorization-relevant data within each document, eliminating the need for `get()` calls in security rules. For user profiles and AI recommendations, the `userId` in the path (`/users/{userId}/...`) directly serves as the authorization context, matching `request.auth.uid`. For collaborative entities like `ChatRoom`, `Message`, and `Call`, a dedicated authorization map (`members` or `participants`) will be present on each document. For instance, `ChatRoom` documents will contain a `members: { [uid]: true }` map (derived from `memberIds`) allowing direct `request.auth.uid in resource.data.members` checks. Similarly, `Message` documents will denormalize the `members` map from their parent `ChatRoom` and `Call` documents will include a `participants: { [uid]: true }` map (derived from `participantIds`). This ensures that the complete authorization logic is available within the `resource.data` of the document being accessed, avoiding expensive and problematic cross-document reads.\n\n**QAPs (Rules are not Filters):** The structure facilitates secure `list` operations (Query as Permission) by using denormalized authorization maps. For example, to list a user's chat rooms, a client can query `db.collection('chatRooms').where(`members.${request.auth.uid}`, '==', true)`. Similarly, a user can list their calls using `db.collection('calls').where(`participants.${request.auth.uid}`, '==', true)`. This allows Firestore's indexing to efficiently filter documents before security rules are applied, ensuring that clients only request data they are authorized to see, thus enforcing QAPs. Private user data like `AIRecommendation` is naturally scoped by the `/users/{userId}` path, making `list` operations naturally secure to the requesting user. Structural Segregation ensures that each collection maintains a homogeneous security posture, simplifying rule sets and preventing accidental data exposure.\n\n**Regional Deployment:** The choice of `Africa-south1` as the Firestore location is an infrastructure detail and does not impact the logical data structure design, which remains optimized for security, scalability, and performance regardless of the region."
+    ]
   }
 }
