@@ -3,7 +3,6 @@
 
 /**
  * @fileOverview Server Actions for PesaPal V3 Integration.
- * Updated for Production (Live) environment with background IPN support.
  */
 
 interface PesapalOrderInput {
@@ -16,41 +15,35 @@ interface PesapalOrderInput {
   callbackUrl: string;
 }
 
-export async function createPesapalOrder(input: PesapalOrderInput) {
+async function getPesapalToken() {
   const consumerKey = process.env.PESAPAL_CONSUMER_KEY;
   const consumerSecret = process.env.PESAPAL_CONSUMER_SECRET;
   const baseUrl = process.env.PESAPAL_BASE_URL || 'https://pay.pesapal.com/v3';
 
-  if (!consumerKey || !consumerSecret) {
-    throw new Error('PesaPal credentials are not configured on the server.');
-  }
+  const authResponse = await fetch(`${baseUrl}/api/Auth/RequestToken`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify({
+      consumer_key: consumerKey,
+      consumer_secret: consumerSecret,
+    }),
+  });
+
+  const authData = await authResponse.json();
+  return authData.token;
+}
+
+export async function createPesapalOrder(input: PesapalOrderInput) {
+  const baseUrl = process.env.PESAPAL_BASE_URL || 'https://pay.pesapal.com/v3';
 
   try {
-    // 1. Get Authentication Token
-    const authResponse = await fetch(`${baseUrl}/api/Auth/RequestToken`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify({
-        consumer_key: consumerKey,
-        consumer_secret: consumerSecret,
-      }),
-    });
+    const token = await getPesapalToken();
+    if (!token) throw new Error('PesaPal Auth Failed');
 
-    const authData = await authResponse.json();
-    if (!authData.token) {
-      console.error('PesaPal Auth Error:', authData);
-      throw new Error('Failed to authenticate with PesaPal.');
-    }
-
-    const token = authData.token;
-
-    // 2. Register IPN (Background confirmation URL)
-    // The IPN URL should be your app's base URL + /api/pesapal/ipn
     const ipnUrl = new URL(input.callbackUrl).origin + '/api/pesapal/ipn';
-    
     const ipnResponse = await fetch(`${baseUrl}/api/URLSetup/RegisterIPN`, {
       method: 'POST',
       headers: {
@@ -67,7 +60,6 @@ export async function createPesapalOrder(input: PesapalOrderInput) {
     const ipnData = await ipnResponse.json();
     const ipnId = ipnData.ipn_id;
 
-    // 3. Submit Order Request
     const merchantReference = `NEXO_${Date.now()}`;
     const orderResponse = await fetch(`${baseUrl}/api/Transactions/SubmitOrderRequest`, {
       method: 'POST',
@@ -85,7 +77,7 @@ export async function createPesapalOrder(input: PesapalOrderInput) {
         notification_id: ipnId,
         billing_address: {
           email_address: input.email,
-          phone_number: input.phoneNumber || "", // Left blank so PesaPal prompts the user
+          phone_number: input.phoneNumber || "",
           country_code: 'KE',
           first_name: input.firstName,
           last_name: input.lastName,
@@ -94,20 +86,32 @@ export async function createPesapalOrder(input: PesapalOrderInput) {
     });
 
     const orderData = await orderResponse.json();
-    
-    if (orderData.redirect_url) {
-      return { 
-        redirectUrl: orderData.redirect_url, 
-        orderTrackingId: orderData.order_tracking_id,
-        merchantReference: merchantReference
-      };
-    } else {
-      console.error('PesaPal Order Error:', orderData);
-      throw new Error(orderData.message || 'Failed to initiate PesaPal transaction.');
-    }
-
+    return { 
+      redirectUrl: orderData.redirect_url, 
+      orderTrackingId: orderData.order_tracking_id,
+      merchantReference: merchantReference
+    };
   } catch (error: any) {
-    console.error('PesaPal Integration Error:', error);
+    console.error('PesaPal Error:', error);
     throw error;
+  }
+}
+
+export async function getTransactionStatus(orderTrackingId: string) {
+  const baseUrl = process.env.PESAPAL_BASE_URL || 'https://pay.pesapal.com/v3';
+  
+  try {
+    const token = await getPesapalToken();
+    const response = await fetch(`${baseUrl}/api/Transactions/GetTransactionStatus?orderTrackingId=${orderTrackingId}`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      }
+    });
+    return await response.json();
+  } catch (error) {
+    console.error('Check Status Error:', error);
+    return null;
   }
 }
