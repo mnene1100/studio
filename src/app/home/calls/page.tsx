@@ -46,7 +46,7 @@ function CallItem({ call }: { call: any }) {
   }, [call.status, isCaller]);
 
   return (
-    <div className="flex items-center px-4 py-4 rounded-[2.5rem] bg-card/50 shadow-sm mb-2 mx-2 border border-transparent">
+    <div className="flex items-center px-6 py-4 border-b border-border/40 last:border-0 relative bg-background">
       <Avatar className="w-14 h-14 border-none shadow-sm overflow-hidden">
         <AvatarImage src={profile?.profilePictureUrl} className="object-cover rounded-full" />
         <AvatarFallback className="bg-primary/10 text-primary font-black rounded-full">
@@ -66,7 +66,7 @@ function CallItem({ call }: { call: any }) {
         </div>
       </div>
       <div className="flex space-x-1">
-        <div className="p-3 bg-muted rounded-2xl">
+        <div className="p-3 bg-muted/50 rounded-2xl">
           {call.type === 'video' ? <Video className="w-5 h-5 text-foreground" /> : <Phone className="w-5 h-5 text-foreground" />}
         </div>
       </div>
@@ -104,13 +104,13 @@ export default function CallsPage() {
         <h1 className="text-3xl font-black italic tracking-tight text-white uppercase">Calls</h1>
       </header>
 
-      <div className="flex-1 overflow-y-auto px-2 pt-4">
+      <div className="flex-1 overflow-y-auto bg-background">
         {isLoading ? (
           <div className="flex justify-center pt-20">
             <Loader2 className="w-8 h-8 text-primary animate-spin" />
           </div>
         ) : sortedCalls.length > 0 ? (
-          <div className="space-y-1">
+          <div className="divide-y divide-border/40">
             {sortedCalls.map((call) => (
               <CallItem key={call.id} call={call} />
             ))}

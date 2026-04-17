@@ -72,7 +72,7 @@ function ChatListItem({ chat }: { chat: any }) {
         onPointerUp={handleLongPressEnd}
         onPointerLeave={handleLongPressEnd}
         onContextMenu={(e) => e.preventDefault()}
-        className="flex items-center px-4 py-4 rounded-[2.5rem] mb-2 mx-2 bg-card/50 shadow-sm relative overflow-hidden touch-none select-none no-underline border border-transparent"
+        className="flex items-center px-6 py-4 relative overflow-hidden touch-none select-none no-underline border-b border-border/40 last:border-0"
         style={{ WebkitTouchCallout: 'none' }}
       >
         <div className="relative">
@@ -168,7 +168,7 @@ export default function ChatListPage() {
         </button>
       </header>
 
-      <div className="flex-1 px-2 pt-4 bg-background">
+      <div className="flex-1 bg-background">
         {isChatsLoading ? (
           <div className="flex flex-col items-center justify-center pt-32">
              <div className="flex flex-col items-center space-y-4 animate-in fade-in zoom-in duration-1000">
