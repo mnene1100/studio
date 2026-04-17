@@ -1,14 +1,13 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Zap, Mail, UserPlus, Loader2 } from "lucide-react";
 import { useAuth, useUser, useFirestore } from '@/firebase';
 import { signInAnonymously, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
 import { toast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
@@ -19,14 +18,12 @@ export default function LoginPage() {
   const router = useRouter();
   const auth = useAuth();
   const db = useFirestore();
-  const { user, isUserLoading } = useUser();
 
   const handleFastLogin = async () => {
     if (!auth || !db) return;
     setIsLoading(true);
     try {
       await signInAnonymously(auth);
-      // Let the root router decide where to go (Onboarding for new, Home for existing)
       router.replace('/');
     } catch (error: any) {
       toast({
@@ -74,8 +71,20 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-black relative overflow-hidden">
+      {/* Background Video */}
+      <video 
+        src="/background.mp4" 
+        autoPlay 
+        muted 
+        loop 
+        playsInline 
+        className="absolute inset-0 w-full h-full object-cover z-0" 
+      />
+      
+      {/* Dark Overlay for Readability */}
       <div className="absolute inset-0 bg-black/60 z-[1]" />
-      <div className="w-full max-w-sm space-y-16 text-center z-10">
+
+      <div className="w-full max-w-sm space-y-16 text-center z-10 relative">
         <div className="space-y-6 animate-in fade-in zoom-in duration-700">
           <div className="mx-auto w-24 h-24 bg-primary rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-primary/30 rotate-12">
             <Zap className="text-white w-12 h-12" />
