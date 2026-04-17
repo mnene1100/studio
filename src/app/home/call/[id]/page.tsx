@@ -63,11 +63,32 @@ export default function CallPage() {
       durationSeconds = Math.floor((endTime - startTimeRef.current) / 1000);
     }
     
-    if (callIdRef.current && db) {
+    if (callIdRef.current && db && currentUser && targetUserId) {
+      // 1. Update Call Document
       updateDocumentNonBlocking(doc(db, 'calls', callIdRef.current), {
         status: status,
         endTime: new Date(endTime).toISOString(),
         durationSeconds: durationSeconds
+      });
+
+      // 2. Sync Status to Chat Room so it appears in Chat List
+      const channelName = [currentUser.uid, targetUserId].sort().join('_');
+      const chatRef = doc(db, 'chatRooms', channelName);
+      
+      let previewText = "";
+      if (status === 'rejected') previewText = "Call Rejected";
+      else if (status === 'cancelled') previewText = "Missed Call";
+      else {
+        const mins = Math.floor(durationSeconds / 60);
+        const secs = durationSeconds % 60;
+        previewText = `${callType === 'video' ? 'Video' : 'Voice'} Call [${mins}:${secs.toString().padStart(2, '0')}]`;
+      }
+
+      updateDocumentNonBlocking(chatRef, {
+        updatedAt: new Date(endTime).toISOString(),
+        lastMessageSentAt: new Date(endTime).toISOString(),
+        lastMessageContent: previewText,
+        hiddenBy: {}
       });
     }
     router.back();
