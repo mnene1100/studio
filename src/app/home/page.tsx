@@ -106,10 +106,19 @@ export default function HomePage() {
                       <h4 className="text-[14px] font-black text-white truncate tracking-tight">{u.displayName?.toLowerCase() || 'guest'}</h4>
                       {u.isVerified && <UserCheck className="w-3.5 h-3.5 text-primary fill-primary" />}
                     </div>
-                    <div className="h-5 w-fit px-2 bg-primary/30 backdrop-blur-md rounded-full border border-primary/40 flex items-center">
-                      <span className="text-[9px] font-black text-white uppercase">
-                        {u.gender === 'Female' ? '♀' : '♂'} {age} • {u.country?.toUpperCase() || 'KE'}
-                      </span>
+                    
+                    {/* Separate Badges with individual backgrounds */}
+                    <div className="flex items-center gap-1.5">
+                      <div className="h-5 w-fit px-2 bg-primary/40 backdrop-blur-md rounded-full border border-white/10 flex items-center shadow-sm">
+                        <span className="text-[8px] font-black text-white uppercase tracking-widest whitespace-nowrap">
+                          {u.gender === 'Female' ? '♀' : '♂'} {age}
+                        </span>
+                      </div>
+                      <div className="h-5 w-fit px-2 bg-black/40 backdrop-blur-md rounded-full border border-white/10 flex items-center shadow-sm">
+                        <span className="text-[8px] font-black text-white uppercase tracking-widest whitespace-nowrap">
+                          {u.country?.toUpperCase() || 'KE'}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
