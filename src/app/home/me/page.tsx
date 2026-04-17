@@ -6,11 +6,11 @@ import { useRouter } from 'next/navigation';
 import { 
   ShieldCheck, Headset, ChevronRight, Copy, 
   Eye, Pencil, Coins, Diamond, Settings, UserCheck,
-  Gift, Users
+  Gift, Users, Sparkles
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useHomeData } from '../layout';
-import Image from 'next/image';
+import Image from 'image';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 
@@ -205,6 +205,32 @@ export default function MePage() {
               <ChevronRight className="w-5 h-5 text-muted-foreground" />
             </button>
           )}
+        </div>
+      )}
+
+      {/* Agency Section for Female Users */}
+      {profile.gender === 'Female' && (
+        <div className="px-6 mt-12 space-y-4">
+          <div className="flex items-center space-x-4 mb-2">
+            <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] whitespace-nowrap">Agency</h3>
+            <div className="h-[1px] w-full bg-border" />
+          </div>
+
+          <button 
+            onClick={() => {
+              toast({
+                title: "Application Received",
+                description: "Our agency recruitment team will review your profile shortly.",
+              });
+            }}
+            className="w-full flex items-center p-5 bg-gradient-to-r from-pink-500/5 to-primary/5 border border-primary/20 rounded-[1.75rem] shadow-sm active:scale-[0.98] transition-all group"
+          >
+            <div className="w-10 h-10 bg-pink-500/10 rounded-xl flex items-center justify-center mr-4">
+              <Sparkles className="w-6 h-6 text-pink-500" />
+            </div>
+            <span className="flex-1 text-left font-black text-foreground text-base tracking-tight">Join Agency</span>
+            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+          </button>
         </div>
       )}
 
