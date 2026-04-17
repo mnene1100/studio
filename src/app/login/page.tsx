@@ -70,8 +70,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-black relative overflow-hidden">
-      {/* Background Video */}
+    <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-zinc-950 relative overflow-hidden">
       <video 
         src="/background.mp4" 
         autoPlay 
@@ -81,7 +80,6 @@ export default function LoginPage() {
         className="absolute inset-0 w-full h-full object-cover z-0" 
       />
       
-      {/* Dark Overlay for Readability */}
       <div className="absolute inset-0 bg-black/60 z-[1]" />
 
       <div className="w-full max-w-sm space-y-16 text-center z-10 relative">

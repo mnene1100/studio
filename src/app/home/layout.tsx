@@ -82,16 +82,18 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   }, [user?.uid, db, fetchDiscovery]);
 
   useEffect(() => {
-    if (isAuthLoading || isProfileLoading) return;
+    if (isAuthLoading) return;
     if (!user) {
       router.replace('/login');
     }
-  }, [user, profile, isAuthLoading, isProfileLoading, router]);
+  }, [user, isAuthLoading, router]);
 
-  if (isAuthLoading || isProfileLoading) {
+  // If we are still determining if a user exists at all, or if we have a user but no profile yet
+  // only show splash if we absolutely have to.
+  if (isAuthLoading || (user && isProfileLoading)) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background premium-gradient">
-        <div className="flex flex-col items-center space-y-4 animate-in fade-in zoom-in duration-1000">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-primary">
+        <div className="flex flex-col items-center space-y-4">
           <h1 className="text-6xl text-white font-['Pacifico'] font-light tracking-tight">NEXO</h1>
           <p className="text-white/40 font-black tracking-[0.4em] uppercase text-[10px] animate-pulse">Premium Communication</p>
         </div>
