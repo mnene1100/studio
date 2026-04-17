@@ -1,10 +1,9 @@
-
 "use client";
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageSquare, MessageCircle, Loader2, Trash2 } from "lucide-react";
+import { MessageSquare, MessageCircle, Trash2 } from "lucide-react";
 import { useUser, useFirestore, useDoc, useMemoFirebase, useCollection, updateDocumentNonBlocking } from '@/firebase';
 import { doc, collection, query, where } from 'firebase/firestore';
 import {
@@ -42,7 +41,7 @@ function ChatListItem({ chat }: { chat: any }) {
   const handleLongPressStart = () => {
     longPressTimer.current = setTimeout(() => {
       setShowDeleteDialog(true);
-    }, 600); // 600ms for long press
+    }, 600);
   };
 
   const handleLongPressEnd = () => {
@@ -71,10 +70,12 @@ function ChatListItem({ chat }: { chat: any }) {
         onPointerDown={handleLongPressStart}
         onPointerUp={handleLongPressEnd}
         onPointerLeave={handleLongPressEnd}
-        className="flex items-center px-4 py-4 rounded-[2.5rem] active:bg-accent/50 transition-all group border border-transparent mb-2 mx-2 bg-card/50 shadow-sm relative overflow-hidden touch-none"
+        onContextMenu={(e) => e.preventDefault()}
+        className="flex items-center px-4 py-4 rounded-[2.5rem] active:bg-accent/50 transition-all group border border-transparent mb-2 mx-2 bg-card/50 shadow-sm relative overflow-hidden touch-none select-none no-underline"
+        style={{ WebkitTouchCallout: 'none' }}
       >
         <div className="relative">
-          <Avatar className="w-14 h-14 rounded-full border-none shadow-sm overflow-hidden">
+          <Avatar className="w-14 h-14 rounded-full border-none shadow-sm overflow-hidden pointer-events-none">
             <AvatarImage src={profile?.profilePictureUrl} className="object-cover rounded-full" />
             <AvatarFallback className="bg-muted text-lg font-bold rounded-full">
               <MessageCircle className="w-6 h-6 text-primary" />
@@ -85,7 +86,7 @@ function ChatListItem({ chat }: { chat: any }) {
           )}
         </div>
         
-        <div className="ml-4 flex-1">
+        <div className="ml-4 flex-1 pointer-events-none">
           <div className="flex items-center justify-between mb-0.5">
             <h3 className="font-bold text-foreground text-sm tracking-tight">{profile?.displayName || 'Loading...'}</h3>
             <span className="text-[10px] font-bold text-muted-foreground">
@@ -138,15 +139,12 @@ export default function ChatListPage() {
 
   const filteredAndSortedChats = (chats || [])
     .filter(chat => {
-      // Must have at least one message
       if (!chat.lastMessageSentAt) return false;
       
-      // Hide if the user "deleted" it recently
       const hideTime = chat.hiddenBy?.[user?.uid || ''];
       if (hideTime) {
         const lastMsgTime = new Date(chat.lastMessageSentAt).getTime();
         const hideTimestamp = new Date(hideTime).getTime();
-        // Only show if a NEW message arrived after the hide action
         return lastMsgTime > hideTimestamp;
       }
       return true;
