@@ -104,7 +104,7 @@ export default function MePage() {
         </button>
 
         <div className="relative mb-4 mt-6">
-          <div className="w-28 h-28 relative rounded-full overflow-hidden shadow-2xl bg-white/10 border-4 border-white/10">
+          <div className="w-28 h-28 relative rounded-full overflow-hidden shadow-2xl bg-white/10">
             {profile.profilePictureUrl ? (
               <Image 
                 src={profile.profilePictureUrl} 

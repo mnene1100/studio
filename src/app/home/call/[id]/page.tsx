@@ -369,12 +369,10 @@ export default function CallPage() {
       {callType === 'video' && (
         <div 
           className={cn(
-            "absolute z-40 transition-all duration-500 rounded-[2.5rem] overflow-hidden border-4 border-white/20 shadow-2xl bg-black ring-8 ring-black/50 aspect-square",
-            isMinimized ? "bottom-44 right-6 w-32 h-32" : "top-24 right-6 w-64 h-64",
+            "fixed z-40 transition-all duration-500 rounded-3xl overflow-hidden shadow-2xl bg-black aspect-[3/4] top-24 right-6 w-24",
             !cameraOn ? "opacity-0 pointer-events-none" : "opacity-100"
           )}
           ref={localVideoRef}
-          onClick={() => setIsMinimized(!isMinimized)}
         />
       )}
 
