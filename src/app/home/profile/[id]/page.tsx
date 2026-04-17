@@ -8,7 +8,7 @@ import { doc } from 'firebase/firestore';
 import { Button } from "@/components/ui/button";
 import { 
   ChevronLeft, MessageCircle, Loader2, 
-  MoreVertical, ShieldAlert, Ban, Flag
+  MoreVertical, ShieldAlert, Ban, Flag, Copy
 } from "lucide-react";
 import { 
   DropdownMenu, 
@@ -68,6 +68,51 @@ export default function UserProfilePage() {
       title: "Report Received",
       description: "Our moderation team will review this profile shortly.",
     });
+  };
+
+  const copyId = async () => {
+    if (profile?.numericId) {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(profile.numericId);
+          toast({
+            title: "Copied ID",
+            description: `ID ${profile.numericId} copied successfully.`,
+          });
+        } else {
+          throw new Error("Clipboard API unavailable");
+        }
+      } catch (err) {
+        const textArea = document.createElement("textarea");
+        textArea.value = profile.numericId;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        textArea.style.top = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+          const successful = document.execCommand('copy');
+          if (successful) {
+            toast({
+              title: "Copied ID",
+              description: `ID ${profile.numericId} copied successfully.`,
+            });
+          } else {
+            throw new Error('Copy command was unsuccessful');
+          }
+        } catch (copyErr) {
+          console.error('Fallback copy failed:', copyErr);
+          toast({
+            variant: "destructive",
+            title: "Copy Failed",
+            description: "Please manually copy the ID.",
+          });
+        }
+        document.body.removeChild(textArea);
+      }
+    }
   };
 
   if (isLoading) {
@@ -150,7 +195,17 @@ export default function UserProfilePage() {
           </div>
         </div>
 
-        <h1 className="text-2xl font-black text-foreground tracking-tight mb-1">{profile.displayName}</h1>
+        <div className="flex flex-col mb-6">
+          <h1 className="text-2xl font-black text-foreground tracking-tight mb-1">{profile.displayName}</h1>
+          <div 
+            onClick={copyId}
+            className="flex items-center space-x-2 w-fit bg-muted px-4 py-1.5 rounded-full border border-border cursor-pointer active:scale-95 transition-all group shadow-sm"
+          >
+            <span className="text-[9px] font-black text-muted-foreground tracking-widest uppercase">ID: {profile.numericId}</span>
+            <Copy className="w-2.5 h-2.5 text-muted-foreground/40 group-hover:text-primary transition-colors" />
+          </div>
+        </div>
+
         <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-8">
           {profile.gender} {age ? `• ${age} Years` : ''} • {profile.country || "KENYA"}
         </p>
