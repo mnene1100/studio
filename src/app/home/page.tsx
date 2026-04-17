@@ -22,7 +22,10 @@ export default function HomePage() {
       <div className="bg-primary safe-top px-5 pb-8 pt-20">
         <div className="grid grid-cols-2 gap-4 mt-6">
           {/* Mystery Note */}
-          <div className="bg-white/10 backdrop-blur-2xl rounded-[1.75rem] h-36 flex flex-col items-center justify-center p-5 border border-white/20 active:scale-95 transition-all cursor-pointer shadow-2xl">
+          <div 
+            onClick={() => router.push('/home/mystery')}
+            className="bg-white/10 backdrop-blur-2xl rounded-[1.75rem] h-36 flex flex-col items-center justify-center p-5 border border-white/20 active:scale-95 transition-all cursor-pointer shadow-2xl"
+          >
             <div className="w-16 h-16 relative mb-2">
                <Image src={mysteryIcon?.imageUrl || "/mystery.png"} alt="Mystery" fill className="object-contain" />
             </div>
@@ -30,7 +33,10 @@ export default function HomePage() {
           </div>
           
           {/* Task Center */}
-          <div className="bg-white/10 backdrop-blur-2xl rounded-[1.75rem] h-36 flex flex-col items-center justify-center p-5 border border-white/20 active:scale-95 transition-all cursor-pointer shadow-2xl">
+          <div 
+            onClick={() => router.push('/home/task-center')}
+            className="bg-white/10 backdrop-blur-2xl rounded-[1.75rem] h-36 flex flex-col items-center justify-center p-5 border border-white/20 active:scale-95 transition-all cursor-pointer shadow-2xl"
+          >
             <div className="w-16 h-16 relative mb-2">
               <Image src={taskIcon?.imageUrl || "/task.png"} alt="Tasks" fill className="object-contain" />
             </div>
@@ -73,7 +79,6 @@ export default function HomePage() {
           <div className="grid grid-cols-2 gap-3 pb-6">
             {discoveryUsers.map((u, i) => {
               const age = u.dob ? differenceInYears(new Date(), new Date(u.dob)) : 20;
-              // Ensure we have a valid country code or fallback
               const countryCode = (u.country || "KE").substring(0, 2).toUpperCase();
 
               return (
@@ -110,15 +115,12 @@ export default function HomePage() {
                       {u.isVerified && <UserCheck className="w-3.5 h-3.5 text-primary fill-primary" />}
                     </div>
                     
-                    {/* Metadata Badges */}
                     <div className="flex items-center gap-1.5">
-                      {/* Age/Gender Badge */}
                       <div className="h-5 w-fit px-2 bg-primary/60 backdrop-blur-md rounded-full border border-white/10 flex items-center shadow-sm">
                         <span className="text-[8px] font-black text-white uppercase tracking-widest whitespace-nowrap">
                           {u.gender === 'Female' ? '♀' : '♂'} {age}
                         </span>
                       </div>
-                      {/* Country Badge */}
                       <div className="h-5 w-fit px-2 bg-black/60 backdrop-blur-md rounded-full border border-white/10 flex items-center shadow-sm">
                         <span className="text-[8px] font-black text-white uppercase tracking-widest whitespace-nowrap">
                           {countryCode}
