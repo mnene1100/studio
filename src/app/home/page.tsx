@@ -57,8 +57,14 @@ export default function HomePage() {
       <div className="px-3 pt-4 flex-1">
         {isDiscoveryLoading && discoveryUsers.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 text-primary animate-spin" />
-            <p className="mt-4 text-[9px] font-black text-primary/40 uppercase tracking-[0.3em]">Finding matches...</p>
+            <div className="flex flex-col items-center space-y-4 animate-in fade-in zoom-in duration-1000">
+              <h1 className="text-4xl text-primary font-['Pacifico'] font-light tracking-tight">NEXO</h1>
+              <div className="flex space-x-1">
+                <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]" />
+                <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]" />
+                <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" />
+              </div>
+            </div>
           </div>
         ) : discoveryUsers.length > 0 ? (
           <div className="grid grid-cols-2 gap-3 pb-6">
@@ -98,7 +104,9 @@ export default function HomePage() {
                       {u.isVerified && <UserCheck className="w-3.5 h-3.5 text-primary fill-primary" />}
                     </div>
                     <div className="h-5 w-fit px-2 bg-primary/30 backdrop-blur-md rounded-full border border-primary/40 flex items-center">
-                      <span className="text-[9px] font-black text-white uppercase">{u.gender === 'Female' ? '♀' : '♂'} {age}</span>
+                      <span className="text-[9px] font-black text-white uppercase">
+                        {u.gender === 'Female' ? '♀' : '♂'} {age} • {u.country?.toUpperCase() || 'KE'}
+                      </span>
                     </div>
                   </div>
                 </div>
