@@ -24,25 +24,41 @@ export default function LoginPage() {
   const [hasCheckedProfile, setHasCheckedProfile] = useState(false);
   const [isProfileComplete, setIsProfileComplete] = useState(false);
 
+  // 1. Check profile existence when user is authenticated
   useEffect(() => {
     if (user && db && !hasCheckedProfile) {
       const checkProfile = async () => {
-        const docRef = doc(db, 'users', user.uid);
-        const snap = await getDoc(docRef);
-        setIsProfileComplete(snap.exists());
-        setHasCheckedProfile(true);
+        try {
+          const docRef = doc(db, 'users', user.uid);
+          const snap = await getDoc(docRef);
+          const exists = snap.exists();
+          setIsProfileComplete(exists);
+          setHasCheckedProfile(true);
+        } catch (e) {
+          console.error("Profile check error:", e);
+        }
       };
       checkProfile();
     }
   }, [user, db, hasCheckedProfile]);
+
+  // 2. Perform automatic redirect as soon as profile check is done
+  useEffect(() => {
+    if (user && hasCheckedProfile) {
+      if (isProfileComplete) {
+        router.replace('/home');
+      } else {
+        router.replace('/onboarding');
+      }
+    }
+  }, [user, hasCheckedProfile, isProfileComplete, router]);
 
   const handleFastLogin = async () => {
     if (!auth || !db) return;
     setIsLoading(true);
     try {
       await signInAnonymously(auth);
-      // Direct push to onboarding for new fast logins
-      router.replace('/onboarding');
+      // Auth state listener (useUser) handles the redirect to onboarding
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -59,7 +75,7 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // No automatic redirect, wait for state to update
+      // Redirect happens automatically via useEffect once user state updates
     } catch (error: any) {
       toast({ 
         variant: "destructive", 
@@ -76,7 +92,7 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      router.replace('/onboarding');
+      // Redirect happens automatically via useEffect once user state updates
     } catch (error: any) {
       toast({ 
         variant: "destructive", 
@@ -84,14 +100,6 @@ export default function LoginPage() {
         description: error.message 
       });
       setIsLoading(false);
-    }
-  };
-
-  const handleContinue = () => {
-    if (isProfileComplete) {
-      router.replace('/home');
-    } else {
-      router.replace('/onboarding');
     }
   };
 
@@ -120,17 +128,10 @@ export default function LoginPage() {
         </div>
 
         <div className="space-y-5">
-          {user && hasCheckedProfile ? (
-            <div className="space-y-4 animate-in slide-in-from-bottom-4">
-              <p className="text-white/60 text-[10px] font-black uppercase tracking-widest mb-2">Logged in as {user.email || 'Guest'}</p>
-              <Button onClick={handleContinue} className="w-full h-16 bg-primary text-white font-black rounded-2xl uppercase tracking-widest shadow-xl active:scale-95 transition-all">
-                Continue to App <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-              <Button variant="ghost" onClick={() => {
-                auth?.signOut();
-                setHasCheckedProfile(false);
-                setIsLoading(false);
-              }} className="text-white/40 text-[10px] uppercase tracking-widest">Switch Account</Button>
+          {user && !hasCheckedProfile ? (
+            <div className="flex flex-col items-center space-y-4">
+              <Loader2 className="w-8 h-8 text-primary animate-spin" />
+              <p className="text-white/40 text-[10px] font-black uppercase tracking-widest">Entering App...</p>
             </div>
           ) : !isEmailVisible ? (
             <div className="space-y-4">
