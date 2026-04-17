@@ -46,16 +46,24 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
       // Filter for the opposite gender
       const oppositeGender = profile.gender === 'Male' ? 'Female' : 'Male';
       
+      // Removed orderBy from query to prevent Index requirement which causes empty results
       const q = query(
         collection(db, 'users'), 
         where('gender', '==', oppositeGender),
-        orderBy('lastOnlineAt', 'desc'), 
-        limit(40)
+        limit(100)
       );
+      
       const snapshot = await getDocs(q);
       const docs = snapshot.docs
         .map(doc => ({ ...doc.data(), id: doc.id }))
-        .filter(u => u.id !== user.uid);
+        .filter(u => u.id !== user.uid)
+        // Sort in memory instead of Firestore to avoid composite index requirement
+        .sort((a: any, b: any) => {
+          const timeA = new Date(a.lastOnlineAt || 0).getTime();
+          const timeB = new Date(b.lastOnlineAt || 0).getTime();
+          return timeB - timeA;
+        })
+        .slice(0, 40);
       
       setDiscoveryUsers(docs);
     } catch (e) {
