@@ -87,8 +87,10 @@ export default function MePage() {
     if (!db) return;
     setIsSupportLoading(true);
     try {
+      // Find the appointed support account
       const q = query(collection(db, 'users'), where('isSupport', '==', true), limit(1));
       const snap = await getDocs(q);
+      
       if (snap.empty) {
         toast({
           title: "Support Offline",
@@ -96,6 +98,7 @@ export default function MePage() {
         });
       } else {
         const supportId = snap.docs[0].id;
+        // Direct route to conversation with the support user
         router.push(`/home/chat/${supportId}`);
       }
     } catch (e) {

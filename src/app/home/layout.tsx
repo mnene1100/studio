@@ -60,11 +60,12 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
       const docs = snapshot.docs
         .map(doc => ({ ...doc.data(), id: doc.id }))
         .filter((u: any) => {
-          // Hide self and official accounts from home grid
-          return u.id !== user.uid && !u.isAdmin && !u.isCoinSeller && !u.isSupport;
+          // STRICT FILTERING: Hide self and ALL official/privileged accounts from home grid
+          const isOfficial = u.isAdmin || u.isCoinSeller || u.isSupport;
+          return u.id !== user.uid && !isOfficial;
         })
         .sort((a: any, b: any) => {
-          // Sort by last activity in memory to avoid needing composite indexes
+          // Sort by last activity in memory
           const timeA = new Date(a.lastOnlineAt || 0).getTime();
           const timeB = new Date(b.lastOnlineAt || 0).getTime();
           return timeB - timeA;
