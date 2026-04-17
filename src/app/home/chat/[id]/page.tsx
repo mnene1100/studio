@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from 'react';
@@ -218,7 +217,7 @@ export default function ChatDetailPage() {
     }
   }, [isOnline, profile?.lastOnlineAt]);
 
-  const displayName = profile?.displayName || "Loading...";
+  const displayName = profile?.isSupport ? "Customer Support" : (profile?.displayName || "Loading...");
   const initials = displayName.substring(0, 2).toUpperCase();
 
   return (
@@ -254,7 +253,7 @@ export default function ChatDetailPage() {
               </div>
               <div className="flex flex-col">
                 <h3 className="text-sm font-black text-white leading-tight tracking-tight">
-                  {profile?.isSupport ? "Customer Support" : displayName}
+                  {displayName}
                 </h3>
                 <span className="text-[8px] font-black text-white/70 uppercase tracking-widest">{lastSeenText}</span>
               </div>
