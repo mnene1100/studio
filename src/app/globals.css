@@ -10,19 +10,19 @@
     --card-foreground: 210 8% 6%;
     --popover: 0 0% 100%;
     --popover-foreground: 210 8% 6%;
-    --primary: 5 54% 50%;
+    --primary: 5 53% 50%;
     --primary-foreground: 0 0% 100%;
     --secondary: 5 40% 92%;
-    --secondary-foreground: 5 54% 25%;
+    --secondary-foreground: 5 53% 25%;
     --muted: 210 8% 95%;
     --muted-foreground: 210 5% 45%;
-    --accent: 5 54% 50%;
+    --accent: 5 53% 50%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
     --border: 210 8% 90%;
     --input: 210 8% 90%;
-    --ring: 5 54% 50%;
+    --ring: 5 53% 50%;
     --radius: 1.5rem;
   }
 
@@ -33,19 +33,19 @@
     --card-foreground: 0 0% 100%;
     --popover: 0 0% 5%;
     --popover-foreground: 0 0% 100%;
-    --primary: 5 54% 50%;
+    --primary: 5 53% 50%;
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 8%;
     --secondary-foreground: 0 0% 100%;
     --muted: 0 0% 12%;
     --muted-foreground: 0 0% 60%;
-    --accent: 5 54% 50%;
+    --accent: 5 53% 50%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 10%;
     --input: 0 0% 10%;
-    --ring: 5 54% 50%;
+    --ring: 5 53% 50%;
   }
 }
 
@@ -99,8 +99,8 @@
 }
 
 .premium-gradient {
-  background: radial-gradient(circle at top left, hsl(5, 54%, 15%), transparent),
-              radial-gradient(circle at bottom right, hsl(5, 54%, 10%), transparent);
+  background: radial-gradient(circle at top left, hsl(5, 53%, 15%), transparent),
+              radial-gradient(circle at bottom right, hsl(5, 53%, 10%), transparent);
 }
 
 .native-card {

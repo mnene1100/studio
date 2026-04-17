@@ -1,12 +1,11 @@
 {
   "name": "NEXO",
   "short_name": "NEXO",
-  "description": "Premium real-time communication ecosystem.",
+  "description": "Premium Communication Platform",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#28B4A4",
-  "orientation": "portrait",
+  "background_color": "#c3483c",
+  "theme_color": "#c3483c",
   "icons": [
     {
       "src": "https://picsum.photos/seed/nexo-logo/192/192",
