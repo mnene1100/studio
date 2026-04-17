@@ -109,6 +109,9 @@ export default function OnboardingPage() {
         balance: 500,
         earnings: 0,
         isVerified: false,
+        isAdmin: false,
+        isCoinSeller: false,
+        isSupport: false,
         education: 'N/A',
         horoscope: 'Aries',
         lookingFor: 'Making Friends'

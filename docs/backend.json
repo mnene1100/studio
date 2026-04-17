@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "UserProfile": {
@@ -50,6 +51,18 @@
           "type": "string",
           "description": "Timestamp when the user profile was last updated.",
           "format": "date-time"
+        },
+        "isAdmin": {
+          "type": "boolean",
+          "description": "Indicates if the user has administrative privileges."
+        },
+        "isCoinSeller": {
+          "type": "boolean",
+          "description": "Indicates if the user is an authorized coin vendor."
+        },
+        "isSupport": {
+          "type": "boolean",
+          "description": "Indicates if the user is a customer support representative."
         }
       },
       "required": [
@@ -359,6 +372,6 @@
         }
       }
     ],
-    "reasoning": "The recommended Firestore structure for the NEXO application prioritizes Authorization Independence, Structural Segregation, and Access Modeling to ensure robust security rules, scalability, and debuggability. All data related to a user's private space (profile, AI recommendations) is nested under `/users/{userId}`. Collaborative data like chat rooms and calls are placed in top-level collections (`/chatRooms`, `/calls`) to allow for flexible queries across users, with necessary authorization context denormalized directly into the documents.\n\n**Authorization Independence:** This is achieved by explicitly including authorization-relevant data within each document, eliminating the need for `get()` calls in security rules. For user profiles and AI recommendations, the `userId` in the path (`/users/{userId}/...`) directly serves as the authorization context, matching `request.auth.uid`. For collaborative entities like `ChatRoom`, `Message`, and `Call`, a dedicated authorization map (`members` or `participants`) will be present on each document. For instance, `ChatRoom` documents will contain a `members: { [uid]: true }` map (derived from `memberIds`) allowing direct `request.auth.uid in resource.data.members` checks. Similarly, `Message` documents will denormalize the `members` map from their parent `ChatRoom` and `Call` documents will include a `participants: { [uid]: true }` map (derived from `participantIds`). This ensures that the complete authorization logic is available within the `resource.data` of the document being accessed, avoiding expensive and problematic cross-document reads.\n\n**QAPs (Rules are not Filters):** The structure facilitates secure `list` operations (Query as Permission) by using denormalized authorization maps. For example, to list a user's chat rooms, a client can query `db.collection('chatRooms').where(`members.${request.auth.uid}`, '==', true)`. Similarly, a user can list their calls using `db.collection('calls').where(`participants.${request.auth.uid}`, '==', true)`. This allows Firestore's indexing to efficiently filter documents before security rules are applied, ensuring that clients only request data they are authorized to see, thus enforcing QAPs. Private user data like `AIRecommendation` is naturally scoped by the `/users/{userId}` path, making `list` operations inherently secure to the requesting user. Structural Segregation ensures that each collection maintains a homogeneous security posture, simplifying rule sets and preventing accidental data exposure.\n\n**Regional Deployment:** The choice of `Africa-south1` as the Firestore location is an infrastructure detail and does not impact the logical data structure design, which remains optimized for security, scalability, and performance regardless of the region."
+    "reasoning": "The recommended Firestore structure for the NEXO application prioritizes Authorization Independence, Structural Segregation, and Access Modeling to ensure robust security rules, scalability, and debuggability. All data related to a user's private space (profile, AI recommendations) is nested under `/users/{userId}`. Collaborative data like chat rooms and calls are placed in top-level collections (`/chatRooms`, `/calls`) to allow for flexible queries across users, with necessary authorization context denormalized directly into the documents.\n\n**Authorization Independence:** This is achieved by explicitly including authorization-relevant data within each document, eliminating the need for `get()` calls in security rules. For user profiles and AI recommendations, the `userId` in the path (`/users/{userId}/...`) directly serves as the authorization context, matching `request.auth.uid`. For collaborative entities like `ChatRoom`, `Message`, and `Call`, a dedicated authorization map (`members` or `participants`) will be present on each document. For instance, `ChatRoom` documents will contain a `members: { [uid]: true }` map (derived from `memberIds`) allowing direct `request.auth.uid in resource.data.members` checks. Similarly, `Message` documents will denormalize the `members` map from their parent `ChatRoom` and `Call` documents will include a `participants: { [uid]: true }` map (derived from `participantIds`). This ensures that the complete authorization logic is available within the `resource.data` of the document being accessed, avoiding expensive and problematic cross-document reads.\n\n**QAPs (Rules are not Filters):** The structure facilitates secure `list` operations (Query as Permission) by using denormalized authorization maps. For example, to list a user's chat rooms, a client can query `db.collection('chatRooms').where(`members.${request.auth.uid}`, '==', true)`. Similarly, a user can list their calls using `db.collection('calls').where(`participants.${request.auth.uid}`, '==', true)`. This allows Firestore's indexing to efficiently filter documents before security rules are applied, ensuring that clients only request data they are authorized to see, thus enforcing QAPs. Private user data like `AIRecommendation` is naturally scoped by the `/users/{userId}` path, making `list` operations naturally secure to the requesting user. Structural Segregation ensures that each collection maintains a homogeneous security posture, simplifying rule sets and preventing accidental data exposure.\n\n**Regional Deployment:** The choice of `Africa-south1` as the Firestore location is an infrastructure detail and does not impact the logical data structure design, which remains optimized for security, scalability, and performance regardless of the region."
   }
 }

@@ -107,7 +107,14 @@ export default function ChatDetailPage() {
   const handleSendMessage = async () => {
     if (!input.trim() || !chatId || !currentUser || !db) return;
     
-    if (currentUserProfile?.gender === 'Male') {
+    // Check for privileged roles for free messaging
+    const isSenderPrivileged = currentUserProfile?.isAdmin || currentUserProfile?.isCoinSeller || currentUserProfile?.isSupport;
+    const isRecipientPrivileged = profile?.isAdmin || profile?.isCoinSeller || profile?.isSupport;
+    
+    // Only charge if sender is Male and neither sender nor recipient is a privileged account
+    const shouldCharge = currentUserProfile?.gender === 'Male' && !isSenderPrivileged && !isRecipientPrivileged;
+
+    if (shouldCharge) {
       const currentBalance = currentUserProfile.balance ?? 0;
       if (currentBalance < 15) {
         toast({
@@ -154,7 +161,6 @@ export default function ChatDetailPage() {
       updatedAt: now,
       lastMessageSentAt: now,
       lastMessageContent: messageContent,
-      // Clear hidden flags when a new message is sent to ensure it's visible to both
       hiddenBy: {}
     });
 
