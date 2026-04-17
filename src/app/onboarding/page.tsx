@@ -37,6 +37,8 @@ export default function OnboardingPage() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingProfile, setIsCheckingProfile] = useState(true);
+  
+  // No default selections
   const [formData, setFormData] = useState({
     displayName: '',
     gender: '', 
@@ -80,24 +82,19 @@ export default function OnboardingPage() {
   const handleComplete = async () => {
     if (!db || !user?.uid) return;
     
-    // Validation for Email Login
-    if (!isFastLogin) {
-      if (!formData.displayName.trim()) {
-        toast({ variant: "destructive", title: "Missing Name", description: "Please enter your display name." });
-        return;
-      }
-      if (!formData.dob) {
-        toast({ variant: "destructive", title: "Selection Required", description: "Please enter your date of birth." });
-        return;
-      }
+    // Validation
+    if (!isFastLogin && !formData.displayName.trim()) {
+      toast({ variant: "destructive", title: "Missing Name", description: "Please enter your display name." });
+      return;
     }
-
-    // Common Validation
+    if (!isFastLogin && !formData.dob) {
+      toast({ variant: "destructive", title: "Selection Required", description: "Please enter your date of birth." });
+      return;
+    }
     if (!formData.gender) {
       toast({ variant: "destructive", title: "Selection Required", description: "Please select your gender." });
       return;
     }
-
     if (!formData.country) {
       toast({ variant: "destructive", title: "Selection Required", description: "Please select your region." });
       return;

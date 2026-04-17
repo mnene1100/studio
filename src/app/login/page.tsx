@@ -21,7 +21,6 @@ export default function LoginPage() {
   const db = useFirestore();
   const { user } = useUser();
 
-  // If already logged in, we show a "Continue" button instead of auto-redirecting
   const [hasCheckedProfile, setHasCheckedProfile] = useState(false);
   const [isProfileComplete, setIsProfileComplete] = useState(false);
 
@@ -42,7 +41,7 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await signInAnonymously(auth);
-      // After login, we explicitly check where to go
+      // Direct push to onboarding for new fast logins
       router.replace('/onboarding');
     } catch (error: any) {
       toast({
@@ -60,7 +59,7 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.replace('/');
+      // No automatic redirect, wait for state to update
     } catch (error: any) {
       toast({ 
         variant: "destructive", 
@@ -127,7 +126,11 @@ export default function LoginPage() {
               <Button onClick={handleContinue} className="w-full h-16 bg-primary text-white font-black rounded-2xl uppercase tracking-widest shadow-xl active:scale-95 transition-all">
                 Continue to App <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button variant="ghost" onClick={() => auth?.signOut().then(() => setHasCheckedProfile(false))} className="text-white/40 text-[10px] uppercase tracking-widest">Switch Account</Button>
+              <Button variant="ghost" onClick={() => {
+                auth?.signOut();
+                setHasCheckedProfile(false);
+                setIsLoading(false);
+              }} className="text-white/40 text-[10px] uppercase tracking-widest">Switch Account</Button>
             </div>
           ) : !isEmailVisible ? (
             <div className="space-y-4">
