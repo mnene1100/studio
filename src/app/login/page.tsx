@@ -21,13 +21,6 @@ export default function LoginPage() {
   const db = useFirestore();
   const { user, isUserLoading } = useUser();
 
-  // On mount, if user already logged in, send them to the root router
-  useEffect(() => {
-    if (!isUserLoading && user && db) {
-      router.replace('/');
-    }
-  }, [user, isUserLoading, router, db]);
-
   const handleFastLogin = async () => {
     if (!auth || !db) return;
     setIsLoading(true);
@@ -105,8 +98,24 @@ export default function LoginPage() {
           ) : (
             <form onSubmit={handleSignIn} className="space-y-4 text-left animate-in slide-in-from-bottom-4">
               <div className="space-y-3">
-                <Input type="email" placeholder="Email address" className="h-14 bg-white/10 border-white/10 text-white rounded-2xl placeholder:text-white/40 focus:ring-primary/50" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                <Input type="password" placeholder="Password" className="h-14 bg-white/10 border-white/10 text-white rounded-2xl placeholder:text-white/40 focus:ring-primary/50" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                <Input 
+                  type="email" 
+                  placeholder="Email address" 
+                  className="h-14 bg-white/10 border-white/10 text-white rounded-2xl placeholder:text-white/40 focus:ring-primary/50" 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)} 
+                  required 
+                  autoComplete="email"
+                />
+                <Input 
+                  type="password" 
+                  placeholder="Password" 
+                  className="h-14 bg-white/10 border-white/10 text-white rounded-2xl placeholder:text-white/40 focus:ring-primary/50" 
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)} 
+                  required 
+                  autoComplete="current-password"
+                />
               </div>
               <div className="flex flex-col space-y-3 pt-2">
                 <Button type="submit" disabled={isLoading} className="w-full h-14 bg-primary text-white font-black rounded-2xl shadow-lg shadow-primary/20 uppercase tracking-widest active:scale-95 transition-all">
