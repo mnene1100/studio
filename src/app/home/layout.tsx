@@ -5,7 +5,7 @@ import { useEffect, createContext, useContext, useState, useRef, useCallback } f
 import { useRouter } from 'next/navigation';
 import { Navigation } from "@/components/navigation";
 import { useUser, useFirestore, useDoc, useMemoFirebase, setDocumentNonBlocking } from '@/firebase';
-import { doc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import { doc, collection, query, orderBy, limit, getDocs, where } from 'firebase/firestore';
 
 interface HomeDataContextType {
   profile: any;
@@ -40,11 +40,15 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   const { data: profile, isLoading: isProfileLoading } = useDoc(profileRef);
 
   const fetchDiscovery = useCallback(async (silent = false) => {
-    if (!db || !user?.uid) return;
+    if (!db || !user?.uid || !profile?.gender) return;
     if (!silent) setIsDiscoveryLoading(true);
     try {
+      // Filter for the opposite gender
+      const oppositeGender = profile.gender === 'Male' ? 'Female' : 'Male';
+      
       const q = query(
         collection(db, 'users'), 
+        where('gender', '==', oppositeGender),
         orderBy('lastOnlineAt', 'desc'), 
         limit(40)
       );
@@ -59,7 +63,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     } finally {
       setIsDiscoveryLoading(false);
     }
-  }, [db, user?.uid]);
+  }, [db, user?.uid, profile?.gender]);
 
   // Presence Tracking
   useEffect(() => {
@@ -73,13 +77,13 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     return () => clearInterval(interval);
   }, [db, user?.uid]);
 
-  // Initial Discovery Fetch
+  // Initial Discovery Fetch - Triggered once profile gender is known
   useEffect(() => {
-    if (user?.uid && !initialDiscoveryFetchedRef.current && db) {
+    if (user?.uid && profile?.gender && !initialDiscoveryFetchedRef.current && db) {
       initialDiscoveryFetchedRef.current = true;
       fetchDiscovery(true);
     }
-  }, [user?.uid, db, fetchDiscovery]);
+  }, [user?.uid, profile?.gender, db, fetchDiscovery]);
 
   useEffect(() => {
     if (isAuthLoading) return;
@@ -88,8 +92,6 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     }
   }, [user, isAuthLoading, router]);
 
-  // If we are still determining if a user exists at all, or if we have a user but no profile yet
-  // only show splash if we absolutely have to.
   if (isAuthLoading || (user && isProfileLoading)) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-primary">

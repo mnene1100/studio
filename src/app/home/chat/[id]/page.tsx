@@ -107,11 +107,11 @@ export default function ChatDetailPage() {
   const handleSendMessage = async () => {
     if (!input.trim() || !chatId || !currentUser || !db) return;
     
-    // Check for privileged roles for free messaging
+    // EXEMPTIONS: Check for privileged roles (Admin, CoinSeller, Support)
     const isSenderPrivileged = currentUserProfile?.isAdmin || currentUserProfile?.isCoinSeller || currentUserProfile?.isSupport;
     const isRecipientPrivileged = profile?.isAdmin || profile?.isCoinSeller || profile?.isSupport;
     
-    // Only charge if sender is Male and neither sender nor recipient is a privileged account
+    // RULE: Only charge 15 coins if sender is Male and neither party is an official account
     const shouldCharge = currentUserProfile?.gender === 'Male' && !isSenderPrivileged && !isRecipientPrivileged;
 
     if (shouldCharge) {
@@ -137,7 +137,7 @@ export default function ChatDetailPage() {
         userId: currentUser.uid,
         type: 'message_fee',
         coins: 15,
-        description: 'Sent text message',
+        description: `Sent text message to ${profile?.displayName || 'User'}`,
         createdAt: new Date().toISOString(),
         status: 'completed'
       }, { merge: true });
