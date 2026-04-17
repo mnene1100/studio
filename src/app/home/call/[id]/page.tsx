@@ -41,8 +41,8 @@ export default function CallPage() {
   const startTimeRef = useRef<number | null>(null);
   const initializationStartedRef = useRef(false);
   const billingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const isBilledForFirstMinRef = useRef(false);
   const isConnectedRef = useRef(false);
+  const lastBilledSecondRef = useRef<number>(-1);
   
   const localAudioTrackRef = useRef<any>(null);
   const localVideoTrackRef = useRef<any>(null);
@@ -107,8 +107,14 @@ export default function CallPage() {
     const deductCoins = async () => {
       const userRef = doc(db, 'users', currentUser.uid);
       const userSnap = await getDoc(userRef);
-      const latestBalance = userSnap.data()?.balance ?? 0;
+      const latestData = userSnap.data();
+      const latestBalance = latestData?.balance ?? 0;
       
+      // Exemption for Admin, CoinSeller, Support
+      if (latestData?.isAdmin || latestData?.isCoinSeller || latestData?.isSupport) {
+        return true;
+      }
+
       if (latestBalance < costPerMin) {
         toast({
           variant: "destructive",
@@ -140,11 +146,27 @@ export default function CallPage() {
       }
     };
 
-    if (!isBilledForFirstMinRef.current) {
-      isBilledForFirstMinRef.current = true;
-      deductCoins();
-      billingIntervalRef.current = setInterval(deductCoins, 60000);
-    }
+    // Billing Timer Monitor
+    billingIntervalRef.current = setInterval(() => {
+      if (!startTimeRef.current) return;
+      
+      const elapsedSeconds = Math.floor((Date.now() - startTimeRef.current) / 1000);
+      
+      // Prevent multiple deductions within the same second tick
+      if (elapsedSeconds === lastBilledSecondRef.current) return;
+
+      // RULE: First 10 seconds free. Deduct first minute at 11th second.
+      if (elapsedSeconds === 11) {
+        deductCoins();
+        lastBilledSecondRef.current = elapsedSeconds;
+      }
+
+      // RULE: Subsequent minutes deduct at the start of the minute (60, 120, 180...)
+      if (elapsedSeconds >= 60 && elapsedSeconds % 60 === 0) {
+        deductCoins();
+        lastBilledSecondRef.current = elapsedSeconds;
+      }
+    }, 1000);
 
     return () => {
       if (billingIntervalRef.current) {
@@ -164,12 +186,13 @@ export default function CallPage() {
       try {
         const costPerMin = callType === 'video' ? 160 : 80;
         const currentBalance = currentUserProfile?.balance ?? 0;
+        const isPrivileged = currentUserProfile?.isAdmin || currentUserProfile?.isCoinSeller || currentUserProfile?.isSupport;
 
-        if (currentBalance < costPerMin) {
+        if (!isPrivileged && currentBalance < costPerMin) {
           toast({
             variant: 'destructive',
             title: 'Insufficient Balance',
-            description: `You need at least ${costPerMin} coins for the first minute.`,
+            description: `You need at least ${costPerMin} coins to start a call.`,
           });
           handleEndCall('insufficient_balance');
           return;
