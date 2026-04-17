@@ -1,24 +1,25 @@
 
 "use client";
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   ShieldCheck, Headset, ChevronRight, Copy, 
   Eye, Pencil, Coins, Diamond, Settings, UserCheck,
-  Gift, Users, Sparkles
+  Gift, Users, Sparkles, Loader2
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useHomeData } from '../layout';
-import Image from 'image';
+import Image from 'next/image';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, orderBy, limit } from 'firebase/firestore';
+import { collection, query, orderBy, limit, getDocs, where } from 'firebase/firestore';
 
 export default function MePage() {
   const router = useRouter();
   const { profile } = useHomeData();
   const { user } = useUser();
   const db = useFirestore();
+  const [isSupportLoading, setIsSupportLoading] = useState(false);
 
   // Localized listener for visitors only on this screen
   const visitorsQuery = useMemoFirebase(() => {
@@ -79,6 +80,32 @@ export default function MePage() {
         }
         document.body.removeChild(textArea);
       }
+    }
+  };
+
+  const goToSupport = async () => {
+    if (!db) return;
+    setIsSupportLoading(true);
+    try {
+      const q = query(collection(db, 'users'), where('isSupport', '==', true), limit(1));
+      const snap = await getDocs(q);
+      if (snap.empty) {
+        toast({
+          title: "Support Offline",
+          description: "No support representative is available right now.",
+        });
+      } else {
+        const supportId = snap.docs[0].id;
+        router.push(`/home/chat/${supportId}`);
+      }
+    } catch (e) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not connect to support service.",
+      });
+    } finally {
+      setIsSupportLoading(false);
     }
   };
 
@@ -241,11 +268,12 @@ export default function MePage() {
         </div>
 
         <button 
-          onClick={() => router.push('/home/support')}
-          className="w-full flex items-center p-5 bg-card border border-border rounded-[1.75rem] shadow-sm active:scale-[0.98] transition-all group"
+          onClick={goToSupport}
+          disabled={isSupportLoading}
+          className="w-full flex items-center p-5 bg-card border border-border rounded-[1.75rem] shadow-sm active:scale-[0.98] transition-all group disabled:opacity-50"
         >
           <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center mr-4">
-            <Headset className="w-6 h-6 text-primary" />
+            {isSupportLoading ? <Loader2 className="w-6 h-6 text-primary animate-spin" /> : <Headset className="w-6 h-6 text-primary" />}
           </div>
           <span className="flex-1 text-left font-black text-foreground text-base tracking-tight">Customer support</span>
           <ChevronRight className="w-5 h-5 text-muted-foreground" />

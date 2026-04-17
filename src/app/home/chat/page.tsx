@@ -72,7 +72,7 @@ function ChatListItem({ chat }: { chat: any }) {
         onPointerUp={handleLongPressEnd}
         onPointerLeave={handleLongPressEnd}
         onContextMenu={(e) => e.preventDefault()}
-        className="flex items-center px-4 py-4 rounded-[2.5rem] active:bg-accent/50 transition-all group border border-transparent mb-2 mx-2 bg-card/50 shadow-sm relative overflow-hidden touch-none select-none no-underline"
+        className="flex items-center px-4 py-4 rounded-[2.5rem] transition-all group border border-transparent mb-2 mx-2 bg-card/50 shadow-sm relative overflow-hidden touch-none select-none no-underline"
         style={{ WebkitTouchCallout: 'none' }}
       >
         <div className="relative">
