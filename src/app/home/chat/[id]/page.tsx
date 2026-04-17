@@ -84,7 +84,6 @@ export default function ChatDetailPage() {
 
   const callsQuery = useMemoFirebase(() => {
     if (!db || !chatId) return null;
-    // Removed orderBy to avoid index requirement for better cross-platform support
     return query(
       collection(db, 'calls'),
       where('chatRoomId', '==', chatId),
@@ -108,7 +107,6 @@ export default function ChatDetailPage() {
   const handleSendMessage = async () => {
     if (!input.trim() || !chatId || !currentUser || !db) return;
     
-    // Message deduction for male users
     if (currentUserProfile?.gender === 'Male') {
       const currentBalance = currentUserProfile.balance ?? 0;
       if (currentBalance < 15) {
@@ -155,7 +153,9 @@ export default function ChatDetailPage() {
     updateDocumentNonBlocking(chatRef, {
       updatedAt: now,
       lastMessageSentAt: now,
-      lastMessageContent: messageContent
+      lastMessageContent: messageContent,
+      // Clear hidden flags when a new message is sent to ensure it's visible to both
+      hiddenBy: {}
     });
 
     setInput('');
@@ -219,7 +219,7 @@ export default function ChatDetailPage() {
 
   return (
     <div className="fixed inset-0 h-[100dvh] flex flex-col bg-background overflow-hidden">
-      <header className="bg-primary safe-top flex-shrink-0 z-20">
+      <header className="bg-primary safe-top flex-shrink-0 z-20 shadow-md">
         <div className="h-16 px-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Button 
