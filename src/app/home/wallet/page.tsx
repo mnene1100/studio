@@ -31,7 +31,7 @@ const PACKAGES = [
 export default function WalletPage() {
   const router = useRouter();
   const { profile } = useHomeData();
-  const [selectedPackage, setSelectedPackage] = useState<typeof PACKAGES[0] | null>(PACKAGES[0]);
+  const [selectedPackage, setSelectedPackage] = useState<typeof PACKAGES[0] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePayment = async () => {
