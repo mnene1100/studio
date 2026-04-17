@@ -1,19 +1,21 @@
-
-import { NextResponse } from 'next/server';
 import { initializeFirebase } from '@/firebase';
 import { collection, query, where, getDocs, doc, updateDoc, increment } from 'firebase/firestore';
 import { getTransactionStatus } from '@/app/actions/pesapal';
 
 /**
- * @fileOverview Cron Job to verify "pending" payments directly with PesaPal.
- * This prevents users from trying to spoof payment successes.
+ * @fileOverview Vercel Cron Job to verify "pending" payments directly with PesaPal.
+ * Follows the specific authentication pattern requested for security.
  */
 
-export async function GET(request: Request) {
-  // 1. Security check for the Cron secret
-  const authHeader = request.headers.get('authorization');
+export async function GET(req: Request) {
+  const authHeader = req.headers.get("authorization");
+
+  // 1. Security check for the Cron secret using the requested pattern
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new NextResponse('Unauthorized', { status: 401 });
+    return new Response(JSON.stringify({ message: "Unauthorized" }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 
   const { firestore: db } = initializeFirebase();
@@ -33,7 +35,7 @@ export async function GET(request: Request) {
       const data = transDoc.data();
       const trackingId = data.id;
 
-      // 3. Ask PesaPal for the actual status
+      // 3. Ask PesaPal for the actual status securely on the server
       const statusData = await getTransactionStatus(trackingId);
 
       if (statusData && statusData.payment_status_description === 'Completed') {
@@ -59,12 +61,20 @@ export async function GET(request: Request) {
       }
     }
 
-    return NextResponse.json({ 
-      processed: results.length, 
+    // 6. Return success response as requested
+    return new Response(JSON.stringify({ 
+      message: "Success",
+      processed: results.length,
       details: results 
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
     });
   } catch (error: any) {
     console.error('Cron Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return new Response(JSON.stringify({ message: "Error", error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }
