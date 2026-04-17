@@ -24,13 +24,20 @@ function CallItem({ call }: { call: any }) {
   
   const { data: profile } = useDoc(targetUserRef);
 
+  const formatDuration = (seconds: number) => {
+    if (!seconds) return '00:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const statusLabel = useMemo(() => {
     if (call.status === 'cancelled') return '[Cancelled]';
     if (call.status === 'rejected') return '[Rejected]';
     if (call.status === 'missed') return '[Missed]';
     if (call.status === 'ongoing') return '[Ongoing]';
-    return isCaller ? '[Outgoing]' : '[Incoming]';
-  }, [call.status, isCaller]);
+    return `[${formatDuration(call.durationSeconds)}]`;
+  }, [call.status, call.durationSeconds]);
 
   const StatusIcon = useMemo(() => {
     if (call.status === 'cancelled' || call.status === 'rejected') return <Ban className="w-3 h-3 text-red-500 mr-1.5" />;
@@ -39,8 +46,8 @@ function CallItem({ call }: { call: any }) {
   }, [call.status, isCaller]);
 
   return (
-    <div className="flex items-center px-4 py-4 rounded-[2.5rem] hover:bg-muted/50 transition-all group bg-card/50 shadow-sm mb-2 mx-2 border border-transparent">
-      <Avatar className="w-14 h-14 ring-2 ring-muted shadow-sm overflow-hidden">
+    <div className="flex items-center px-4 py-4 rounded-[2.5rem] bg-card/50 shadow-sm mb-2 mx-2 border border-transparent">
+      <Avatar className="w-14 h-14 border-none shadow-sm overflow-hidden">
         <AvatarImage src={profile?.profilePictureUrl} className="object-cover rounded-full" />
         <AvatarFallback className="bg-primary/10 text-primary font-black rounded-full">
           {profile?.displayName?.substring(0, 2).toUpperCase() || '??'}
@@ -59,7 +66,7 @@ function CallItem({ call }: { call: any }) {
         </div>
       </div>
       <div className="flex space-x-1">
-        <div className="p-3 bg-muted rounded-2xl group-hover:bg-primary/10 transition-all">
+        <div className="p-3 bg-muted rounded-2xl">
           {call.type === 'video' ? <Video className="w-5 h-5 text-foreground" /> : <Phone className="w-5 h-5 text-foreground" />}
         </div>
       </div>
@@ -73,7 +80,6 @@ export default function CallsPage() {
 
   const callsQuery = useMemoFirebase(() => {
     if (!db || !user?.uid) return null;
-    // Removed orderBy to prevent index requirement which causes permission errors
     return query(
       collection(db, 'calls'),
       where('participantIds', 'array-contains', user.uid),

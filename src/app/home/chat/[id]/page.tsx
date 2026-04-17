@@ -107,11 +107,9 @@ export default function ChatDetailPage() {
   const handleSendMessage = async () => {
     if (!input.trim() || !chatId || !currentUser || !db) return;
     
-    // EXEMPTIONS: Check for privileged roles (Admin, CoinSeller, Support)
     const isSenderPrivileged = currentUserProfile?.isAdmin || currentUserProfile?.isCoinSeller || currentUserProfile?.isSupport;
     const isRecipientPrivileged = profile?.isAdmin || profile?.isCoinSeller || profile?.isSupport;
     
-    // RULE: Only charge 15 coins if sender is Male and neither party is an official account
     const shouldCharge = currentUserProfile?.gender === 'Male' && !isSenderPrivileged && !isRecipientPrivileged;
 
     if (shouldCharge) {
@@ -197,10 +195,10 @@ export default function ChatDetailPage() {
   };
 
   const formatDuration = (seconds: number) => {
-    if (!seconds) return '[00:00]';
+    if (!seconds) return '00:00';
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `[${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}]`;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   const isOnline = useMemo(() => {
@@ -298,8 +296,8 @@ export default function ChatDetailPage() {
             const statusText = item.status === 'cancelled' ? '[Cancelled]' : 
                              item.status === 'rejected' ? '[Rejected]' : 
                              item.status === 'missed' ? '[Missed]' : 
-                             item.status === 'ongoing' ? '[Ongoing]' : 
-                             `Duration ${formatDuration(item.durationSeconds)}`;
+                             item.status === 'ongoing' ? '[Calling...]' : 
+                             `[${formatDuration(item.durationSeconds)}]`;
             
             return (
               <div key={`call-${item.id}`} className="flex justify-center w-full py-2">
@@ -339,7 +337,7 @@ export default function ChatDetailPage() {
                 <button 
                   key={i}
                   onClick={() => setInput(s)}
-                  className="whitespace-nowrap px-4 py-2 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest rounded-full border border-primary/10 active:scale-95 transition-all"
+                  className="whitespace-nowrap px-4 py-2 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest rounded-full border border-primary/10 transition-all"
                 >
                   {s}
                 </button>
@@ -371,7 +369,7 @@ export default function ChatDetailPage() {
                   "absolute right-1.5 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full shadow-sm transition-all duration-300 overflow-hidden",
                   !input.trim() 
                     ? "bg-primary/20 text-white/50 cursor-not-allowed" 
-                    : "bg-primary text-white shadow-lg active:scale-90"
+                    : "bg-primary text-white shadow-lg"
                 )}
                 onClick={handleSendMessage}
                 disabled={!input.trim()}

@@ -64,24 +64,23 @@ export default function CallPage() {
     }
     
     if (callIdRef.current && db && currentUser && targetUserId) {
-      // 1. Update Call Document
       updateDocumentNonBlocking(doc(db, 'calls', callIdRef.current), {
         status: status,
         endTime: new Date(endTime).toISOString(),
         durationSeconds: durationSeconds
       });
 
-      // 2. Sync Status to Chat Room so it appears in Chat List
       const channelName = [currentUser.uid, targetUserId].sort().join('_');
       const chatRef = doc(db, 'chatRooms', channelName);
       
       let previewText = "";
-      if (status === 'rejected') previewText = "Call Rejected";
-      else if (status === 'cancelled') previewText = "Missed Call";
+      if (status === 'rejected') previewText = "[Rejected]";
+      else if (status === 'cancelled') previewText = "[Cancelled]";
+      else if (status === 'missed') previewText = "[Missed]";
       else {
         const mins = Math.floor(durationSeconds / 60);
         const secs = durationSeconds % 60;
-        previewText = `${callType === 'video' ? 'Video' : 'Voice'} Call [${mins}:${secs.toString().padStart(2, '0')}]`;
+        previewText = `[${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}]`;
       }
 
       updateDocumentNonBlocking(chatRef, {
@@ -131,7 +130,6 @@ export default function CallPage() {
       const latestData = userSnap.data();
       const latestBalance = latestData?.balance ?? 0;
       
-      // Exemption for Admin, CoinSeller, Support
       if (latestData?.isAdmin || latestData?.isCoinSeller || latestData?.isSupport) {
         return true;
       }
@@ -167,22 +165,18 @@ export default function CallPage() {
       }
     };
 
-    // Billing Timer Monitor
     billingIntervalRef.current = setInterval(() => {
       if (!startTimeRef.current) return;
       
       const elapsedSeconds = Math.floor((Date.now() - startTimeRef.current) / 1000);
       
-      // Prevent multiple deductions within the same second tick
       if (elapsedSeconds === lastBilledSecondRef.current) return;
 
-      // RULE: First 10 seconds free. Deduct first minute at 11th second.
       if (elapsedSeconds === 11) {
         deductCoins();
         lastBilledSecondRef.current = elapsedSeconds;
       }
 
-      // RULE: Subsequent minutes deduct at the start of the minute (60, 120, 180...)
       if (elapsedSeconds >= 60 && elapsedSeconds % 60 === 0) {
         deductCoins();
         lastBilledSecondRef.current = elapsedSeconds;
@@ -267,7 +261,6 @@ export default function CallPage() {
         const callId = `${currentUser.uid}_${targetUserId}_${Date.now()}`;
         callIdRef.current = callId;
 
-        // 1. Create Call Document
         setDocumentNonBlocking(doc(db, 'calls', callId), {
           id: callId,
           callerId: currentUser.uid,
@@ -278,7 +271,6 @@ export default function CallPage() {
           status: 'ongoing'
         }, { merge: true });
 
-        // 2. Update Chat Room to show activity in list
         const chatRef = doc(db, 'chatRooms', channelName);
         setDocumentNonBlocking(chatRef, {
           id: channelName,
@@ -286,7 +278,7 @@ export default function CallPage() {
           participantIds: [currentUser.uid, targetUserId as string],
           updatedAt: now,
           lastMessageSentAt: now,
-          lastMessageContent: callType === 'video' ? 'Video Call initiated' : 'Voice Call initiated',
+          lastMessageContent: "[Calling...]",
           hiddenBy: {}
         }, { merge: true });
 
@@ -408,7 +400,7 @@ export default function CallPage() {
             <div className="relative">
               <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping opacity-30" />
               <div className="absolute inset-0 bg-primary/10 rounded-full animate-pulse blur-3xl" />
-              <Avatar className="w-40 h-40 border-8 border-white/5 shadow-[0_0_80px_rgba(40,180,164,0.3)] relative z-10 rounded-full overflow-hidden">
+              <Avatar className="w-40 h-40 border-none shadow-[0_0_80px_rgba(40,180,164,0.3)] relative z-10 rounded-full overflow-hidden">
                 <AvatarImage src={targetProfile?.profilePictureUrl} className="object-cover rounded-full" />
                 <AvatarFallback className="bg-primary/10 text-primary text-4xl font-black rounded-full">{initials}</AvatarFallback>
               </Avatar>

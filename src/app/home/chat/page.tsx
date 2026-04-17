@@ -76,7 +76,7 @@ function ChatListItem({ chat }: { chat: any }) {
         style={{ WebkitTouchCallout: 'none' }}
       >
         <div className="relative">
-          <Avatar className="w-14 h-14 rounded-full border-none shadow-sm overflow-hidden pointer-events-none">
+          <Avatar className="w-14 h-14 border-none shadow-sm overflow-hidden pointer-events-none">
             <AvatarImage src={profile?.profilePictureUrl} className="object-cover rounded-full" />
             <AvatarFallback className="bg-muted text-lg font-bold rounded-full">
               <MessageCircle className="w-6 h-6 text-primary" />
@@ -114,7 +114,7 @@ function ChatListItem({ chat }: { chat: any }) {
             <AlertDialogCancel className="flex-1 h-12 rounded-2xl bg-muted border-none text-[10px] font-black uppercase tracking-widest mt-0">Cancel</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleDelete}
-              className="flex-1 h-12 rounded-2xl bg-red-500 hover:bg-red-600 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-red-500/20"
+              className="flex-1 h-12 rounded-2xl bg-red-500 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-red-500/20"
             >
               Delete
             </AlertDialogAction>
@@ -140,7 +140,6 @@ export default function ChatListPage() {
 
   const filteredAndSortedChats = (chats || [])
     .filter(chat => {
-      // Show chats with either messages OR recent call activity
       const hasActivity = chat.lastMessageSentAt || chat.updatedAt;
       if (!hasActivity) return false;
       
@@ -164,7 +163,7 @@ export default function ChatListPage() {
         <h1 className="text-3xl text-white font-black italic tracking-tight uppercase pt-2">
           Chats
         </h1>
-        <button className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 active:scale-90 transition-all mt-2 overflow-hidden">
+        <button className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 mt-2 overflow-hidden">
           <MessageCircle className="w-4 h-4 text-white fill-white" />
         </button>
       </header>
