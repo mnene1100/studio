@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useRouter } from 'next/navigation';
@@ -33,11 +32,9 @@ export default function HomePage() {
                 </AvatarFallback>
              </Avatar>
              <div className="flex flex-col">
-                <span className="text-[8px] font-black text-white/50 uppercase tracking-[0.2em]">Welcome back</span>
-                <h2 className="text-sm font-black text-white tracking-tight">{profile?.displayName || 'User'}</h2>
+                <h2 className="text-sm font-black text-white tracking-tight uppercase tracking-widest">{profile?.displayName || 'User'}</h2>
              </div>
           </div>
-          {/* Balance removed from here per user request */}
         </div>
 
         <div className="grid grid-cols-2 gap-4">
