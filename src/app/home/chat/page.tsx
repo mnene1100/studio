@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef } from 'react';
@@ -145,8 +146,10 @@ export default function ChatListPage() {
 
   const filteredAndSortedChats = (chats || [])
     .filter(chat => {
-      const hasActivity = chat.lastMessageSentAt || chat.updatedAt;
-      if (!hasActivity) return false;
+      // Only show chats if a message has actually been sent (or explicit activity)
+      // This hides empty chat rooms that were initialized but never started.
+      const hasActualMessages = !!chat.lastMessageSentAt;
+      if (!hasActualMessages) return false;
       
       const hideTime = chat.hiddenBy?.[user?.uid || ''];
       if (hideTime) {

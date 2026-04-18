@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -74,7 +75,8 @@ export function Navigation() {
                   isActive ? "text-primary fill-primary/10" : "text-muted-foreground"
                 )} 
               />
-              {item.badge && item.badge > 0 && (
+              {/* Only show badge if count is strictly greater than 0 */}
+              {item.badge !== undefined && item.badge > 0 && (
                 <div className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[7px] font-black min-w-[14px] h-[14px] flex items-center justify-center rounded-full ring-2 ring-background shadow-lg">
                   {item.badge > 9 ? '9+' : item.badge}
                 </div>
