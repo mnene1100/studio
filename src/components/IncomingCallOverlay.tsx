@@ -4,10 +4,14 @@ import { useState, useEffect, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Phone, PhoneOff, Video, Loader2 } from "lucide-react";
-import { useUser, useFirestore, useCollection, useMemoFirebase, useDoc } from '@/firebase';
-import { collection, query, where, limit, doc, updateDoc, orderBy } from 'firebase/firestore';
+import { useUser, useFirestore, useCollection, useMemoFirebase, useDoc, updateDocumentNonBlocking } from '@/firebase';
+import { collection, query, where, limit, doc, orderBy } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
 
+/**
+ * @fileOverview A global overlay that listens for incoming calls in real-time.
+ * It appears full-screen when a user is invited to a call, providing Accept/Reject buttons.
+ */
 export function IncomingCallOverlay() {
   const { user } = useUser();
   const db = useFirestore();
@@ -24,7 +28,6 @@ export function IncomingCallOverlay() {
       collection(db, 'calls'),
       where('participantIds', 'array-contains', user.uid),
       where('status', '==', 'ongoing'),
-      orderBy('startTime', 'desc'),
       limit(1)
     );
   }, [db, user?.uid]);
@@ -35,6 +38,7 @@ export function IncomingCallOverlay() {
   const activeCall = useMemo(() => {
     if (!calls || calls.length === 0) return null;
     const call = calls[0];
+    // If current user is the one who initiated the call, don't show the "incoming" UI
     if (call.callerId === user?.uid) return null;
     return call;
   }, [calls, user?.uid]);
@@ -47,17 +51,17 @@ export function IncomingCallOverlay() {
 
   const handleAccept = () => {
     if (!activeCall) return;
+    // Direct link to join the existing Agora session
     router.push(`/home/call/${activeCall.callerId}?type=${activeCall.type}&callId=${activeCall.id}`);
   };
 
-  const handleReject = async () => {
+  const handleReject = () => {
     if (!activeCall || !db) return;
-    try {
-      const callRef = doc(db, 'calls', activeCall.id);
-      await updateDoc(callRef, { status: 'rejected', endTime: new Date().toISOString() });
-    } catch (e) {
-      console.error("Reject error:", e);
-    }
+    const callRef = doc(db, 'calls', activeCall.id);
+    updateDocumentNonBlocking(callRef, { 
+      status: 'rejected', 
+      endTime: new Date().toISOString() 
+    });
   };
 
   if (!activeCall || isInCall) return null;

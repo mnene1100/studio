@@ -17,6 +17,9 @@ import { cn } from '@/lib/utils';
 import { useHomeData } from '../../layout';
 import { toast } from '@/hooks/use-toast';
 
+/**
+ * @fileOverview Seamless 1-on-1 chat experience with integrated call logs and AI starters.
+ */
 export default function ChatDetailPage() {
   const { id: targetUserId } = useParams();
   const id = targetUserId as string;
@@ -36,10 +39,12 @@ export default function ChatDetailPage() {
   }, [db, id]);
   const { data: profile } = useDoc(targetUserRef);
 
+  // Initialize or fetch conversation metadata
   useEffect(() => {
     if (!db || !currentUser || !id) return;
 
     const findConversation = async () => {
+      // Look for a chatRoom where both users are participants
       const q = query(
         collection(db, 'chatRooms'),
         where('participantIds', 'array-contains', currentUser.uid)
@@ -62,6 +67,7 @@ export default function ChatDetailPage() {
       });
 
       if (!found) {
+        // Create new chat room if one doesn't exist
         const newChatId = [currentUser.uid, id].sort().join('_');
         const chatRef = doc(db, 'chatRooms', newChatId);
         setDocumentNonBlocking(chatRef, {
@@ -96,8 +102,8 @@ export default function ChatDetailPage() {
     if (!db || !chatId || !currentUser?.uid) return null;
     return query(
       collection(db, 'calls'),
-      where('chatRoomId', '==', chatId),
       where('participantIds', 'array-contains', currentUser.uid),
+      where('chatRoomId', '==', chatId),
       limit(50)
     );
   }, [db, chatId, currentUser?.uid]);
@@ -118,6 +124,7 @@ export default function ChatDetailPage() {
   const handleSendMessage = async () => {
     if (!input.trim() || !chatId || !currentUser || !db) return;
     
+    // Revenue logic: Men pay 15 coins per message to Official users or Female users
     const isSenderPrivileged = currentUserProfile?.isAdmin || currentUserProfile?.isCoinSeller || currentUserProfile?.isSupport;
     const isRecipientPrivileged = profile?.isAdmin || profile?.isCoinSeller || profile?.isSupport;
     
