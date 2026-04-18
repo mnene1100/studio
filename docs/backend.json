@@ -1,4 +1,3 @@
-
 {
   "entities": {
     "UserProfile": {
@@ -107,6 +106,12 @@
         "updatedAt": {
           "type": "string",
           "format": "date-time"
+        },
+        "unreadCounts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
         }
       },
       "required": [

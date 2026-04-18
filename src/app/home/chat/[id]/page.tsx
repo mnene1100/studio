@@ -51,6 +51,13 @@ export default function ChatDetailPage() {
         if (data.participantIds.includes(id)) {
           setChatId(doc.id);
           found = true;
+          
+          // Clear unread count when entering chat
+          if (data.unreadCounts?.[currentUser.uid] > 0) {
+            updateDocumentNonBlocking(doc.ref, {
+              [`unreadCounts.${currentUser.uid}`]: 0
+            });
+          }
         }
       });
 
@@ -62,7 +69,11 @@ export default function ChatDetailPage() {
           type: 'private',
           participantIds: [currentUser.uid, id],
           createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date().toISOString(),
+          unreadCounts: {
+            [currentUser.uid]: 0,
+            [id]: 0
+          }
         }, { merge: true });
         setChatId(newChatId);
       }
@@ -83,7 +94,6 @@ export default function ChatDetailPage() {
 
   const callsQuery = useMemoFirebase(() => {
     if (!db || !chatId || !currentUser?.uid) return null;
-    // Security Fix: Must filter by participantIds to satisfy security rules for 'list'
     return query(
       collection(db, 'calls'),
       where('chatRoomId', '==', chatId),
@@ -160,7 +170,8 @@ export default function ChatDetailPage() {
       updatedAt: now,
       lastMessageSentAt: now,
       lastMessageContent: messageContent,
-      hiddenBy: {}
+      hiddenBy: {},
+      [`unreadCounts.${id}`]: increment(1)
     });
 
     setInput('');

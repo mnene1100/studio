@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useRef } from 'react';
@@ -38,6 +37,7 @@ function ChatListItem({ chat }: { chat: any }) {
 
   const lastMessageTime = chat.lastMessageSentAt || chat.updatedAt;
   const lastMessagePreview = chat.lastMessageContent || "Start a conversation...";
+  const unreadCount = user ? (chat.unreadCounts?.[user.uid] || 0) : 0;
 
   const handleLongPressStart = () => {
     longPressTimer.current = setTimeout(() => {
@@ -98,6 +98,11 @@ function ChatListItem({ chat }: { chat: any }) {
             <p className="text-[11px] text-muted-foreground line-clamp-1 font-medium italic">
               {lastMessagePreview}
             </p>
+            {unreadCount > 0 && (
+              <div className="ml-2 bg-primary text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-lg shadow-primary/20">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </div>
+            )}
           </div>
         </div>
       </Link>
