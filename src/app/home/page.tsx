@@ -7,7 +7,6 @@ import { differenceInYears } from 'date-fns';
 import { useHomeData } from './layout';
 import { cn } from '@/lib/utils';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export default function HomePage() {
   const router = useRouter();
@@ -18,25 +17,8 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen pb-32 bg-background">
-      {/* Header with user profile and quick links */}
+      {/* Header with quick links */}
       <div className="bg-[#c3483c] safe-top px-5 pb-8 pt-12">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-3">
-             <Avatar 
-                className="w-10 h-10 border-2 border-white/20 shadow-lg cursor-pointer active:scale-95 transition-all"
-                onClick={() => router.push('/home/me')}
-             >
-                <AvatarImage src={profile?.profilePictureUrl} className="object-cover" />
-                <AvatarFallback className="bg-white/10 text-white font-black text-xs">
-                  {profile?.displayName?.substring(0, 2).toUpperCase()}
-                </AvatarFallback>
-             </Avatar>
-             <div className="flex flex-col">
-                <h2 className="text-sm font-black text-white tracking-tight uppercase tracking-widest">{profile?.displayName || 'User'}</h2>
-             </div>
-          </div>
-        </div>
-
         <div className="grid grid-cols-2 gap-4">
           {/* Mystery Note */}
           <div 
