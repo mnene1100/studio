@@ -1,9 +1,3 @@
-
 {
-  "crons": [
-    {
-      "path": "/api/cron/verify-payments",
-      "schedule": "*/10 * * * *"
-    }
-  ]
+  "comment": "This file is no longer used for Vercel deployment."
 }
