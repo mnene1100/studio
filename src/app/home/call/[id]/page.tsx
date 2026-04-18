@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
@@ -20,6 +19,7 @@ export default function CallPage() {
   const { id: targetUserId } = useParams();
   const searchParams = useSearchParams();
   const callType = searchParams.get('type') || 'video';
+  const existingCallId = searchParams.get('callId');
   const router = useRouter();
   const db = useFirestore();
   const { user: currentUser } = useUser();
@@ -34,10 +34,11 @@ export default function CallPage() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState('Calling...');
+  const [isCaller, setIsCaller] = useState(!existingCallId);
 
   const localVideoRef = useRef<HTMLDivElement>(null);
   const agoraClientRef = useRef<any>(null);
-  const callIdRef = useRef<string | null>(null);
+  const callIdRef = useRef<string | null>(existingCallId);
   const startTimeRef = useRef<number | null>(null);
   const initializationStartedRef = useRef(false);
   const billingIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -55,7 +56,7 @@ export default function CallPage() {
 
   const handleEndCall = (finalStatus?: string) => {
     const isConnected = isConnectedRef.current;
-    const status = finalStatus || (isConnected ? 'ended' : 'cancelled');
+    const status = finalStatus || (isConnected ? 'ended' : (isCaller ? 'cancelled' : 'missed'));
     const endTime = Date.now();
     let durationSeconds = 0;
     
@@ -77,18 +78,20 @@ export default function CallPage() {
       if (status === 'rejected') previewText = "[Rejected]";
       else if (status === 'cancelled') previewText = "[Cancelled]";
       else if (status === 'missed') previewText = "[Missed]";
-      else {
+      else if (status === 'ended' || isConnected) {
         const mins = Math.floor(durationSeconds / 60);
         const secs = durationSeconds % 60;
         previewText = `[${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}]`;
       }
 
-      updateDocumentNonBlocking(chatRef, {
-        updatedAt: new Date(endTime).toISOString(),
-        lastMessageSentAt: new Date(endTime).toISOString(),
-        lastMessageContent: previewText,
-        hiddenBy: {}
-      });
+      if (previewText) {
+        updateDocumentNonBlocking(chatRef, {
+          updatedAt: new Date(endTime).toISOString(),
+          lastMessageSentAt: new Date(endTime).toISOString(),
+          lastMessageContent: previewText,
+          hiddenBy: {}
+        });
+      }
     }
     router.back();
   };
@@ -98,13 +101,17 @@ export default function CallPage() {
     
     const unsubscribe = onSnapshot(doc(db, 'calls', callIdRef.current), (snapshot) => {
       const data = snapshot.data();
-      if (data?.status === 'rejected') {
+      if (!data) return;
+
+      if (data.status === 'rejected') {
         toast({
           variant: "destructive",
           title: "Call Rejected",
           description: "The other user declined the call.",
         });
         handleEndCall('rejected');
+      } else if (data.status === 'ended') {
+        handleEndCall('ended');
       }
     });
 
@@ -120,7 +127,8 @@ export default function CallPage() {
       setStatusMessage('Connected');
     }
 
-    if (!isCallConnected || !currentUser || !db || billingIntervalRef.current) return;
+    // Only the CALLER gets billed
+    if (!isCaller || !isCallConnected || !currentUser || !db || billingIntervalRef.current) return;
 
     const costPerMin = callType === 'video' ? 160 : 80;
     
@@ -189,7 +197,7 @@ export default function CallPage() {
         billingIntervalRef.current = null;
       }
     };
-  }, [remoteUsers.length, currentUser?.uid, db, callType]);
+  }, [remoteUsers.length, currentUser?.uid, db, callType, isCaller]);
 
   useEffect(() => {
     if (initializationStartedRef.current || !currentUser || !targetUserId || !db || !currentUserProfile) return;
@@ -199,18 +207,21 @@ export default function CallPage() {
       if (typeof window === 'undefined') return;
 
       try {
-        const costPerMin = callType === 'video' ? 160 : 80;
-        const currentBalance = currentUserProfile?.balance ?? 0;
-        const isPrivileged = currentUserProfile?.isAdmin || currentUserProfile?.isCoinSeller || currentUserProfile?.isSupport;
+        // Validation: Receiver doesn't need balance to join, only caller
+        if (isCaller) {
+          const costPerMin = callType === 'video' ? 160 : 80;
+          const currentBalance = currentUserProfile?.balance ?? 0;
+          const isPrivileged = currentUserProfile?.isAdmin || currentUserProfile?.isCoinSeller || currentUserProfile?.isSupport;
 
-        if (!isPrivileged && currentBalance < costPerMin) {
-          toast({
-            variant: 'destructive',
-            title: 'Insufficient Balance',
-            description: `You need at least ${costPerMin} coins to start a call.`,
-          });
-          handleEndCall('insufficient_balance');
-          return;
+          if (!isPrivileged && currentBalance < costPerMin) {
+            toast({
+              variant: 'destructive',
+              title: 'Insufficient Balance',
+              description: `You need at least ${costPerMin} coins to start a call.`,
+            });
+            handleEndCall('insufficient_balance');
+            return;
+          }
         }
 
         const appId = process.env.NEXT_PUBLIC_AGORA_APP_ID;
@@ -235,6 +246,7 @@ export default function CallPage() {
           setRemoteUsers((prev) => prev.filter((u) => u.uid !== user.uid));
         });
 
+        // Consistent Channel Name
         const channelName = [currentUser.uid, targetUserId].sort().join('_');
         
         try {
@@ -257,30 +269,32 @@ export default function CallPage() {
 
         await agoraClientRef.current.join(appId, channelName, result.token, currentUser.uid);
 
-        const now = new Date().toISOString();
-        const callId = `${currentUser.uid}_${targetUserId}_${Date.now()}`;
-        callIdRef.current = callId;
+        if (isCaller) {
+          const now = new Date().toISOString();
+          const callId = `${currentUser.uid}_${targetUserId}_${Date.now()}`;
+          callIdRef.current = callId;
 
-        setDocumentNonBlocking(doc(db, 'calls', callId), {
-          id: callId,
-          callerId: currentUser.uid,
-          participantIds: [currentUser.uid, targetUserId],
-          chatRoomId: channelName,
-          type: callType,
-          startTime: now,
-          status: 'ongoing'
-        }, { merge: true });
+          setDocumentNonBlocking(doc(db, 'calls', callId), {
+            id: callId,
+            callerId: currentUser.uid,
+            participantIds: [currentUser.uid, targetUserId],
+            chatRoomId: channelName,
+            type: callType,
+            startTime: now,
+            status: 'ongoing'
+          }, { merge: true });
 
-        const chatRef = doc(db, 'chatRooms', channelName);
-        setDocumentNonBlocking(chatRef, {
-          id: channelName,
-          type: 'private',
-          participantIds: [currentUser.uid, targetUserId as string],
-          updatedAt: now,
-          lastMessageSentAt: now,
-          lastMessageContent: "[Calling...]",
-          hiddenBy: {}
-        }, { merge: true });
+          const chatRef = doc(db, 'chatRooms', channelName);
+          setDocumentNonBlocking(chatRef, {
+            id: channelName,
+            type: 'private',
+            participantIds: [currentUser.uid, targetUserId as string],
+            updatedAt: now,
+            lastMessageSentAt: now,
+            lastMessageContent: "[Calling...]",
+            hiddenBy: {}
+          }, { merge: true });
+        }
 
         const tracks = [];
         if (localAudioTrackRef.current) {
@@ -326,7 +340,7 @@ export default function CallPage() {
         clearInterval(billingIntervalRef.current);
       }
     };
-  }, [currentUser?.uid, targetUserId, callType, db]);
+  }, [currentUser?.uid, targetUserId, callType, db, isCaller]);
 
   const toggleMic = async () => {
     if (localAudioTrackRef.current) {
@@ -400,7 +414,7 @@ export default function CallPage() {
             <div className="relative">
               <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping opacity-30" />
               <div className="absolute inset-0 bg-primary/10 rounded-full animate-pulse blur-3xl" />
-              <Avatar className="w-40 h-40 border-none shadow-[0_0_80px_rgba(40,180,164,0.3)] relative z-10 rounded-full overflow-hidden">
+              <Avatar className="w-40 h-40 border-none shadow-[0_0_80px_rgba(195,72,60,0.3)] relative z-10 rounded-full overflow-hidden">
                 <AvatarImage src={targetProfile?.profilePictureUrl} className="object-cover rounded-full" />
                 <AvatarFallback className="bg-primary/10 text-primary text-4xl font-black rounded-full">{initials}</AvatarFallback>
               </Avatar>

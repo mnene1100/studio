@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, createContext, useContext, useState, useRef, useCallback } from 'react';
@@ -6,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Navigation } from "@/components/navigation";
 import { useUser, useFirestore, useDoc, useMemoFirebase, setDocumentNonBlocking } from '@/firebase';
 import { doc, collection, query, limit, getDocs, where } from 'firebase/firestore';
+import { IncomingCallOverlay } from '@/components/IncomingCallOverlay';
 
 interface HomeDataContextType {
   profile: any;
@@ -40,14 +40,12 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   const { data: profile, isLoading: isProfileLoading } = useDoc(profileRef);
 
   const fetchDiscovery = useCallback(async (silent = false) => {
-    // Only fetch if we have a profile and its gender
     if (!db || !user?.uid || !profile?.gender) {
       return;
     }
     
     if (!silent) setIsDiscoveryLoading(true);
     try {
-      // Logic: Male sees Female, Female sees Male
       const oppositeGender = profile.gender === 'Male' ? 'Female' : 'Male';
       
       const q = query(
@@ -60,12 +58,10 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
       const docs = snapshot.docs
         .map(doc => ({ ...doc.data(), id: doc.id }))
         .filter((u: any) => {
-          // STRICT FILTERING: Hide self and ALL official/privileged accounts from home grid
           const isOfficial = u.isAdmin || u.isCoinSeller || u.isSupport;
           return u.id !== user.uid && !isOfficial;
         })
         .sort((a: any, b: any) => {
-          // Sort by last activity in memory
           const timeA = new Date(a.lastOnlineAt || 0).getTime();
           const timeB = new Date(b.lastOnlineAt || 0).getTime();
           return timeB - timeA;
@@ -91,7 +87,6 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
     return () => clearInterval(interval);
   }, [db, user?.uid]);
 
-  // Trigger fetch when profile and gender are loaded
   useEffect(() => {
     if (user?.uid && profile?.gender && !initialDiscoveryFetchedRef.current && db) {
       initialDiscoveryFetchedRef.current = true;
@@ -126,6 +121,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
       refreshDiscovery: () => fetchDiscovery(false) 
     }}>
       <div className="min-h-screen bg-background relative">
+        <IncomingCallOverlay />
         <main className="max-w-md mx-auto min-h-screen pb-safe">
           {children}
         </main>
