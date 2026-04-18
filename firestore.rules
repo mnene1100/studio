@@ -42,9 +42,9 @@ service cloud.firestore {
     }
 
     match /transactions/{transId} {
-      // Users can see their own history, but only the system (Admin/Server/Cron) can write
+      // Users can see their own history, but only the system can write final status
       allow read: if request.auth != null && request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null; // Initial pending state
+      allow create: if request.auth != null; 
       allow update, delete: if false; 
     }
   }
